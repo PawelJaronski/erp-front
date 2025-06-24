@@ -1,3 +1,10 @@
+import SimpleExpenseForm from "@/components/SimpleExpenseForm";
+
 export default function Home() {
-  return <div>Hello World - ERP Front is Live</div>;
+  return (
+    <main>
+      <h1>ERP App</h1>
+      <SimpleExpenseForm />
+    </main>
+  );
 }
