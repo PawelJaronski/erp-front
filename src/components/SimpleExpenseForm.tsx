@@ -20,7 +20,7 @@ export default function SimpleExpenseForm() {
             business_timestamp: businessDate,
         }
         try {
-            const response = await fetch("http://srv10.mikr.us:30162/add-transaction", {
+            const response = await fetch("https://erp.jaronski.pl/add-transaction", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
