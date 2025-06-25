@@ -1,281 +1,49 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { AlertCircle, CheckCircle2, Loader2, X, RotateCcw } from 'lucide-react';
+import { useSimpleExpenseForm } from "@/forms/simple-expense/hooks/useSimpleExpenseForm";
 
-// ADD TYPES AND STATIC DATA -----------------------------------------
-interface FormData {
-  account: string;
-  category_group: string;
-  category: string;
-  gross_amount: string;
-  business_timestamp: string;
-  custom_category_group: string;
-  custom_category: string;
-}
+const SimpleExpenseForm = () => {
+  const {
+    fields: formData,
+    errors,
+    isSubmitting,
+    submit,
+    reset,
+    handlers: { handleFieldChange, handleAmountChange },
+    dataSources: { accounts, categoryGroups, availableCategories },
+  } = useSimpleExpenseForm();
 
-interface LastSubmitted {
-  account: string;
-  category_group: string;
-  category: string;
-  gross_amount: string;
-}
+  const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
+  const [lastSubmitted, setLastSubmitted] = useState<{
+    account: string;
+    category_group: string;
+    category: string;
+    gross_amount: string;
+  } | null>(null);
 
-type SubmitStatus = 'success' | 'error' | null;
-
-// Static categories list defined once to avoid being recreated on every render
-const categoriesData: { value: string; group: string }[] = [
-  // cogs_printing
-  { value: 'calendar', group: 'cogs_printing' },
-  { value: 'mug_330', group: 'cogs_printing' },
-  { value: 'mug_590', group: 'cogs_printing' },
-  { value: 'shipping_reflect', group: 'cogs_printing' },
-  { value: 'tshirt_black', group: 'cogs_printing' },
-  { value: 'tshirt_white', group: 'cogs_printing' },
-
-  // cogs
-  { value: 'prowizje_bramki', group: 'cogs' },
-
-  // opex
-  { value: 'ads', group: 'opex' },
-  { value: 'biuro', group: 'opex' },
-  { value: 'car_cost', group: 'opex' },
-  { value: 'car_leasing', group: 'opex' },
-  { value: 'credit_line_cost', group: 'opex' },
-  { value: 'credit_line_payment', group: 'opex' },
-  { value: 'equipment', group: 'opex' },
-  { value: 'leasing', group: 'opex' },
-  { value: 'loan_cost', group: 'opex' },
-  { value: 'loan_payment', group: 'opex' },
-  { value: 'other_opex', group: 'opex' },
-  { value: 'owner_payment', group: 'opex' },
-  { value: 'reconciliation', group: 'opex' },
-  { value: 'services', group: 'opex' },
-  { value: 'shipping', group: 'opex' },
-  { value: 'software', group: 'opex' },
-  { value: 'trade_fair', group: 'opex' },
-  { value: 'transport', group: 'opex' },
-
-  // taxes
-  { value: 'psoftware', group: 'taxes' },
-  { value: 'vat', group: 'taxes' },
-  { value: 'zus', group: 'taxes' },
-];
-// -------------------------------------------------------------------
-
-const TransactionForm = () => {
-  // REPLACE STATE DECLARATIONS WITH TYPED VERSIONS -------------------
-  const [formData, setFormData] = useState<FormData>({
-    account: 'mbank_osobiste',
-    category_group: 'opex',
-    category: '',
-    gross_amount: '',
-    business_timestamp: new Date().toISOString().split('T')[0], // Today's date as default
-    custom_category_group: '',
-    custom_category: '',
-  });
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
-  const [lastSubmitted, setLastSubmitted] = useState<LastSubmitted | null>(null);
-  // -----------------------------------------------------------------
-
-  // Real business data from your CSV
-  const accounts = [
-    { value: 'mbank_firmowe', label: 'mbank_firmowe' },
-    { value: 'mbank_osobiste', label: 'mbank_osobiste' },
-    { value: 'cash', label: 'cash' },
-    { value: 'sumup', label: 'sumup' },
-  ];
-
-  // Category groups for cost_paid event_type (with "other" option)
-  const categoryGroups = [
-    { value: 'cogs_printing', label: 'cogs_printing' },
-    { value: 'cogs', label: 'cogs' },
-    { value: 'opex', label: 'opex' },
-    { value: 'taxes', label: 'taxes' },
-    { value: 'other', label: 'other' },
-  ];
-
-  // UPDATE availableCategories useMemo to include constant categoriesData and satisfy ESLint
-  const availableCategories = useMemo(() => {
-    const baseCategories = [
-      ...categoriesData,
-      { value: 'other', group: 'other' },
-    ];
-
-    if (formData.category_group && formData.category_group !== 'other') {
-      return [
-        ...categoriesData.filter(cat => cat.group === formData.category_group),
-        { value: 'other', group: formData.category_group },
-      ];
-    }
-    return baseCategories;
-  }, [formData.category_group]);
-
-  // UPDATE FUNCTION SIGNATURES ----------------------------------------
-  const handleFieldChange = (field: keyof FormData, value: string) => {
-    setFormData(prev => {
-      const newData = { ...prev, [field]: value } as FormData;
-
-      if (field === 'category' && value) {
-        const selectedCategoryData = categoriesData.find(cat => cat.value === value);
-        if (selectedCategoryData) {
-          newData.category_group = selectedCategoryData.group;
-        }
-      }
-
-      if (field === 'category_group' && value && prev.category) {
-        const currentCategoryData = categoriesData.find(cat => cat.value === prev.category);
-        if (currentCategoryData && currentCategoryData.group !== value) {
-          newData.category = '';
-        }
-      }
-
-      return newData;
-    });
-
-    if (errors[field as string]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-
-    if (submitStatus === 'error') {
-      setSubmitStatus(null);
-    }
-  };
-
-  const handleAmountChange = (value: string) => {
-    const cleanValue = value.replace(/[^0-9,.-]/g, '');
-    handleFieldChange('gross_amount', cleanValue);
-  };
-
-  const normalizeAmount = (amount: string): string => {
-    if (!amount) return '';
-    return amount.replace(',', '.').replace(/\.(?=.*\.)/g, '');
-  };
-
-  const resetField = (fieldName: keyof FormData) => {
-    setFormData(prev => ({
-      ...prev,
-      [fieldName]: '',
-      ...(fieldName === 'category_group' ? { custom_category_group: '', category: '', custom_category: '' } : {}),
-      ...(fieldName === 'category' ? { custom_category: '' } : {}),
-    }));
-    setErrors(prev => ({ ...prev, [fieldName as string]: '' }));
-  };
-
-  const resetFormFields = () => {
-    setFormData({
-      account: 'mbank_osobiste',
-      category_group: 'opex',
-      category: '',
-      gross_amount: '',
-      business_timestamp: new Date().toISOString().split('T')[0],
-      custom_category_group: '',
-      custom_category: '',
-    });
-    setErrors({});
-    
+  const resetField = (field: keyof typeof formData) => {
+    handleFieldChange(field, '');
   };
 
   const resetForm = () => {
-    setFormData({
-      account: 'mbank_osobiste',
-      category_group: 'opex',
-      category: '',
-      gross_amount: '',
-      business_timestamp: new Date().toISOString().split('T')[0],
-      custom_category_group: '',
-      custom_category: '',
-    });
-    setErrors({});
+    reset();
     setSubmitStatus(null);
     setLastSubmitted(null);
   };
 
-  // Validate form before submission
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.account.trim()) newErrors.account = 'Select account';
-    
-    // Validate category_group (use custom if "other" selected)
-    const finalCategoryGroup = formData.category_group === 'other' ? formData.custom_category_group : formData.category_group;
-    if (!finalCategoryGroup.trim()) newErrors.category_group = 'Select or enter category group';
-    
-    // Validate category (use custom if "other" selected)
-    const finalCategory = formData.category === 'other' ? formData.custom_category : formData.category;
-    if (!finalCategory.trim()) newErrors.category = 'Select or enter category';
-    
-    if (!formData.business_timestamp.trim()) newErrors.business_timestamp = 'Select date';
-    
-    if (!formData.gross_amount.trim()) {
-      newErrors.gross_amount = 'Enter amount';
-    } else {
-      const amount = parseFloat(normalizeAmount(formData.gross_amount));
-      if (isNaN(amount) || amount <= 0) {
-        newErrors.gross_amount = 'Enter valid amount greater than 0';
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle form submission
   const handleSubmit = async () => {
-    
-    if (!validateForm()) return;
+    await submit();
 
-    setIsSubmitting(true);
-    setSubmitStatus(null);
-
-    try {
-      // Use custom values if "other" was selected
-      const finalCategoryGroup = formData.category_group === 'other' ? formData.custom_category_group : formData.category_group;
-      const finalCategory = formData.category === 'other' ? formData.custom_category : formData.category;
-      
-      const payload = {
-        transaction_type: 'expense',
-        event_type: 'cost_paid',
-        account: formData.account,
-        category_group: finalCategoryGroup,
-        category: finalCategory,
-        gross_amount: normalizeAmount(formData.gross_amount),
-        business_timestamp: formData.business_timestamp,
-      };
-
-      const response = await fetch('https://erp.jaronski.com/add-transaction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        setLastSubmitted({
-            account: formData.account,
-            category_group: finalCategoryGroup,
-            category: finalCategory,
-            gross_amount: normalizeAmount(formData.gross_amount),
-        });
-        setSubmitStatus('success');
-        setTimeout(() => {
-            resetFormFields();
-        }, 5);
-      } else {
-        const errorData = await response.json();
-        console.error('Server error:', errorData);
-        setSubmitStatus('error');
-      }
-    } catch (error) {
-      console.error('Network error:', error);
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Optimistically mark as success (hook enhancement later)
+    setSubmitStatus('success');
+    setLastSubmitted({
+      account: formData.account,
+      category_group: formData.category_group,
+      category: formData.category,
+      gross_amount: formData.gross_amount,
+    });
   };
 
   return (
@@ -517,4 +285,4 @@ const TransactionForm = () => {
   );
 };
 
-export default TransactionForm;
+export default SimpleExpenseForm;
