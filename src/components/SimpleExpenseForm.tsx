@@ -3,9 +3,69 @@
 import React, { useState, useMemo } from 'react';
 import { AlertCircle, CheckCircle2, Loader2, X, RotateCcw } from 'lucide-react';
 
+// ADD TYPES AND STATIC DATA -----------------------------------------
+interface FormData {
+  account: string;
+  category_group: string;
+  category: string;
+  gross_amount: string;
+  business_timestamp: string;
+  custom_category_group: string;
+  custom_category: string;
+}
+
+interface LastSubmitted {
+  account: string;
+  category_group: string;
+  category: string;
+  gross_amount: string;
+}
+
+type SubmitStatus = 'success' | 'error' | null;
+
+// Static categories list defined once to avoid being recreated on every render
+const categoriesData: { value: string; group: string }[] = [
+  // cogs_printing
+  { value: 'calendar', group: 'cogs_printing' },
+  { value: 'mug_330', group: 'cogs_printing' },
+  { value: 'mug_590', group: 'cogs_printing' },
+  { value: 'shipping_reflect', group: 'cogs_printing' },
+  { value: 'tshirt_black', group: 'cogs_printing' },
+  { value: 'tshirt_white', group: 'cogs_printing' },
+
+  // cogs
+  { value: 'prowizje_bramki', group: 'cogs' },
+
+  // opex
+  { value: 'ads', group: 'opex' },
+  { value: 'biuro', group: 'opex' },
+  { value: 'car_cost', group: 'opex' },
+  { value: 'car_leasing', group: 'opex' },
+  { value: 'credit_line_cost', group: 'opex' },
+  { value: 'credit_line_payment', group: 'opex' },
+  { value: 'equipment', group: 'opex' },
+  { value: 'leasing', group: 'opex' },
+  { value: 'loan_cost', group: 'opex' },
+  { value: 'loan_payment', group: 'opex' },
+  { value: 'other_opex', group: 'opex' },
+  { value: 'owner_payment', group: 'opex' },
+  { value: 'reconciliation', group: 'opex' },
+  { value: 'services', group: 'opex' },
+  { value: 'shipping', group: 'opex' },
+  { value: 'software', group: 'opex' },
+  { value: 'trade_fair', group: 'opex' },
+  { value: 'transport', group: 'opex' },
+
+  // taxes
+  { value: 'psoftware', group: 'taxes' },
+  { value: 'vat', group: 'taxes' },
+  { value: 'zus', group: 'taxes' },
+];
+// -------------------------------------------------------------------
 
 const TransactionForm = () => {
-  const [formData, setFormData] = useState({
+  // REPLACE STATE DECLARATIONS WITH TYPED VERSIONS -------------------
+  const [formData, setFormData] = useState<FormData>({
     account: '',
     category_group: '',
     category: '',
@@ -15,10 +75,11 @@ const TransactionForm = () => {
     custom_category: '',
   });
 
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
-  const [lastSubmitted, setLastSubmitted] = useState(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>(null);
+  const [lastSubmitted, setLastSubmitted] = useState<LastSubmitted | null>(null);
+  // -----------------------------------------------------------------
 
   // Real business data from your CSV
   const accounts = [
@@ -37,118 +98,71 @@ const TransactionForm = () => {
     { value: 'other', label: 'other' },
   ];
 
-  // Owin categoriesData w useMemo
-  const categoriesData = useMemo(() => [
-    // cogs_printing
-    { value: 'calendar', group: 'cogs_printing' },
-    { value: 'mug_330', group: 'cogs_printing' },
-    { value: 'mug_590', group: 'cogs_printing' },
-    { value: 'shipping_reflect', group: 'cogs_printing' },
-    { value: 'tshirt_black', group: 'cogs_printing' },
-    { value: 'tshirt_white', group: 'cogs_printing' },
-    
-    // cogs
-    { value: 'prowizje_bramki', group: 'cogs' },
-    
-    // opex
-    { value: 'ads', group: 'opex' },
-    { value: 'biuro', group: 'opex' },
-    { value: 'car_cost', group: 'opex' },
-    { value: 'car_leasing', group: 'opex' },
-    { value: 'credit_line_cost', group: 'opex' },
-    { value: 'credit_line_payment', group: 'opex' },
-    { value: 'equipment', group: 'opex' },
-    { value: 'leasing', group: 'opex' },
-    { value: 'loan_cost', group: 'opex' },
-    { value: 'loan_payment', group: 'opex' },
-    { value: 'other_opex', group: 'opex' },
-    { value: 'owner_payment', group: 'opex' },
-    { value: 'reconciliation', group: 'opex' },
-    { value: 'services', group: 'opex' },
-    { value: 'shipping', group: 'opex' },
-    { value: 'software', group: 'opex' },
-    { value: 'trade_fair', group: 'opex' },
-    { value: 'transport', group: 'opex' },
-    
-    // taxes
-    { value: 'psoftware', group: 'taxes' },
-    { value: 'vat', group: 'taxes' },
-    { value: 'zus', group: 'taxes' },
-  ], []); // Pusta dependency array bo dane są statyczne
-
-  // Logic for filtering categories based on selected group
+  // UPDATE availableCategories useMemo to include constant categoriesData and satisfy ESLint
   const availableCategories = useMemo(() => {
-    const baseCategoriesData = [...categoriesData];
-    
-    // Add "other" option to all categories
-    baseCategoriesData.push({ value: 'other', group: 'other' });
-    
-    if (formData.category_group && formData.category_group !== 'other') {
-      // Filter categories by selected group + add "other"
-      const filtered = baseCategoriesData.filter(cat => cat.group === formData.category_group);
-      filtered.push({ value: 'other', group: formData.category_group });
-      return filtered;
-    }
-    // Show all categories if no group selected or "other" group selected
-    return baseCategoriesData;
-  }, [formData.category_group, categoriesData]);
+    const baseCategories = [
+      ...categoriesData,
+      { value: 'other', group: 'other' },
+    ];
 
-  // Handle form field changes
-  const handleFieldChange = (field: string, value: string) => {
+    if (formData.category_group && formData.category_group !== 'other') {
+      return [
+        ...categoriesData.filter(cat => cat.group === formData.category_group),
+        { value: 'other', group: formData.category_group },
+      ];
+    }
+    return baseCategories;
+  }, [formData.category_group]);
+
+  // UPDATE FUNCTION SIGNATURES ----------------------------------------
+  const handleFieldChange = (field: keyof FormData, value: string) => {
     setFormData(prev => {
-      const newData = { ...prev, [field]: value };
-      
-      // When category is selected, auto-set the category_group
+      const newData = { ...prev, [field]: value } as FormData;
+
       if (field === 'category' && value) {
         const selectedCategoryData = categoriesData.find(cat => cat.value === value);
         if (selectedCategoryData) {
           newData.category_group = selectedCategoryData.group;
         }
       }
-      
-      // When category_group is changed manually, clear category if it doesn't match
+
       if (field === 'category_group' && value && prev.category) {
         const currentCategoryData = categoriesData.find(cat => cat.value === prev.category);
         if (currentCategoryData && currentCategoryData.group !== value) {
           newData.category = '';
         }
       }
-      
+
       return newData;
     });
 
-    // Clear error when user starts typing
-    if (errors[field]) {
+    if (errors[field as string]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
 
-    // Clear general errors
     if (submitStatus === 'error') {
       setSubmitStatus(null);
     }
   };
 
-  // Handle Polish decimal formatting (any format to dot conversion)
   const handleAmountChange = (value: string) => {
     const cleanValue = value.replace(/[^0-9,.-]/g, '');
     handleFieldChange('gross_amount', cleanValue);
   };
 
-  // Normalize amount format (convert any decimal separator to dot)
   const normalizeAmount = (amount: string): string => {
     if (!amount) return '';
     return amount.replace(',', '.').replace(/\.(?=.*\.)/g, '');
   };
 
-  // Reset functions
-  const resetField = (fieldName: string) => {
-    setFormData(prev => ({ 
-      ...prev, 
+  const resetField = (fieldName: keyof FormData) => {
+    setFormData(prev => ({
+      ...prev,
       [fieldName]: '',
       ...(fieldName === 'category_group' ? { custom_category_group: '', category: '', custom_category: '' } : {}),
-      ...(fieldName === 'category' ? { custom_category: '' } : {})
+      ...(fieldName === 'category' ? { custom_category: '' } : {}),
     }));
-    setErrors(prev => ({ ...prev, [fieldName]: '' }));
+    setErrors(prev => ({ ...prev, [fieldName as string]: '' }));
   };
 
   const resetFormFields = () => {
@@ -458,7 +472,10 @@ const TransactionForm = () => {
                 value={formData.business_timestamp}
                 onChange={(e) => handleFieldChange('business_timestamp', e.target.value)}
                 max={new Date().toISOString().split('T')[0]}
-                onDoubleClick={(e) => e.target.showPicker && e.target.showPicker()}
+                onDoubleClick={(e) => {
+                  const input = e.target as HTMLInputElement & { showPicker?: () => void };
+                  input.showPicker?.();
+                }}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer ${
                   errors.business_timestamp ? 'border-red-300 bg-red-50' : 'border-gray-300'
                 }`}
