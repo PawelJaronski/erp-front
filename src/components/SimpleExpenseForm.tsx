@@ -66,8 +66,8 @@ const categoriesData: { value: string; group: string }[] = [
 const TransactionForm = () => {
   // REPLACE STATE DECLARATIONS WITH TYPED VERSIONS -------------------
   const [formData, setFormData] = useState<FormData>({
-    account: '',
-    category_group: '',
+    account: 'mbank_osobiste',
+    category_group: 'opex',
     category: '',
     gross_amount: '',
     business_timestamp: new Date().toISOString().split('T')[0], // Today's date as default
@@ -167,8 +167,8 @@ const TransactionForm = () => {
 
   const resetFormFields = () => {
     setFormData({
-      account: '',
-      category_group: '',
+      account: 'mbank_osobiste',
+      category_group: 'opex',
       category: '',
       gross_amount: '',
       business_timestamp: new Date().toISOString().split('T')[0],
@@ -181,8 +181,8 @@ const TransactionForm = () => {
 
   const resetForm = () => {
     setFormData({
-      account: '',
-      category_group: '',
+      account: 'mbank_osobiste',
+      category_group: 'opex',
       category: '',
       gross_amount: '',
       business_timestamp: new Date().toISOString().split('T')[0],
@@ -284,7 +284,7 @@ const TransactionForm = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Add
+            Add Transaction
           </h1>
         </div>
 
