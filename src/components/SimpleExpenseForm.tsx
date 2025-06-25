@@ -196,7 +196,7 @@ const TransactionForm = () => {
 
   // Validate form before submission
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.account.trim()) newErrors.account = 'Select account';
     
