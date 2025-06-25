@@ -284,7 +284,7 @@ const TransactionForm = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Add Transaction
+            Add
           </h1>
         </div>
 
@@ -467,7 +467,7 @@ const TransactionForm = () => {
                 className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
-                Reset Form
+                Reset
               </button>
               <button
                 onClick={handleSubmit}
@@ -480,7 +480,7 @@ const TransactionForm = () => {
                     Adding...
                   </>
                 ) : (
-                  'Add Transaction'
+                  'Add'
                 )}
               </button>
             </div>
