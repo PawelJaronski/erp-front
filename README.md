@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ERP-Front – Simple Expense Module
 
-## Getting Started
+> Next.js 15 · React 19 · TypeScript · Tailwind CSS 4 · Jest
 
-First, run the development server:
+This repository contains the **Simple Expense** form used in the internal ERP system.  
+It allows accounting staff to record expenses while enforcing domain rules such as bidirectional category ↔ group synchronisation and Polish comma-decimal validation.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Key Points
+
+* **App Router** – Next 15 with server components where required.
+* **Hook-driven state** – `useSimpleExpenseForm` handles form state, validation, API calls.
+* **Pure utilities** – amount parsing, validation, payload builder; all unit-tested.
+* **Tailwind CSS** – utility-first styling, no global CSS apart from reset.
+* **Vercel-ready** – production build passes, deployment succeeds.
+
+---
+
+## Project Structure
+
+```text
+src/
+  app/                     # Next.js entry (layout, page)
+  components/
+    SimpleExpenseForm.tsx  # Presentational wrapper
+  forms/
+    simple-expense/
+      hooks/
+        useSimpleExpenseForm.ts
+      utils/
+        amount.ts           # comma-decimal helpers
+        validation.ts       # field validation
+        syncCategory.ts     # bidirectional sync logic
+        payload.ts          # builds POST body
+        staticData.ts       # categories, accounts, groups
+      __tests__/            # Jest unit tests (excluded from prod build)
+  types/
+    transactions.ts         # shared interfaces
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Two **tsconfig** files are used:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| File | Purpose |
+|------|---------|
+| `tsconfig.json` | Production build; test files are **excluded** to keep Vercel compile fast. |
+| `tsconfig.jest.json` | Extends base config; includes Jest types so unit tests type-check. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Local Development
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Install dependencies
+pnpm install         # or npm / yarn
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start dev server (http://localhost:3000)
+pnpm dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Run unit tests (utilities only)
+pnpm test
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployed on **Vercel** using the default Next.js preset. Tests are ignored during `next build`; the production build is therefore unaffected by dev-only dependencies.
+
+---
+
+## API Payload Example
+
+```jsonc
+{
+  "transaction_type": "expense",
+  "event_type": "cost_paid",
+  "account": "mbank_osobiste",
+  "category_group": "opex",
+  "category": "ads",
+  "gross_amount": "123.45",       // normalized by utils/amount.ts
+  "business_timestamp": "2025-06-24"
+}
+```
+
+`utils/payload.ts` is the single source of truth for building this request body.
+
+---
+
+## License
+
+Private internal project – © 2025 Pawel Jaronski.
