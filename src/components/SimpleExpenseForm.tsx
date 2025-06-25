@@ -340,7 +340,7 @@ const TransactionForm = () => {
                   <button
                     type="button"
                     onClick={() => resetField('category_group')}
-                    className="px-3 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-3 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                     title="Clear category group"
                   >
                     <X className="w-4 h-4 text-gray-500" />
@@ -390,7 +390,7 @@ const TransactionForm = () => {
                   <button
                     type="button"
                     onClick={() => resetField('category')}
-                    className="px-3 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="px-3 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
                     title="Clear category"
                   >
                     <X className="w-4 h-4 text-gray-500" />
@@ -464,7 +464,7 @@ const TransactionForm = () => {
               <button
                 onClick={resetForm}
                 type="button"
-                className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2 cursor-pointer"
               >
                 <RotateCcw className="w-4 h-4" />
                 Reset
@@ -472,7 +472,7 @@ const TransactionForm = () => {
               <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
