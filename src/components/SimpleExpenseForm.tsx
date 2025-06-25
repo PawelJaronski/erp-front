@@ -288,32 +288,6 @@ const TransactionForm = () => {
           </h1>
         </div>
 
-        {/* Success/Error Messages */}
-        {submitStatus === 'success' && lastSubmitted && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
-            <div>
-            <p className="text-green-800 font-medium">
-                Transakcja została dodana pomyślnie.
-            </p>
-            <p className="text-sm text-gray-700 mt-1">
-                Kwota: <strong>{lastSubmitted.gross_amount} zł</strong> <br />
-                Kategoria: <strong>{lastSubmitted.category}</strong>{lastSubmitted.category_group ? ` (${lastSubmitted.category_group})` : ''} <br />
-                Konto: <strong>{lastSubmitted.account}</strong>
-            </p>
-            </div>
-        </div>
-        )}
-
-        {submitStatus === 'error' && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-            <p className="text-red-800 font-medium">
-              Error adding transaction. Please try again.
-            </p>
-          </div>
-        )}
-
         {/* Form */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
           <div className="space-y-6">
@@ -512,6 +486,32 @@ const TransactionForm = () => {
             </div>
           </div>
         </div>
+
+        {/* Success/Error Messages */}
+        {submitStatus === 'success' && lastSubmitted && (
+          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+            <div>
+            <p className="text-green-800 font-medium">
+                Transakcja została dodana pomyślnie.
+            </p>
+            <p className="text-sm text-gray-700 mt-1">
+                Kwota: <strong>{lastSubmitted.gross_amount} zł</strong> <br />
+                Kategoria: <strong>{lastSubmitted.category}</strong>{lastSubmitted.category_group ? ` (${lastSubmitted.category_group})` : ''} <br />
+                Konto: <strong>{lastSubmitted.account}</strong>
+            </p>
+            </div>
+        </div>
+        )}
+
+        {submitStatus === 'error' && (
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            <p className="text-red-800 font-medium">
+              Error adding transaction. Please try again.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
