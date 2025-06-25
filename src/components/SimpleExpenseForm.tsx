@@ -37,8 +37,8 @@ const TransactionForm = () => {
     { value: 'other', label: 'other' },
   ];
 
-  // All categories with their groups - from your CSV data
-  const categoriesData = [
+  // Owin categoriesData w useMemo
+  const categoriesData = useMemo(() => [
     // cogs_printing
     { value: 'calendar', group: 'cogs_printing' },
     { value: 'mug_330', group: 'cogs_printing' },
@@ -74,7 +74,7 @@ const TransactionForm = () => {
     { value: 'psoftware', group: 'taxes' },
     { value: 'vat', group: 'taxes' },
     { value: 'zus', group: 'taxes' },
-  ];
+  ], []); // Pusta dependency array bo dane są statyczne
 
   // Logic for filtering categories based on selected group
   const availableCategories = useMemo(() => {
@@ -94,7 +94,7 @@ const TransactionForm = () => {
   }, [formData.category_group, categoriesData]);
 
   // Handle form field changes
-  const handleFieldChange = (field, value) => {
+  const handleFieldChange = (field: string, value: string) => {
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
       
@@ -129,25 +129,22 @@ const TransactionForm = () => {
   };
 
   // Handle Polish decimal formatting (any format to dot conversion)
-  const handleAmountChange = (value) => {
-    // Allow any decimal format - will be normalized before submission
+  const handleAmountChange = (value: string) => {
     const cleanValue = value.replace(/[^0-9,.-]/g, '');
     handleFieldChange('gross_amount', cleanValue);
   };
 
   // Normalize amount format (convert any decimal separator to dot)
-  const normalizeAmount = (amount) => {
+  const normalizeAmount = (amount: string): string => {
     if (!amount) return '';
-    // Replace comma with dot, handle multiple separators
     return amount.replace(',', '.').replace(/\.(?=.*\.)/g, '');
   };
 
   // Reset functions
-  const resetField = (fieldName) => {
+  const resetField = (fieldName: string) => {
     setFormData(prev => ({ 
       ...prev, 
       [fieldName]: '',
-      // Also clear custom fields when resetting main fields
       ...(fieldName === 'category_group' ? { custom_category_group: '', category: '', custom_category: '' } : {}),
       ...(fieldName === 'category' ? { custom_category: '' } : {})
     }));
