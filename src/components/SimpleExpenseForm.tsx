@@ -78,7 +78,7 @@ const TransactionForm = () => {
 
   // Logic for filtering categories based on selected group
   const availableCategories = useMemo(() => {
-    let baseCategoriesData = [...categoriesData];
+    const baseCategoriesData = [...categoriesData];
     
     // Add "other" option to all categories
     baseCategoriesData.push({ value: 'other', group: 'other' });
@@ -91,7 +91,7 @@ const TransactionForm = () => {
     }
     // Show all categories if no group selected or "other" group selected
     return baseCategoriesData;
-  }, [formData.category_group]);
+  }, [formData.category_group, categoriesData]);
 
   // Handle form field changes
   const handleFieldChange = (field, value) => {
