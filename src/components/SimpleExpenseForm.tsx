@@ -102,11 +102,6 @@ const SimpleExpenseForm = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Add Transaction
-          </h1>
-        </div>
 
         {/* Form */}
         
