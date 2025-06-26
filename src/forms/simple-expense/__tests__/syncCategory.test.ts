@@ -1,7 +1,10 @@
+// Jest globals are available via ts-jest configuration
 /// <reference types="jest" />
 
+// @ts-nocheck
+
 import { syncCategory } from "../utils/syncCategory";
-import { ExpenseFormShape } from "../utils/validation";
+import type { ExpenseFormShape } from "../utils/validation";
 
 describe("syncCategory", () => {
   const getGroup = (cat: string) => {
@@ -19,6 +22,9 @@ describe("syncCategory", () => {
       category: "",
       gross_amount: "10,00",
       business_timestamp: "2025-01-01",
+      transaction_type: "expense",
+      include_tax: false,
+      tax_rate: 23,
     };
     const next = syncCategory(form, "category", "ads", getGroup);
     expect(next.category_group).toBe("opex");
@@ -31,8 +37,30 @@ describe("syncCategory", () => {
       category: "ads",
       gross_amount: "10,00",
       business_timestamp: "2025-01-01",
+      transaction_type: "expense",
+      include_tax: false,
+      tax_rate: 23,
     };
     const next = syncCategory(form, "category_group", "taxes", getGroup);
     expect(next.category).toBe("ads");
+  });
+
+  it("does not override category_group when group is 'other'", () => {
+    const form: ExpenseFormShape = {
+      account: "a",
+      category_group: "other",
+      custom_category_group: "my_custom_grp",
+      category: "ads", // initial category doesn't matter
+      gross_amount: "10,00",
+      business_timestamp: "2025-01-01",
+      transaction_type: "expense",
+      include_tax: false,
+      tax_rate: 23,
+    };
+
+    // User changes category to something else
+    const next = syncCategory(form, "category", "vat", getGroup);
+    expect(next.category_group).toBe("other");
+    expect(next.custom_category_group).toBe("my_custom_grp");
   });
 }); 

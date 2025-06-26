@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
-import { AlertCircle, CheckCircle2, Loader2, X, RotateCcw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { AlertCircle, CheckCircle2, Loader2, X, RotateCcw, ChevronDown, Calendar as CalendarIcon } from 'lucide-react';
 import { useSimpleExpenseForm } from "@/forms/simple-expense/hooks/useSimpleExpenseForm";
+import { DayPicker } from 'react-day-picker';
+import { format } from 'date-fns';
 
 const SimpleExpenseForm = () => {
   const {
@@ -46,6 +48,51 @@ const SimpleExpenseForm = () => {
     });
   };
 
+  const DateInput = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
+    const [open, setOpen] = React.useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    useEffect(() => {
+      const handler = (e: MouseEvent) => {
+        if (!ref.current?.contains(e.target as Node)) setOpen(false);
+      };
+      window.addEventListener('mousedown', handler);
+      return () => window.removeEventListener('mousedown', handler);
+    }, []);
+
+    const selected = value ? new Date(value) : undefined;
+
+    return (
+      <div className="relative w-full" ref={ref}>
+        <button
+          type="button"
+          ref={buttonRef}
+          onClick={() => setOpen((o) => !o)}
+          className="w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 text-left flex items-center justify-between"
+        >
+          <span>{selected ? format(selected, 'yyyy-MM-dd') : 'Select date…'}</span>
+          <CalendarIcon className="w-4 h-4 text-gray-500" />
+        </button>
+        {open && (
+          <div className="absolute z-20 mt-2 bg-white border rounded-xl shadow-lg">
+            <DayPicker
+              mode="single"
+              selected={selected}
+              onSelect={(d: Date | undefined) => {
+                if (d) {
+                  onChange(format(d, 'yyyy-MM-dd'));
+                  setOpen(false);
+                }
+              }}
+              fromYear={2000}
+              toYear={2100}
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
       <div className="max-w-2xl mx-auto">
@@ -60,271 +107,244 @@ const SimpleExpenseForm = () => {
         
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
           <div className="space-y-6">
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Transaction Type
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="transaction_type"
-                  value="expense"
-                  checked={formData.transaction_type === "expense"}
-                  onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
-                  className="mr-2"
-                />
-                <span>Expense</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="transaction_type"
-                  value="income"
-                  checked={formData.transaction_type === "income"}
-                  onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
-                  className="mr-2"
-                />
-                <span>Income</span>
-              </label>
-            </div>
-          </div>
-            {/* Account Selection */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                account
-              </label>
-              <select
-                value={formData.account}
-                onChange={(e) => handleFieldChange('account', e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.account ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-              >
-                <option value="">Select account...</option>
-                {accounts.map(account => (
-                  <option key={account.value} value={account.value}>
-                    {account.label}
-                  </option>
-                ))}
-              </select>
-              {errors.account && (
-                <p className="mt-1 text-sm text-red-600">{errors.account}</p>
-              )}
-            </div>
-
-            {/* Category Group Selection (Primary) */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                category_group
-              </label>
-              <div className="flex gap-2">
+            {/* transaction_type + account in one row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  transaction_type
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="transaction_type"
+                      value="expense"
+                      checked={formData.transaction_type === "expense"}
+                      onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                      className="mr-2"
+                    />
+                    <span>expense</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="transaction_type"
+                      value="income"
+                      checked={formData.transaction_type === "income"}
+                      onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                      className="mr-2"
+                    />
+                    <span>income</span>
+                  </label>
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  account
+                </label>
                 <select
-                  value={formData.category_group}
-                  onChange={(e) => handleFieldChange('category_group', e.target.value)}
-                  className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.category_group ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
+                  value={formData.account}
+                  onChange={(e) => handleFieldChange('account', e.target.value)}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.account ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
                 >
-                  <option value="">All groups (show all categories)</option>
-                  {categoryGroups.map(group => (
-                    <option key={group.value} value={group.value}>
-                      {group.label}
+                  <option value="">Select account...</option>
+                  {accounts.map(account => (
+                    <option key={account.value} value={account.value}>
+                      {account.label}
                     </option>
                   ))}
                 </select>
-                {formData.category_group && (
+                {errors.account && (
+                  <p className="mt-1 text-sm text-red-600">{errors.account}</p>
+                )}
+              </div>
+            </div>
+
+            {/* category_group + category in one row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  category_group
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.category_group}
+                    onChange={(e) => handleFieldChange('category_group', e.target.value)}
+                    className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 transition-colors truncate ${errors.category_group ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                  >
+                    <option value="">All groups (show all categories)</option>
+                    {categoryGroups.map(group => (
+                      <option key={group.value} value={group.value}>
+                        {group.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <button
                     type="button"
                     onClick={() => resetField('category_group')}
-                    className="px-3 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    className={`absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors ${formData.category_group ? 'opacity-100 cursor-pointer' : 'opacity-0 pointer-events-none'}`}
                     title="Clear category group"
                   >
                     <X className="w-4 h-4 text-gray-500" />
                   </button>
+                </div>
+                {formData.category_group === 'other' && (
+                  <input
+                    type="text"
+                    value={formData.custom_category_group}
+                    onChange={(e) => handleFieldChange('custom_category_group', e.target.value)}
+                    placeholder="Enter custom category group..."
+                    className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                )}
+                {errors.category_group && (
+                  <p className="mt-1 text-sm text-red-600">{errors.category_group}</p>
                 )}
               </div>
-              
-              {formData.category_group === 'other' && (
-                <input
-                  type="text"
-                  value={formData.custom_category_group}
-                  onChange={(e) => handleFieldChange('custom_category_group', e.target.value)}
-                  placeholder="Enter custom category group..."
-                  className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                />
-              )}
-              
-              {errors.category_group && (
-                <p className="mt-1 text-sm text-red-600">{errors.category_group}</p>
-              )}
-              <p className="mt-1 text-xs text-gray-500">
-                Use to filter categories, or gets auto-set when you select a category
-              </p>
-            </div>
-
-            {/* Category Selection (Secondary) */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                category {formData.category && formData.category !== 'other' && <span className="text-xs text-gray-500">(auto-sets group)</span>}
-              </label>
-              <div className="flex gap-2">
-                <select
-                  value={formData.category}
-                  onChange={(e) => handleFieldChange('category', e.target.value)}
-                  className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.category ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select category...</option>
-                  {availableCategories.map(category => (
-                    <option key={category.value} value={category.value}>
-                      {category.value}
-                    </option>
-                  ))}
-                </select>
-                {formData.category && (
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  category
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.category}
+                    onChange={(e) => handleFieldChange('category', e.target.value)}
+                    className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 transition-colors truncate ${errors.category ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                  >
+                    <option value="">Select category...</option>
+                    {availableCategories.map(category => (
+                      <option key={category.value} value={category.value}>
+                        {category.value}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <button
                     type="button"
                     onClick={() => resetField('category')}
-                    className="px-3 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    className={`absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors ${formData.category ? 'opacity-100 cursor-pointer' : 'opacity-0 pointer-events-none'}`}
                     title="Clear category"
                   >
                     <X className="w-4 h-4 text-gray-500" />
                   </button>
+                </div>
+                {formData.category === 'other' && (
+                  <input
+                    type="text"
+                    value={formData.custom_category}
+                    onChange={(e) => handleFieldChange('custom_category', e.target.value)}
+                    placeholder="Enter custom category..."
+                    className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                )}
+                {errors.category && (
+                  <p className="mt-1 text-sm text-red-600">{errors.category}</p>
                 )}
               </div>
-              
-              {formData.category === 'other' && (
+            </div>
+
+            {/* gross_amount + business_reference in one row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  gross_amount (zł)
+                </label>
                 <input
                   type="text"
-                  value={formData.custom_category}
-                  onChange={(e) => handleFieldChange('custom_category', e.target.value)}
-                  placeholder="Enter custom category..."
-                  className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  value={formData.gross_amount}
+                  onChange={(e) => handleAmountChange(e.target.value)}
+                  placeholder="123.45 or 123,45"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.gross_amount ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
                 />
-              )}
-              
-              {errors.category && (
-                <p className="mt-1 text-sm text-red-600">{errors.category}</p>
-              )}
-              <p className="mt-1 text-xs text-gray-500">
-                {availableCategories.length} categories available
-                {formData.category_group && formData.category_group !== 'other' && ` (filtered by ${formData.category_group})`}
-              </p>
-            </div>
-
-            {/* Amount Input */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                gross_amount (zł)
-              </label>
-              <input
-                type="text"
-                value={formData.gross_amount}
-                onChange={(e) => handleAmountChange(e.target.value)}
-                placeholder="123.45 or 123,45"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.gross_amount ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-              />
-              {errors.gross_amount && (
-                <p className="mt-1 text-sm text-red-600">{errors.gross_amount}</p>
-              )}
-            </div>
-
-            {/* ADD THESE THREE SECTIONS AFTER THE GROSS_AMOUNT FIELD */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Business Reference
-              </label>
-              <input
-                type="text"
-                value={formData.business_reference || ""}
-                onChange={(e) => handleFieldChange('business_reference', e.target.value)}
-                placeholder="Invoice number, order ID, etc."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Item
-              </label>
-              <input
-                type="text"
-                value={formData.item || ""}
-                onChange={(e) => handleFieldChange('item', e.target.value)}
-                placeholder="What was purchased/sold"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Note
-              </label>
-              <input
-                type="text"
-                value={formData.note || ""}
-                onChange={(e) => handleFieldChange('note', e.target.value)}
-                placeholder="Additional details"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label className="flex items-center mb-2">
+                {errors.gross_amount && (
+                  <p className="mt-1 text-sm text-red-600">{errors.gross_amount}</p>
+                )}
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  business_reference
+                </label>
                 <input
-                  type="checkbox"
-                  checked={formData.include_tax}
-                  onChange={(e) => handleBooleanChange('include_tax', e.target.checked)}
-                  className="mr-2"
+                  type="text"
+                  value={formData.business_reference || ""}
+                  onChange={(e) => handleFieldChange('business_reference', e.target.value)}
+                  placeholder="Invoice number, order ID, etc."
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
-                <span className="text-sm font-medium text-gray-700">Include VAT</span>
-              </label>
-              
-              {formData.include_tax && (
-                <div className="ml-6 flex gap-4">
-                  <span className="text-sm text-gray-700">Rate:</span>
+              </div>
+            </div>
+
+            {/* item + note in one row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  item
+                </label>
+                <input
+                  type="text"
+                  value={formData.item || ""}
+                  onChange={(e) => handleFieldChange('item', e.target.value)}
+                  placeholder="What was purchased/sold"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  note
+                </label>
+                <input
+                  type="text"
+                  value={formData.note || ""}
+                  onChange={(e) => handleFieldChange('note', e.target.value)}
+                  placeholder="Additional details"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* include_vat (switch) + business_timestamp in one row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+              <div className="flex flex-col">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  include_vat
+                </label>
+                <div className="flex items-center flex-wrap gap-2">
+                  <button
+                    type="button"
+                    aria-pressed={formData.include_tax}
+                    onClick={() => handleBooleanChange('include_tax', !formData.include_tax)}
+                    className={`relative inline-flex h-8 w-16 border-2 border-transparent rounded-full cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formData.include_tax ? 'bg-blue-600' : 'bg-gray-200'}`}
+                  >
+                    <span
+                      className={`inline-block h-7 w-7 rounded-full bg-white shadow transform ring-0 transition duration-200 ease-in-out ${formData.include_tax ? 'translate-x-8' : 'translate-x-0'}`}
+                    />
+                  </button>
                   {[0, 5, 8, 23].map(rate => (
-                    <label key={rate} className="flex items-center">
-                      <input
-                        type="radio"
-                        name="tax_rate"
-                        value={rate}
-                        checked={formData.tax_rate === rate}
-                        onChange={(e) => handleNumberChange('tax_rate', parseInt(e.target.value))}
-                        className="mr-1"
-                      />
-                      <span className="text-sm">{rate}</span>
-                    </label>
+                    <button
+                      key={rate}
+                      type="button"
+                      tabIndex={formData.include_tax ? 0 : -1}
+                      onClick={() => handleNumberChange('tax_rate', rate)}
+                      className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 cursor-pointer ${formData.include_tax ? (formData.tax_rate === rate ? 'bg-blue-600 text-white border-blue-700' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100') : 'opacity-0 pointer-events-none'}`}
+                    >
+                      {rate}
+                    </button>
                   ))}
                 </div>
-              )}
-            </div>
-
-            {/* Date Input */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                business_timestamp
-              </label>
-              <input
-                type="date"
-                value={formData.business_timestamp}
-                onChange={(e) => handleFieldChange('business_timestamp', e.target.value)}
-                max={new Date().toISOString().split('T')[0]}
-                onDoubleClick={(e) => {
-                  const input = e.target as HTMLInputElement & { showPicker?: () => void };
-                  input.showPicker?.();
-                }}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer ${
-                  errors.business_timestamp ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-              />
-              {errors.business_timestamp && (
-                <p className="mt-1 text-sm text-red-600">{errors.business_timestamp}</p>
-              )}
+              </div>
+              <div className="flex flex-col">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  business_timestamp
+                </label>
+                <DateInput
+                  value={formData.business_timestamp}
+                  onChange={(val) => handleFieldChange('business_timestamp', val)}
+                />
+                {errors.business_timestamp && (
+                  <p className="mt-1 text-sm text-red-600">{errors.business_timestamp}</p>
+                )}
+              </div>
             </div>
 
             {/* Submit and Reset Buttons */}
