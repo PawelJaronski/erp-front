@@ -6,8 +6,9 @@ export type FieldKey = keyof ExpenseFormShape;
  * Bidirectional category ↔ category_group synchronisation.
  *
  * When the `category` field changes we auto-set `category_group` based on
- * static mapping; when `category_group` changes we clear `category` if now
- * mismatched.
+ * static mapping. If the `category_group` field changes **after** a category
+ * has already been chosen, we now allow the pair to become temporarily
+ * “inconsistent” – we no longer clear the selected `category` automatically.
  *
  * Returns the *mutated copy* of the provided form object (does not mutate the
  * original).
@@ -27,12 +28,9 @@ export function syncCategory(
     }
   }
 
-  if (field === "category_group" && value && form.category) {
-    const currentCategoryGroup = getGroupForCategory(form.category);
-    if (currentCategoryGroup && currentCategoryGroup !== value) {
-      next.category = "";
-    }
-  }
+  // NOTE: previously we cleared `category` when `category_group` changed and
+  // became incompatible. Business feedback (2025-06-26) requires keeping the
+  // selected category intact, so we intentionally **do nothing** here.
 
   return next;
 } 

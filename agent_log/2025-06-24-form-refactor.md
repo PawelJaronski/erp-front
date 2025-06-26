@@ -3,7 +3,7 @@
 ## Overview
 This document summarises the incremental refactor of the **SimpleExpenseForm** feature carried out between 24–25 Jun 2025.
 
-* Goal: separate UI / state / business-logic, introduce testable utilities, prepare the code for future features (multi-currency, recurring expenses).
+* Goal: separate UI / state / business-logic, introduce testable utilities, prepare the code for future features.
 * Outcome: functional form deployed to Vercel; utilities & hook architecture in place; unit tests green (integration tests parked due to React 19 peer issues).
 
 ---
@@ -54,12 +54,3 @@ src/forms/simple-expense/
   hooks/useSimpleExpenseForm.ts
 components/SimpleExpenseForm.tsx
 ```
-
----
-
-## Next Steps (optional)
-
-1. Re-add integration tests when React 19-compatible RTL is released.
-2. Extract reusable UI atoms (`SelectField`, `TextField`, `AmountField`).
-3. Add Storybook or Playwright smoke tests.
-4. Implement multi-currency & recurring expenses per roadmap. 

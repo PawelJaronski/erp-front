@@ -24,7 +24,7 @@ describe("syncCategory", () => {
     expect(next.category_group).toBe("opex");
   });
 
-  it("clears category when category_group becomes incompatible", () => {
+  it("keeps category intact when category_group changes to a different one", () => {
     const form: ExpenseFormShape = {
       account: "a",
       category_group: "opex",
@@ -33,6 +33,6 @@ describe("syncCategory", () => {
       business_timestamp: "2025-01-01",
     };
     const next = syncCategory(form, "category_group", "taxes", getGroup);
-    expect(next.category).toBe("");
+    expect(next.category).toBe("ads");
   });
 }); 

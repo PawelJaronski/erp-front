@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { categoriesData, accounts, categoryGroups } from "../utils/staticData";
+import { computeAvailableCategories } from "../utils/availableCategories";
 import { ExpenseFormShape, validateExpenseForm } from "../utils/validation";
 import { syncCategory } from "../utils/syncCategory";
 import { buildExpensePayload } from "../utils/payload";
@@ -38,16 +39,10 @@ export function useSimpleExpenseForm(): UseSimpleExpenseReturn {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const availableCategories = useMemo(() => {
-    const base = [...categoriesData, { value: "other", group: "other" }];
-    if (fields.category_group && fields.category_group !== "other") {
-      return [
-        ...categoriesData.filter((c) => c.group === fields.category_group),
-        { value: "other", group: fields.category_group },
-      ];
-    }
-    return base;
-  }, [fields.category_group]);
+  const availableCategories = useMemo(
+    () => computeAvailableCategories(fields),
+    [fields.category_group, fields.category]
+  );
 
   const handleFieldChange = useCallback(
     (field: keyof ExpenseFormShape, value: string) => {
