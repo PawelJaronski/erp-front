@@ -58,13 +58,11 @@ const SimpleExpenseForm = () => {
   const DateInput = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
+    // Trigger the native date picker if the browser exposes the non-standard `showPicker()` API.
     const openPicker = () => {
-      // Some browsers (Chromium) expose showPicker()
-      try {
-        (inputRef.current as any)?.showPicker?.();
-      } catch (_) {
-        /* no-op for unsupported browsers */
-      }
+      const node = inputRef.current as (HTMLInputElement & { showPicker?: () => void }) | null;
+      // In supporting browsers (e.g. Chromium) call `showPicker()`; ignore otherwise.
+      node?.showPicker?.();
     };
 
     return (

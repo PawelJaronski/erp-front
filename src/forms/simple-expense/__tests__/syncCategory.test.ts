@@ -1,8 +1,6 @@
 // Jest globals are available via ts-jest configuration
 /// <reference types="jest" />
 
-// @ts-nocheck
-
 import { syncCategory } from "../utils/syncCategory";
 import type { ExpenseFormShape } from "../utils/validation";
 
