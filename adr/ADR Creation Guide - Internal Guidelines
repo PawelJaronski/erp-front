@@ -14,6 +14,7 @@
 2. **Capture only real reasoning** - Include the actual thoughts and concerns that led to the decision
 3. **Skip empty sections** - If there's nothing meaningful to say, omit the section entirely
 4. **Focus on business value** - Emphasize why this decision matters for the business
+5. **Always writ ein English** - If it is not explicitly stated that the ADR should be in Polish, write in English.
 
 ## ADR Template
 

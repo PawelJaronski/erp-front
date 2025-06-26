@@ -6,8 +6,14 @@ export interface ExpenseFormShape {
   category: string;
   gross_amount: string;
   business_timestamp: string;
+  transaction_type: string;
   custom_category_group?: string;
   custom_category?: string;
+  include_tax: boolean;
+  tax_rate: number;
+  business_reference?: string;
+  item?: string;
+  note?: string;
 }
 
 /**

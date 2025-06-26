@@ -7,7 +7,7 @@ It allows accounting staff to record expenses while enforcing domain rules such 
 
 ---
 
-## Key Points
+## Key Features
 
 * **App Router** – Next 15 with server components where required.
 * **Hook-driven state** – `useSimpleExpenseForm` handles form state, validation, API calls.
@@ -21,7 +21,11 @@ It allows accounting staff to record expenses while enforcing domain rules such 
 
 ```text
 src/
-  app/                     # Next.js entry (layout, page)
+  app/                     # Next.js entry (layout, page, styles)
+    favicon.ico            # App icon
+    globals.css            # Global styles
+    layout.tsx             # Layout component
+    page.tsx               # Main page component
   components/
     SimpleExpenseForm.tsx  # Presentational wrapper
   forms/
@@ -31,10 +35,12 @@ src/
       utils/
         amount.ts           # comma-decimal helpers
         validation.ts       # field validation
-        syncCategory.ts     # bidirectional sync logic
+        syncCategory.ts     # bidirectional sync logic (lenient)
+        availableCategories.ts # computes available categories based on form state
         payload.ts          # builds POST body
         staticData.ts       # categories, accounts, groups
       __tests__/            # Jest unit tests (excluded from prod build)
+        availableCategories.test.ts # tests for category filtering logic
   types/
     transactions.ts         # shared interfaces
 ```
@@ -63,7 +69,7 @@ pnpm test
 
 ---
 
-## Deployment
+## Deployment & Testing
 
 Deployed on **Vercel** using the default Next.js preset. Tests are ignored during `next build`; the production build is therefore unaffected by dev-only dependencies.
 
@@ -87,6 +93,6 @@ Deployed on **Vercel** using the default Next.js preset. Tests are ignored durin
 
 ---
 
-## License
+## License & Acknowledgments
 
 Private internal project – © 2025 Pawel Jaronski.

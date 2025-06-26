@@ -6,24 +6,24 @@ Date: 2025-06-26
 
 Historically we kept the two form fields in strict sync:
 
-* wybór `category` nadpisywał `category_group` (jednokierunkowo w górę) — OK;
-* zmiana `category_group` usuwała (`""`) `category`, jeśli już nie pasowała do grupy.
+* selecting `category` overwrote `category_group` (one-way upward) — OK;  
+* changing `category_group` cleared (`""`) `category` if it no longer matched the group.
 
-W praktyce przeszkadzało to w scenariuszu:
-1. Użytkownik wybiera właściwą **kategorię** (np. `ads`).
-2. Orientuje się, że powinna być przypisana do innej **grupy kategorii**.
-3. Po zmianie grupy wybrana kategoria znika z listy, a pole `category` jest czyszczone.
+In practice, this caused issues in the scenario:  
+1. The user selects the correct **category** (e.g., `ads`).  
+2. Realizes it should be assigned to a different **category group**.  
+3. After changing the group, the selected category disappears from the list, and the `category` field is cleared.
 
-Tym samym operacja nie mogła zostać dokończona.
+As a result, the operation could not be completed.
 
 ## Decision
 
-* Zachowujemy automatyczne **ustawianie** `category_group` po wyborze `category` (business shortcut).
-* **Usuwamy** automatyczne czyszczenie `category` przy zmianie `category_group`.
-* Lista kategorii (`availableCategories`) jest filtrowana *tylko* wtedy, gdy `category` jest puste. Gdy jest już wybrana – wyświetlamy pełną listę, tak aby wybrana pozycja była zawsze dostępna.
+* We keep the automatic **setting** of `category_group` after selecting `category` (business shortcut).  
+* **Remove** automatic clearing of `category` when changing `category_group`.  
+* The category list (`availableCategories`) is filtered *only* when `category` is empty. When one is already selected – we display the full list so that the selected item is always available.
 
 ## Consequences
 
-+ Użytkownik może najpierw wybrać kategorię, a później skorygować jej grupę bez utraty wyboru.
-+ Możliwe są tymczasowo "niespójne" pary (kategoria spoza grupy). W UI można je ewentualnie wyróżnić.
-+ Logika została wyekstrahowana do `computeAvailableCategories` + zaktualizowano `syncCategory`. Pokryte testami jednostkowymi. 
++ The user can first select a category and then correct its group without losing the selection.  
++ Temporarily "inconsistent" pairs are possible (category outside the group). These can optionally be highlighted in the UI.  
++ Logic has been extracted to `computeAvailableCategories` + `syncCategory` updated. Covered by unit tests.

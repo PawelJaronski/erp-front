@@ -10,8 +10,8 @@ const SimpleExpenseForm = () => {
     errors,
     isSubmitting,
     submit,
-    reset,
-    handlers: { handleFieldChange, handleAmountChange },
+    reset: resetFormFromHook,
+    handlers: { handleFieldChange, handleAmountChange, handleBooleanChange, handleNumberChange },
     dataSources: { accounts, categoryGroups, availableCategories },
   } = useSimpleExpenseForm();
 
@@ -28,7 +28,7 @@ const SimpleExpenseForm = () => {
   };
 
   const resetForm = () => {
-    reset();
+    resetFormFromHook();
     setSubmitStatus(null);
     setLastSubmitted(null);
   };
@@ -57,9 +57,38 @@ const SimpleExpenseForm = () => {
         </div>
 
         {/* Form */}
+        
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
           <div className="space-y-6">
-            
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Transaction Type
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="transaction_type"
+                  value="expense"
+                  checked={formData.transaction_type === "expense"}
+                  onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                  className="mr-2"
+                />
+                <span>Expense</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="transaction_type"
+                  value="income"
+                  checked={formData.transaction_type === "income"}
+                  onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                  className="mr-2"
+                />
+                <span>Income</span>
+              </label>
+            </div>
+          </div>
             {/* Account Selection */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -201,6 +230,77 @@ const SimpleExpenseForm = () => {
               />
               {errors.gross_amount && (
                 <p className="mt-1 text-sm text-red-600">{errors.gross_amount}</p>
+              )}
+            </div>
+
+            {/* ADD THESE THREE SECTIONS AFTER THE GROSS_AMOUNT FIELD */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Business Reference
+              </label>
+              <input
+                type="text"
+                value={formData.business_reference || ""}
+                onChange={(e) => handleFieldChange('business_reference', e.target.value)}
+                placeholder="Invoice number, order ID, etc."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Item
+              </label>
+              <input
+                type="text"
+                value={formData.item || ""}
+                onChange={(e) => handleFieldChange('item', e.target.value)}
+                placeholder="What was purchased/sold"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Note
+              </label>
+              <input
+                type="text"
+                value={formData.note || ""}
+                onChange={(e) => handleFieldChange('note', e.target.value)}
+                placeholder="Additional details"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center mb-2">
+                <input
+                  type="checkbox"
+                  checked={formData.include_tax}
+                  onChange={(e) => handleBooleanChange('include_tax', e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-sm font-medium text-gray-700">Include VAT</span>
+              </label>
+              
+              {formData.include_tax && (
+                <div className="ml-6 flex gap-4">
+                  <span className="text-sm text-gray-700">Rate:</span>
+                  {[0, 5, 8, 23].map(rate => (
+                    <label key={rate} className="flex items-center">
+                      <input
+                        type="radio"
+                        name="tax_rate"
+                        value={rate}
+                        checked={formData.tax_rate === rate}
+                        onChange={(e) => handleNumberChange('tax_rate', parseInt(e.target.value))}
+                        className="mr-1"
+                      />
+                      <span className="text-sm">{rate}</span>
+                    </label>
+                  ))}
+                </div>
               )}
             </div>
 

@@ -14,6 +14,8 @@ export interface UseSimpleExpenseReturn {
   handlers: {
     handleFieldChange: (field: keyof ExpenseFormShape, value: string) => void;
     handleAmountChange: (value: string) => void;
+    handleBooleanChange: (field: keyof ExpenseFormShape, value: boolean) => void;
+    handleNumberChange: (field: keyof ExpenseFormShape, value: number) => void;
   };
   dataSources: {
     accounts: typeof accounts;
@@ -32,8 +34,14 @@ export function useSimpleExpenseForm(): UseSimpleExpenseReturn {
     category: "",
     gross_amount: "",
     business_timestamp: defaultDate,
+    transaction_type: "expense",
     custom_category_group: "",
     custom_category: "",
+    include_tax: false,
+    tax_rate: 23,
+    business_reference: "",
+    item: "",
+    note: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -67,8 +75,17 @@ export function useSimpleExpenseForm(): UseSimpleExpenseReturn {
     handleFieldChange("gross_amount", clean);
   };
 
+  const handleBooleanChange = useCallback((field: keyof ExpenseFormShape, value: boolean) => {
+    setFields(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleNumberChange = (field: keyof ExpenseFormShape, value: number) => {
+    setFields(prev => ({ ...prev, [field]: value }));
+  };
+
   const reset = () => {
     setFields({
+      transaction_type: "expense",
       account: "mbank_osobiste",
       category_group: "opex",
       category: "",
@@ -76,6 +93,11 @@ export function useSimpleExpenseForm(): UseSimpleExpenseReturn {
       business_timestamp: defaultDate,
       custom_category_group: "",
       custom_category: "",
+      include_tax: false,
+      tax_rate: 23,
+      business_reference: "",
+      item: "",
+      note: "",
     });
     setErrors({});
   };
@@ -111,7 +133,7 @@ export function useSimpleExpenseForm(): UseSimpleExpenseReturn {
     isSubmitting,
     submit,
     reset,
-    handlers: { handleFieldChange, handleAmountChange },
+    handlers: { handleFieldChange, handleAmountChange, handleBooleanChange, handleNumberChange },
     dataSources: {
       accounts,
       categoryGroups,
