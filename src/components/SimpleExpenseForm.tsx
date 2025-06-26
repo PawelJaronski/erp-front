@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { AlertCircle, CheckCircle2, Loader2, X, RotateCcw, ChevronDown, Calendar as CalendarIcon } from 'lucide-react';
 import { useSimpleExpenseForm } from "@/forms/simple-expense/hooks/useSimpleExpenseForm";
-import { DayPicker } from 'react-day-picker';
-import { format } from 'date-fns';
 
 const SimpleExpenseForm = () => {
   const {
@@ -36,59 +34,68 @@ const SimpleExpenseForm = () => {
   };
 
   const handleSubmit = async () => {
-    await submit();
+    const success = await submit();
 
-    // Optimistically mark as success (hook enhancement later)
-    setSubmitStatus('success');
-    setLastSubmitted({
-      account: formData.account,
-      category_group: formData.category_group,
-      category: formData.category,
-      gross_amount: formData.gross_amount,
-    });
+    if (success) {
+      setSubmitStatus('success');
+      setLastSubmitted({
+        account: formData.account,
+        category_group: formData.category_group,
+        category: formData.category,
+        gross_amount: formData.gross_amount,
+      });
+    } else {
+      // Only show error banner if there are no validation errors (server/network)
+      if (Object.keys(errors).length === 0) {
+        setSubmitStatus('error');
+      } else {
+        setSubmitStatus(null);
+      }
+    }
   };
 
+  // Native date input for simple UX & localization
   const DateInput = ({ value, onChange }: { value: string; onChange: (v: string) => void }) => {
-    const [open, setOpen] = React.useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-    const buttonRef = useRef<HTMLButtonElement>(null);
-    useEffect(() => {
-      const handler = (e: MouseEvent) => {
-        if (!ref.current?.contains(e.target as Node)) setOpen(false);
-      };
-      window.addEventListener('mousedown', handler);
-      return () => window.removeEventListener('mousedown', handler);
-    }, []);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    const selected = value ? new Date(value) : undefined;
+    const openPicker = () => {
+      // Some browsers (Chromium) expose showPicker()
+      try {
+        (inputRef.current as any)?.showPicker?.();
+      } catch (_) {
+        /* no-op for unsupported browsers */
+      }
+    };
 
     return (
-      <div className="relative w-full" ref={ref}>
+      <div className="relative w-full">
+        <input
+          ref={inputRef}
+          type="date"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onDoubleClick={openPicker}
+          className="w-full pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+        />
+        {value && (
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            tabIndex={0}
+            className="absolute right-8 top-1/2 -translate-y-1/2 p-1 rounded-md border border-gray-300 bg-white hover:bg-gray-50"
+            title="Clear date"
+          >
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
+        )}
         <button
           type="button"
-          ref={buttonRef}
-          onClick={() => setOpen((o) => !o)}
-          className="w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 text-left flex items-center justify-between"
+          onClick={openPicker}
+          tabIndex={-1}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-500 hover:text-gray-700"
         >
-          <span>{selected ? format(selected, 'yyyy-MM-dd') : 'Select date…'}</span>
-          <CalendarIcon className="w-4 h-4 text-gray-500" />
+          <CalendarIcon className="w-4 h-4" />
         </button>
-        {open && (
-          <div className="absolute z-20 mt-2 bg-white border rounded-xl shadow-lg">
-            <DayPicker
-              mode="single"
-              selected={selected}
-              onSelect={(d: Date | undefined) => {
-                if (d) {
-                  onChange(format(d, 'yyyy-MM-dd'));
-                  setOpen(false);
-                }
-              }}
-              fromYear={2000}
-              toYear={2100}
-            />
-          </div>
-        )}
       </div>
     );
   };
@@ -114,7 +121,7 @@ const SimpleExpenseForm = () => {
                   transaction_type
                 </label>
                 <div className="flex gap-4">
-                  <label className="flex items-center">
+                  <label className="flex items-center cursor-pointer">
                     <input
                       type="radio"
                       name="transaction_type"
@@ -125,7 +132,7 @@ const SimpleExpenseForm = () => {
                     />
                     <span>expense</span>
                   </label>
-                  <label className="flex items-center">
+                  <label className="flex items-center cursor-pointer">
                     <input
                       type="radio"
                       name="transaction_type"
@@ -145,7 +152,7 @@ const SimpleExpenseForm = () => {
                 <select
                   value={formData.account}
                   onChange={(e) => handleFieldChange('account', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.account ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${errors.account ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
                 >
                   <option value="">Select account...</option>
                   {accounts.map(account => (
@@ -170,7 +177,7 @@ const SimpleExpenseForm = () => {
                   <select
                     value={formData.category_group}
                     onChange={(e) => handleFieldChange('category_group', e.target.value)}
-                    className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 transition-colors truncate ${errors.category_group ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                    className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors truncate ${errors.category_group ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
                   >
                     <option value="">All groups (show all categories)</option>
                     {categoryGroups.map(group => (
@@ -182,6 +189,7 @@ const SimpleExpenseForm = () => {
                   <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <button
                     type="button"
+                    tabIndex={formData.category_group ? 0 : -1}
                     onClick={() => resetField('category_group')}
                     className={`absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors ${formData.category_group ? 'opacity-100 cursor-pointer' : 'opacity-0 pointer-events-none'}`}
                     title="Clear category group"
@@ -195,7 +203,7 @@ const SimpleExpenseForm = () => {
                     value={formData.custom_category_group}
                     onChange={(e) => handleFieldChange('custom_category_group', e.target.value)}
                     placeholder="Enter custom category group..."
-                    className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
                   />
                 )}
                 {errors.category_group && (
@@ -210,7 +218,7 @@ const SimpleExpenseForm = () => {
                   <select
                     value={formData.category}
                     onChange={(e) => handleFieldChange('category', e.target.value)}
-                    className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 transition-colors truncate ${errors.category ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                    className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors truncate ${errors.category ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
                   >
                     <option value="">Select category...</option>
                     {availableCategories.map(category => (
@@ -222,6 +230,7 @@ const SimpleExpenseForm = () => {
                   <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <button
                     type="button"
+                    tabIndex={formData.category ? 0 : -1}
                     onClick={() => resetField('category')}
                     className={`absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors ${formData.category ? 'opacity-100 cursor-pointer' : 'opacity-0 pointer-events-none'}`}
                     title="Clear category"
@@ -235,7 +244,7 @@ const SimpleExpenseForm = () => {
                     value={formData.custom_category}
                     onChange={(e) => handleFieldChange('custom_category', e.target.value)}
                     placeholder="Enter custom category..."
-                    className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
                   />
                 )}
                 {errors.category && (
@@ -255,7 +264,7 @@ const SimpleExpenseForm = () => {
                   value={formData.gross_amount}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="123.45 or 123,45"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.gross_amount ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                  className={`w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${errors.gross_amount ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
                 />
                 {errors.gross_amount && (
                   <p className="mt-1 text-sm text-red-600">{errors.gross_amount}</p>
@@ -270,7 +279,7 @@ const SimpleExpenseForm = () => {
                   value={formData.business_reference || ""}
                   onChange={(e) => handleFieldChange('business_reference', e.target.value)}
                   placeholder="Invoice number, order ID, etc."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -286,7 +295,7 @@ const SimpleExpenseForm = () => {
                   value={formData.item || ""}
                   onChange={(e) => handleFieldChange('item', e.target.value)}
                   placeholder="What was purchased/sold"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
                 />
               </div>
               <div className="flex-1">
@@ -298,7 +307,7 @@ const SimpleExpenseForm = () => {
                   value={formData.note || ""}
                   onChange={(e) => handleFieldChange('note', e.target.value)}
                   placeholder="Additional details"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -314,7 +323,7 @@ const SimpleExpenseForm = () => {
                     type="button"
                     aria-pressed={formData.include_tax}
                     onClick={() => handleBooleanChange('include_tax', !formData.include_tax)}
-                    className={`relative inline-flex h-8 w-16 border-2 border-transparent rounded-full cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${formData.include_tax ? 'bg-blue-600' : 'bg-gray-200'}`}
+                    className={`relative inline-flex h-8 w-16 border-2 border-transparent rounded-full cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-0 ${formData.include_tax ? 'bg-blue-600' : 'bg-gray-200'}`}
                   >
                     <span
                       className={`inline-block h-7 w-7 rounded-full bg-white shadow transform ring-0 transition duration-200 ease-in-out ${formData.include_tax ? 'translate-x-8' : 'translate-x-0'}`}

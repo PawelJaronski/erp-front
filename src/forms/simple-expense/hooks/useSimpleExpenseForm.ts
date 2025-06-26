@@ -9,7 +9,7 @@ export interface UseSimpleExpenseReturn {
   fields: ExpenseFormShape;
   errors: Record<string, string>;
   isSubmitting: boolean;
-  submit: () => Promise<void>;
+  submit: () => Promise<boolean>;
   reset: () => void;
   handlers: {
     handleFieldChange: (field: keyof ExpenseFormShape, value: string) => void;
@@ -102,10 +102,12 @@ export function useSimpleExpenseForm(): UseSimpleExpenseReturn {
     setErrors({});
   };
 
-  const submit = async () => {
+  const submit = async (): Promise<boolean> => {
     const validationErrors = validateExpenseForm(fields);
     setErrors(validationErrors);
-    if (Object.keys(validationErrors).length !== 0) return;
+    if (Object.keys(validationErrors).length !== 0) {
+      return false;
+    }
 
     setIsSubmitting(true);
     try {
@@ -120,8 +122,10 @@ export function useSimpleExpenseForm(): UseSimpleExpenseReturn {
 
       // success – reset but keep account selection for convenience
       reset();
+      return true;
     } catch (e) {
       console.error(e);
+      return false;
     } finally {
       setIsSubmitting(false);
     }
