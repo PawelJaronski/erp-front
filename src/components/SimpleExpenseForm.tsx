@@ -322,17 +322,23 @@ const SimpleExpenseForm = () => {
                       className={`inline-block h-7 w-7 rounded-full bg-white shadow transform ring-0 transition duration-200 ease-in-out ${formData.include_tax ? 'translate-x-8' : 'translate-x-0'}`}
                     />
                   </button>
-                  {[0, 5, 8, 23].map(rate => (
-                    <button
-                      key={rate}
-                      type="button"
-                      tabIndex={formData.include_tax ? 0 : -1}
-                      onClick={() => handleNumberChange('tax_rate', rate)}
-                      className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 cursor-pointer ${formData.include_tax ? (formData.tax_rate === rate ? 'bg-blue-600 text-white border-blue-700' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100') : 'opacity-0 pointer-events-none'}`}
-                    >
-                      {rate}
-                    </button>
-                  ))}
+                  {/* Render VAT rate buttons only when VAT is included to avoid empty layout space */}
+                  {formData.include_tax &&
+                    [0, 5, 8, 23].map((rate) => (
+                      <button
+                        key={rate}
+                        type="button"
+                        tabIndex={0}
+                        onClick={() => handleNumberChange("tax_rate", rate)}
+                        className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 cursor-pointer ${
+                          formData.tax_rate === rate
+                            ? "bg-blue-600 text-white border-blue-700"
+                            : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
+                        }`}
+                      >
+                        {rate}
+                      </button>
+                    ))}
                 </div>
               </div>
               <div className="flex flex-col">
