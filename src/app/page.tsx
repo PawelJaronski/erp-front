@@ -1,9 +1,9 @@
-import TransactionForm from "@/components/TransactionForm";
+import SimpleTransactionForm from "@/components/SimpleTransactionForm";
 
 export default function Home() {
   return (
     <main>
-      <TransactionForm />
+      <SimpleTransactionForm />
     </main>
     
   );

@@ -1,10 +1,10 @@
 /// <reference types="jest" />
 
 import { computeAvailableCategories } from "../utils/availableCategories";
-import { TransactionFormShape } from "../utils/validation";
+import { SimpleTransactionFormShape } from "../utils/validation";
 
 // Minimal fields helper
-const baseForm: TransactionFormShape = {
+const baseForm: SimpleTransactionFormShape = {
   account: "a",
   category_group: "opex",
   category: "",

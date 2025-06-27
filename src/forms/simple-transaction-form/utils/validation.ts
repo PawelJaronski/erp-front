@@ -1,6 +1,6 @@
 import { validateAmount } from "./amount";
 
-export interface TransactionFormShape {
+export interface SimpleTransactionFormShape {
   account: string;
   category_group: string;
   category: string;
@@ -20,7 +20,7 @@ export interface TransactionFormShape {
  * Validate a transaction form. Returns a map of field names to error
  * messages. An *empty* object means the form is valid.
  */
-export function validateTransactionForm(fields: TransactionFormShape): Record<string, string> {
+export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape): Record<string, string> {
   const errors: Record<string, string> = {};
 
   if (!fields.account.trim()) errors.account = "Select account";

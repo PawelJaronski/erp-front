@@ -2,7 +2,7 @@
 /// <reference types="jest" />
 
 import { syncCategory } from "../utils/syncCategory";
-import type { TransactionFormShape } from "../utils/validation";
+import type { SimpleTransactionFormShape } from "../utils/validation";
 
 describe("syncCategory", () => {
   const getGroup = (cat: string) => {
@@ -14,7 +14,7 @@ describe("syncCategory", () => {
   };
 
   it("sets category_group when category changes", () => {
-    const form: TransactionFormShape = {
+    const form: SimpleTransactionFormShape = {
       account: "a",
       category_group: "",
       category: "",
@@ -29,7 +29,7 @@ describe("syncCategory", () => {
   });
 
   it("keeps category intact when category_group changes to a different one", () => {
-    const form: TransactionFormShape = {
+    const form: SimpleTransactionFormShape = {
       account: "a",
       category_group: "opex",
       category: "ads",
@@ -44,7 +44,7 @@ describe("syncCategory", () => {
   });
 
   it("does not override category_group when group is 'other'", () => {
-    const form: TransactionFormShape = {
+    const form: SimpleTransactionFormShape = {
       account: "a",
       category_group: "other",
       custom_category_group: "my_custom_grp",

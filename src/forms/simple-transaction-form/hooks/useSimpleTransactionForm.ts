@@ -1,21 +1,21 @@
 import { useState, useMemo, useCallback } from "react";
 import { categoriesData, accounts, categoryGroups } from "../utils/staticData";
 import { computeAvailableCategories } from "../utils/availableCategories";
-import { TransactionFormShape, validateTransactionForm } from "../utils/validation";
+import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
 import { syncCategory } from "../utils/syncCategory";
-import { buildTransactionPayload } from "../utils/payload";
+import { buildSimpleTransactionPayload } from "../utils/payload";
 
-export interface UseTransactionFormReturn {
-  fields: TransactionFormShape;
+export interface UseSimpleTransactionFormReturn {
+  fields: SimpleTransactionFormShape;
   errors: Record<string, string>;
   isSubmitting: boolean;
   submit: () => Promise<boolean>;
   reset: () => void;
   handlers: {
-    handleFieldChange: (field: keyof TransactionFormShape, value: string) => void;
+    handleFieldChange: (field: keyof SimpleTransactionFormShape, value: string) => void;
     handleAmountChange: (value: string) => void;
-    handleBooleanChange: (field: keyof TransactionFormShape, value: boolean) => void;
-    handleNumberChange: (field: keyof TransactionFormShape, value: number) => void;
+    handleBooleanChange: (field: keyof SimpleTransactionFormShape, value: boolean) => void;
+    handleNumberChange: (field: keyof SimpleTransactionFormShape, value: number) => void;
   };
   dataSources: {
     accounts: typeof accounts;
@@ -27,8 +27,8 @@ export interface UseTransactionFormReturn {
 
 const defaultDate = new Date().toISOString().split("T")[0];
 
-export function useTransactionForm(): UseTransactionFormReturn {
-  const [fields, setFields] = useState<TransactionFormShape>({
+export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
+  const [fields, setFields] = useState<SimpleTransactionFormShape>({
     account: "mbank_osobiste",
     category_group: "opex",
     category: "",
@@ -53,8 +53,8 @@ export function useTransactionForm(): UseTransactionFormReturn {
   );
 
   const handleFieldChange = useCallback(
-    (field: keyof TransactionFormShape, value: string) => {
-      setFields((prev: TransactionFormShape) => {
+    (field: keyof SimpleTransactionFormShape, value: string) => {
+      setFields((prev: SimpleTransactionFormShape) => {
         const synced = syncCategory(prev, field, value, (cat) => {
           const found = categoriesData.find((c) => c.value === cat);
           return found?.group;
@@ -75,12 +75,12 @@ export function useTransactionForm(): UseTransactionFormReturn {
     handleFieldChange("gross_amount", clean);
   };
 
-  const handleBooleanChange = useCallback((field: keyof TransactionFormShape, value: boolean) => {
-    setFields((prev: TransactionFormShape) => ({ ...prev, [field]: value }));
+  const handleBooleanChange = useCallback((field: keyof SimpleTransactionFormShape, value: boolean) => {
+    setFields((prev: SimpleTransactionFormShape) => ({ ...prev, [field]: value }));
   }, []);
 
-  const handleNumberChange = (field: keyof TransactionFormShape, value: number) => {
-    setFields((prev: TransactionFormShape) => ({ ...prev, [field]: value }));
+  const handleNumberChange = (field: keyof SimpleTransactionFormShape, value: number) => {
+    setFields((prev: SimpleTransactionFormShape) => ({ ...prev, [field]: value }));
   };
 
   const reset = () => {
@@ -103,7 +103,7 @@ export function useTransactionForm(): UseTransactionFormReturn {
   };
 
   const submit = async (): Promise<boolean> => {
-    const validationErrors = validateTransactionForm(fields);
+    const validationErrors = validateSimpleTransactionForm(fields);
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length !== 0) {
       return false;
@@ -111,7 +111,7 @@ export function useTransactionForm(): UseTransactionFormReturn {
 
     setIsSubmitting(true);
     try {
-      const payload = buildTransactionPayload(fields);
+      const payload = buildSimpleTransactionPayload(fields);
       const res = await fetch("https://erp.jaronski.com/add-transaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

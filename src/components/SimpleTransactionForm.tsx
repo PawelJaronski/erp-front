@@ -2,9 +2,9 @@
 
 import React, { useState, useRef } from 'react';
 import { AlertCircle, CheckCircle2, Loader2, X, RotateCcw, ChevronDown, Calendar as CalendarIcon } from 'lucide-react';
-import { useTransactionForm } from "@/forms/transaction-form/hooks/useTransactionForm";
+import { useSimpleTransactionForm } from "@/forms/simple-transaction-form/hooks/useSimpleTransactionForm";
 
-const TransactionForm = () => {
+const SimpleTransactionForm = () => {
   const {
     fields: formData,
     errors,
@@ -13,7 +13,7 @@ const TransactionForm = () => {
     reset: resetFormFromHook,
     handlers: { handleFieldChange, handleAmountChange, handleBooleanChange, handleNumberChange },
     dataSources: { accounts, categoryGroups, availableCategories },
-  } = useTransactionForm();
+  } = useSimpleTransactionForm();
 
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
   const [lastSubmitted, setLastSubmitted] = useState<{
@@ -418,4 +418,4 @@ const TransactionForm = () => {
   );
 };
 
-export default TransactionForm;
+export default SimpleTransactionForm;
