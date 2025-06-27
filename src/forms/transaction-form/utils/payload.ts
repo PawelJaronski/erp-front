@@ -1,7 +1,7 @@
-import { ExpenseFormShape } from "./validation";
+import { TransactionFormShape } from "./validation";
 import { normalizeAmount } from "./amount";
 
-interface ExpensePayload {
+interface TransactionPayload {
   transaction_type: string;
   event_type: string;
   account: string;
@@ -20,14 +20,14 @@ interface ExpensePayload {
  * Build API payload adhering to the backend contract. Handles "other" custom
  * fields and amount normalization.
  */
-export function buildExpensePayload(form: ExpenseFormShape): ExpensePayload {
+export function buildTransactionPayload(form: TransactionFormShape): TransactionPayload {
   const category_group = form.category_group === "other" ? form.custom_category_group ?? "" : form.category_group;
   const category = form.category === "other" ? form.custom_category ?? "" : form.category;
 
   // Determine event_type based on transaction_type
   const event_type = form.transaction_type === "expense" ? "cost_paid" : "income_received";
 
-  const payload: ExpensePayload = {
+  const payload: TransactionPayload = {
     transaction_type: form.transaction_type,  // Change from hardcoded
     event_type,                               // Dynamic based on transaction_type
     account: form.account,
@@ -54,5 +54,3 @@ export function buildExpensePayload(form: ExpenseFormShape): ExpensePayload {
 
   return payload;
 }
-
-export { buildExpensePayload as buildTransactionPayload }; 

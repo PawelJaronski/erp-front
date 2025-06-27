@@ -17,7 +17,7 @@ export interface TransactionFormShape {
 }
 
 /**
- * Validate a simple-expense form. Returns a map of field names to error
+ * Validate a transaction form. Returns a map of field names to error
  * messages. An *empty* object means the form is valid.
  */
 export function validateTransactionForm(fields: TransactionFormShape): Record<string, string> {

@@ -1,15 +1,18 @@
 /// <reference types="jest" />
 
 import { computeAvailableCategories } from "../utils/availableCategories";
-import { ExpenseFormShape } from "../utils/validation";
+import { TransactionFormShape } from "../utils/validation";
 
 // Minimal fields helper
-const baseForm: ExpenseFormShape = {
+const baseForm: TransactionFormShape = {
   account: "a",
   category_group: "opex",
   category: "",
   gross_amount: "10,00",
   business_timestamp: "2025-01-01",
+  transaction_type: "some_type",
+  include_tax: false,
+  tax_rate: 0,
 };
 
 describe("computeAvailableCategories", () => {

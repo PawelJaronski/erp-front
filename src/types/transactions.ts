@@ -1,4 +1,4 @@
-export interface SimpleExpenseInput {
+export interface TransactionInput {
   id?: string;
   date: string; // ISO yyyy-mm-dd
   category_group: string;
@@ -7,4 +7,4 @@ export interface SimpleExpenseInput {
   amount: string; // Polish comma decimal
 }
 
-export type SimpleExpenseErrorMap = Record<keyof SimpleExpenseInput, string | undefined>; 
+export type TransactionErrorMap = Record<keyof TransactionInput, string | undefined>; 
