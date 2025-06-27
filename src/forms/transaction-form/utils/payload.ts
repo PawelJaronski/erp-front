@@ -53,4 +53,6 @@ export function buildExpensePayload(form: ExpenseFormShape): ExpensePayload {
   }
 
   return payload;
-} 
+}
+
+export { buildExpensePayload as buildTransactionPayload }; 

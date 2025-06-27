@@ -1,6 +1,6 @@
-import { ExpenseFormShape } from "./validation";
+import { TransactionFormShape } from "./validation";
 
-export type FieldKey = keyof ExpenseFormShape;
+export type FieldKey = keyof TransactionFormShape;
 
 /**
  * Bidirectional category ↔ category_group synchronisation.
@@ -14,12 +14,12 @@ export type FieldKey = keyof ExpenseFormShape;
  * original).
  */
 export function syncCategory(
-  form: ExpenseFormShape,
+  form: TransactionFormShape,
   field: FieldKey,
   value: string,
   getGroupForCategory: (category: string) => string | undefined,
-): ExpenseFormShape {
-  const next = { ...form, [field]: value } as ExpenseFormShape;
+): TransactionFormShape {
+  const next = { ...form, [field]: value } as TransactionFormShape;
 
   if (field === "category" && value) {
     const deducedGroup = getGroupForCategory(value);

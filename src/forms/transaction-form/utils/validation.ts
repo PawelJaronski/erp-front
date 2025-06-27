@@ -1,6 +1,6 @@
 import { validateAmount } from "./amount";
 
-export interface ExpenseFormShape {
+export interface TransactionFormShape {
   account: string;
   category_group: string;
   category: string;
@@ -20,22 +20,22 @@ export interface ExpenseFormShape {
  * Validate a simple-expense form. Returns a map of field names to error
  * messages. An *empty* object means the form is valid.
  */
-export function validateExpenseForm(form: ExpenseFormShape): Record<string, string> {
+export function validateTransactionForm(fields: TransactionFormShape): Record<string, string> {
   const errors: Record<string, string> = {};
 
-  if (!form.account.trim()) errors.account = "Select account";
+  if (!fields.account.trim()) errors.account = "Select account";
 
   // Derive actual category_group & category accounting for the "other" option.
-  const finalCategoryGroup = form.category_group === "other" ? form.custom_category_group ?? "" : form.category_group;
-  const finalCategory = form.category === "other" ? form.custom_category ?? "" : form.category;
+  const finalCategoryGroup = fields.category_group === "other" ? fields.custom_category_group ?? "" : fields.category_group;
+  const finalCategory = fields.category === "other" ? fields.custom_category ?? "" : fields.category;
 
   if (!finalCategoryGroup.trim()) errors.category_group = "Select or enter category group";
   if (!finalCategory.trim()) errors.category = "Select or enter category";
 
-  if (!form.business_timestamp.trim()) errors.business_timestamp = "Select date";
+  if (!fields.business_timestamp.trim()) errors.business_timestamp = "Select date";
 
-  const amountError = validateAmount(form.gross_amount);
+  const amountError = validateAmount(fields.gross_amount);
   if (amountError) errors.gross_amount = amountError;
 
   return errors;
-} 
+}
