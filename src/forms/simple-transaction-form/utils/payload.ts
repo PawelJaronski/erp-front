@@ -25,7 +25,7 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
   const category = form.category === "other" ? form.custom_category ?? "" : form.category;
 
   // Determine event_type based on transaction_type
-  const event_type = form.transaction_type === "expense" ? "cost_paid" : "income_received";
+  const event_type = form.transaction_type === "simple_expense" ? "cost_paid" : "income_received";
 
   const payload: SimpleTransactionPayload = {
     transaction_type: form.transaction_type,  // Change from hardcoded
