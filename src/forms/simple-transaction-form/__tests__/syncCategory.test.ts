@@ -20,7 +20,7 @@ describe("syncCategory", () => {
       category: "",
       gross_amount: "10,00",
       business_timestamp: "2025-01-01",
-      transaction_type: "expense",
+      transaction_type: "simple_expense",
       include_tax: false,
       tax_rate: 23,
     };
@@ -35,7 +35,7 @@ describe("syncCategory", () => {
       category: "ads",
       gross_amount: "10,00",
       business_timestamp: "2025-01-01",
-      transaction_type: "expense",
+      transaction_type: "simple_expense",
       include_tax: false,
       tax_rate: 23,
     };
@@ -51,7 +51,7 @@ describe("syncCategory", () => {
       category: "ads", // initial category doesn't matter
       gross_amount: "10,00",
       business_timestamp: "2025-01-01",
-      transaction_type: "expense",
+      transaction_type: "simple_expense",
       include_tax: false,
       tax_rate: 23,
     };
