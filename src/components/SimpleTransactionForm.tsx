@@ -119,7 +119,7 @@ const SimpleTransactionForm = () => {
                       type="radio"
                       name="transaction_type"
                       value="expense"
-                      checked={formData.transaction_type === "expense"}
+                      checked={formData.transaction_type === "simple_expense"}
                       onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
                       className="mr-2"
                     />
@@ -130,7 +130,7 @@ const SimpleTransactionForm = () => {
                       type="radio"
                       name="transaction_type"
                       value="income"
-                      checked={formData.transaction_type === "income"}
+                      checked={formData.transaction_type === "simple_income"}
                       onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
                       className="mr-2"
                     />

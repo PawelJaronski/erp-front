@@ -34,7 +34,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     category: "",
     gross_amount: "",
     business_timestamp: defaultDate,
-    transaction_type: "expense",
+    transaction_type: "simple_expense",
     custom_category_group: "",
     custom_category: "",
     include_tax: false,
