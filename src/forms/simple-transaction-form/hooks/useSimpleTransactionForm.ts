@@ -112,7 +112,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     setIsSubmitting(true);
     try {
       const payload = buildSimpleTransactionPayload(fields);
-      const res = await fetch("https://jaronski-erp-backend-production.up.railway.app/add-transaction", {
+      const res = await fetch("https://jaronski-erp.railway.app/add-transaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
