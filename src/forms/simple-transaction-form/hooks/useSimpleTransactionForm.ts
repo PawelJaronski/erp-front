@@ -85,7 +85,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
 
   const reset = () => {
     setFields({
-      transaction_type: "expense",
+      transaction_type: "simple_expense",
       account: "mbank_osobiste",
       category_group: "opex",
       category: "",
