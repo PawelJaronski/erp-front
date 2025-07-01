@@ -155,8 +155,8 @@ const SimpleTransactionForm = () => {
               </div>
             </div>
 
-            {/* account row (and to_account if transfer) */}
-            <div className={`grid grid-cols-1 ${isTransfer ? 'md:grid-cols-2' : ''} gap-4 mb-4`}>
+            {/* Account (and optional to_account) row – always two columns on md+ to keep consistent width */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   {isTransfer ? 'from_account' : 'account'}
