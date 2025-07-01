@@ -255,7 +255,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
       // success – reset but keep current account selection for convenience
       reset();
       return true;
-    } catch (e) {
+    } catch (e: unknown) {
       console.error(e);
       return false;
     } finally {
