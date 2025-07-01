@@ -14,6 +14,7 @@ interface SimpleTransactionPayload {
   note?: string;
   include_tax?: boolean;
   tax_rate?: number;
+  to_account?: string;
 }
 
 /**
@@ -24,15 +25,24 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
   const category_group = form.category_group === "other" ? form.custom_category_group ?? "" : form.category_group;
   const category = form.category === "other" ? form.custom_category ?? "" : form.category;
 
-  // Determine event_type based on transaction_type
-  const event_type = form.transaction_type === "simple_expense" ? "cost_paid" : "income_received";
+  let event_type: string;
+  let finalCategoryGroup: string = category_group;
+  let finalCategory: string = category;
 
-  const payload: SimpleTransactionPayload = {
-    transaction_type: form.transaction_type,  // Change from hardcoded
-    event_type,                               // Dynamic based on transaction_type
+  if (form.transaction_type === "simple_transfer") {
+    event_type = "transfer";
+    finalCategoryGroup = "internal_transfer";
+    finalCategory = "outgoing_transfer";
+  } else {
+    event_type = form.transaction_type === "simple_expense" ? "cost_paid" : "income_received";
+  }
+
+  const payload: SimpleTransactionPayload & { to_account?: string } = {
+    transaction_type: form.transaction_type,
+    event_type,
     account: form.account,
-    category_group,
-    category,
+    category_group: finalCategoryGroup,
+    category: finalCategory,
     gross_amount: normalizeAmount(form.gross_amount),
     business_timestamp: form.business_timestamp,
   };
@@ -47,9 +57,13 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
   if (form.note?.trim()) {
     payload.note = form.note;
   }
-  if (form.include_tax) {
+  if (form.transaction_type !== "simple_transfer" && form.include_tax) {
     payload.include_tax = form.include_tax;
     payload.tax_rate = form.tax_rate;
+  }
+
+  if (form.transaction_type === "simple_transfer") {
+    payload.to_account = form.to_account ?? "";
   }
 
   return payload;

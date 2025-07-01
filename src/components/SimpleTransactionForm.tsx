@@ -153,7 +153,7 @@ const SimpleTransactionForm = () => {
               </div>
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  account
+                  {isTransfer ? 'from_account' : 'account'}
                 </label>
                 <select
                   value={formData.account}
@@ -195,7 +195,8 @@ const SimpleTransactionForm = () => {
               )}
             </div>
 
-            {/* category_group + category in one row */}
+            {/* category_group + category in one row – hidden for transfers */}
+            {!isTransfer && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -280,6 +281,7 @@ const SimpleTransactionForm = () => {
                 )}
               </div>
             </div>
+            )}
 
             {/* gross_amount + business_reference in one row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -342,6 +344,7 @@ const SimpleTransactionForm = () => {
 
             {/* include_vat (switch) + business_timestamp in one row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+              {!isTransfer && (
               <div className="flex flex-col">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   include_vat
@@ -381,6 +384,7 @@ const SimpleTransactionForm = () => {
                   )}
                 </div>
               </div>
+              )}
               <div className="flex flex-col">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   business_timestamp

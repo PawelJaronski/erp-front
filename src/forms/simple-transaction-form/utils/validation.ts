@@ -26,12 +26,22 @@ export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape
 
   if (!fields.account.trim()) errors.account = "Select account";
 
-  // Derive actual category_group & category accounting for the "other" option.
-  const finalCategoryGroup = fields.category_group === "other" ? fields.custom_category_group ?? "" : fields.category_group;
-  const finalCategory = fields.category === "other" ? fields.custom_category ?? "" : fields.category;
+  // Transfer-specific rules
+  const isTransfer = fields.transaction_type === "simple_transfer";
 
-  if (!finalCategoryGroup.trim()) errors.category_group = "Select or enter category group";
-  if (!finalCategory.trim()) errors.category = "Select or enter category";
+  if (isTransfer) {
+    if (!fields.to_account?.trim()) errors.to_account = "Select destination account";
+    if (fields.to_account && fields.to_account === fields.account) {
+      errors.to_account = "From and To accounts must differ";
+    }
+  } else {
+    // Expense / income rules – validate categories
+    const finalCategoryGroup = fields.category_group === "other" ? fields.custom_category_group ?? "" : fields.category_group;
+    const finalCategory = fields.category === "other" ? fields.custom_category ?? "" : fields.category;
+
+    if (!finalCategoryGroup.trim()) errors.category_group = "Select or enter category group";
+    if (!finalCategory.trim()) errors.category = "Select or enter category";
+  }
 
   if (!fields.business_timestamp.trim()) errors.business_timestamp = "Select date";
 
