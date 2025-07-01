@@ -50,3 +50,6 @@ export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape
 
   return errors;
 }
+
+// TODO: Deprecated – kept temporarily for legacy test suite.
+export const validateExpenseForm = validateSimpleTransactionForm;

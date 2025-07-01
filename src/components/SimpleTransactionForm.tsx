@@ -372,7 +372,6 @@ const SimpleTransactionForm = () => {
 
             {/* include_vat (switch) + business_timestamp in one row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              {!isTransfer && (
               <div className={`flex flex-col ${isTransfer ? 'invisible' : ''}`}>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   include_vat
@@ -412,7 +411,6 @@ const SimpleTransactionForm = () => {
                   )}
                 </div>
               </div>
-              )}
               <div className="flex flex-col">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   business_timestamp
