@@ -18,9 +18,11 @@ const SimpleTransactionForm = () => {
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
   const [lastSubmitted, setLastSubmitted] = useState<{
     account: string;
-    category_group: string;
-    category: string;
+    to_account?: string;
+    category_group?: string;
+    category?: string;
     gross_amount: string;
+    transaction_type: string;
   } | null>(null);
 
   const isTransfer = formData.transaction_type === "simple_transfer";
@@ -42,9 +44,11 @@ const SimpleTransactionForm = () => {
       setSubmitStatus('success');
       setLastSubmitted({
         account: formData.account,
+        to_account: formData.to_account,
         category_group: formData.category_group,
         category: formData.category,
         gross_amount: formData.gross_amount,
+        transaction_type: formData.transaction_type,
       });
     } else {
       // Only show error banner if there are no validation errors (server/network)
@@ -109,48 +113,50 @@ const SimpleTransactionForm = () => {
         
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
           <div className="space-y-6">
-            {/* transaction_type + account in one row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div className="flex-1">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  transaction_type
+            {/* transaction_type row */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                transaction_type
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="transaction_type"
+                    value="simple_expense"
+                    checked={formData.transaction_type === "simple_expense"}
+                    onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                    className="mr-2"
+                  />
+                  <span>expense</span>
                 </label>
-                <div className="flex gap-4">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="transaction_type"
-                      value="simple_expense"
-                      checked={formData.transaction_type === "simple_expense"}
-                      onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
-                      className="mr-2"
-                    />
-                    <span>expense</span>
-                  </label>
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="transaction_type"
-                      value="simple_income"
-                      checked={formData.transaction_type === "simple_income"}
-                      onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
-                      className="mr-2"
-                    />
-                    <span>income</span>
-                  </label>
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="transaction_type"
-                      value="simple_transfer"
-                      checked={formData.transaction_type === "simple_transfer"}
-                      onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
-                      className="mr-2"
-                    />
-                    <span>transfer</span>
-                  </label>
-                </div>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="transaction_type"
+                    value="simple_income"
+                    checked={formData.transaction_type === "simple_income"}
+                    onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                    className="mr-2"
+                  />
+                  <span>income</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="transaction_type"
+                    value="simple_transfer"
+                    checked={formData.transaction_type === "simple_transfer"}
+                    onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                    className="mr-2"
+                  />
+                  <span>transfer</span>
+                </label>
               </div>
+            </div>
+
+            {/* account row (and to_account if transfer) */}
+            <div className={`grid grid-cols-1 ${isTransfer ? 'md:grid-cols-2' : ''} gap-4 mb-4`}>
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   {isTransfer ? 'from_account' : 'account'}
@@ -219,9 +225,8 @@ const SimpleTransactionForm = () => {
               )}
             </div>
 
-            {/* category_group + category in one row – hidden for transfers */}
-            {!isTransfer && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* category row – invisible placeholder when transfer to avoid layout jump */}
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${isTransfer ? 'invisible' : ''}`}>
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   category_group
@@ -305,7 +310,6 @@ const SimpleTransactionForm = () => {
                 )}
               </div>
             </div>
-            )}
 
             {/* gross_amount + business_reference in one row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -369,7 +373,7 @@ const SimpleTransactionForm = () => {
             {/* include_vat (switch) + business_timestamp in one row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               {!isTransfer && (
-              <div className="flex flex-col">
+              <div className={`flex flex-col ${isTransfer ? 'invisible' : ''}`}>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   include_vat
                 </label>
@@ -461,8 +465,12 @@ const SimpleTransactionForm = () => {
             </p>
             <p className="text-sm text-gray-700 mt-1">
                 Kwota: <strong>{lastSubmitted.gross_amount} zł</strong> <br />
-                Kategoria: <strong>{lastSubmitted.category}</strong>{lastSubmitted.category_group ? ` (${lastSubmitted.category_group})` : ''} <br />
-                Konto: <strong>{lastSubmitted.account}</strong>
+                {lastSubmitted.transaction_type === 'simple_transfer' ? (
+                  <>Konto: <strong>{lastSubmitted.account}</strong> → <strong>{lastSubmitted.to_account}</strong><br /></>
+                ) : (
+                  <>Kategoria: <strong>{lastSubmitted.category}</strong>{lastSubmitted.category_group ? ` (${lastSubmitted.category_group})` : ''} <br />
+                  Konto: <strong>{lastSubmitted.account}</strong><br /></>
+                )}
             </p>
             </div>
         </div>
