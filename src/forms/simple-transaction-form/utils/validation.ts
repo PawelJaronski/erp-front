@@ -14,6 +14,7 @@ export interface SimpleTransactionFormShape {
   business_reference?: string;
   item?: string;
   note?: string;
+  to_account?: string;
 }
 
 /**

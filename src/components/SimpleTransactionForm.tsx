@@ -23,6 +23,8 @@ const SimpleTransactionForm = () => {
     gross_amount: string;
   } | null>(null);
 
+  const isTransfer = formData.transaction_type === "simple_transfer";
+
   const resetField = (field: keyof typeof formData) => {
     handleFieldChange(field, '');
   };
@@ -136,6 +138,17 @@ const SimpleTransactionForm = () => {
                     />
                     <span>income</span>
                   </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="transaction_type"
+                      value="simple_transfer"
+                      checked={formData.transaction_type === "simple_transfer"}
+                      onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                      className="mr-2"
+                    />
+                    <span>transfer</span>
+                  </label>
                 </div>
               </div>
               <div className="flex-1">
@@ -158,6 +171,28 @@ const SimpleTransactionForm = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.account}</p>
                 )}
               </div>
+              {isTransfer && (
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    to_account
+                  </label>
+                  <select
+                    value={formData.to_account || ''}
+                    onChange={(e) => handleFieldChange('to_account', e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${errors.to_account ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                  >
+                    <option value="">Select account...</option>
+                    {accounts.map(account => (
+                      <option key={account.value} value={account.value}>
+                        {account.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.to_account && (
+                    <p className="mt-1 text-sm text-red-600">{errors.to_account}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* category_group + category in one row */}

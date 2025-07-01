@@ -39,6 +39,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     custom_category: "",
     include_tax: false,
     tax_rate: 23,
+    to_account: "",
     business_reference: "",
     item: "",
     note: "",
@@ -55,6 +56,15 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
   const handleFieldChange = useCallback(
     (field: keyof SimpleTransactionFormShape, value: string) => {
       setFields((prev: SimpleTransactionFormShape) => {
+        if (field === "transaction_type" && value === "simple_transfer") {
+          return {
+            ...prev,
+            transaction_type: value as any,
+            account: "mbank_firmowe",
+            to_account: "mbank_osobiste",
+          };
+        }
+
         const synced = syncCategory(prev, field, value, (cat) => {
           const found = categoriesData.find((c) => c.value === cat);
           return found?.group;
@@ -95,6 +105,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
       custom_category: "",
       include_tax: false,
       tax_rate: 23,
+      to_account: "",
       business_reference: "",
       item: "",
       note: "",
