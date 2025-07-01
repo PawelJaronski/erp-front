@@ -2,9 +2,8 @@ import SimpleTransactionForm from "@/components/SimpleTransactionForm";
 
 export default function Home() {
   return (
-    <main>
+    <main className="h-screen overflow-y-auto">
       <SimpleTransactionForm />
     </main>
-    
   );
 }
