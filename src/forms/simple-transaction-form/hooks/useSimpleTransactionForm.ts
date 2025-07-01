@@ -59,8 +59,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
       setFields((prev: SimpleTransactionFormShape) => {
         if (field === "transaction_type") {
           if (value === "simple_transfer") {
-            const defaultTo = prev.to_account && prev.to_account !== prev.account ? prev.to_account : getCounterAccount(prev.account);
-            return { ...prev, transaction_type: value, to_account: defaultTo };
+            return { ...prev, transaction_type: value, account: "mbank_firmowe", to_account: "mbank_osobiste" };
           } else {
             return { ...prev, transaction_type: value };
           }

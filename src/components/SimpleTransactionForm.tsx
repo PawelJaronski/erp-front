@@ -155,18 +155,30 @@ const SimpleTransactionForm = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   {isTransfer ? 'from_account' : 'account'}
                 </label>
-                <select
-                  value={formData.account}
-                  onChange={(e) => handleFieldChange('account', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${errors.account ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
-                >
-                  <option value="">Select account...</option>
-                  {accounts.map(account => (
-                    <option key={account.value} value={account.value}>
-                      {account.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={formData.account}
+                    onChange={(e) => handleFieldChange('account', e.target.value)}
+                    className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${errors.account ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                  >
+                    <option value="">Select account...</option>
+                    {accounts.map(account => (
+                      <option key={account.value} value={account.value}>
+                        {account.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <button
+                    type="button"
+                    tabIndex={formData.account ? 0 : -1}
+                    onClick={() => resetField('account')}
+                    className={`absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors ${formData.account ? 'opacity-100 cursor-pointer' : 'opacity-0 pointer-events-none'}`}
+                    title="Clear account"
+                  >
+                    <X className="w-4 h-4 text-gray-500" />
+                  </button>
+                </div>
                 {errors.account && (
                   <p className="mt-1 text-sm text-red-600">{errors.account}</p>
                 )}
@@ -176,18 +188,30 @@ const SimpleTransactionForm = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     to_account
                   </label>
-                  <select
-                    value={formData.to_account || ''}
-                    onChange={(e) => handleFieldChange('to_account', e.target.value)}
-                    className={`w-full px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${errors.to_account ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
-                  >
-                    <option value="">Select account...</option>
-                    {accounts.map(account => (
-                      <option key={account.value} value={account.value}>
-                        {account.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      value={formData.to_account || ''}
+                      onChange={(e) => handleFieldChange('to_account', e.target.value)}
+                      className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${errors.to_account ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                    >
+                      <option value="">Select account...</option>
+                      {accounts.map(account => (
+                        <option key={account.value} value={account.value}>
+                          {account.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <button
+                      type="button"
+                      tabIndex={formData.to_account ? 0 : -1}
+                      onClick={() => resetField('to_account')}
+                      className={`absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors ${formData.to_account ? 'opacity-100 cursor-pointer' : 'opacity-0 pointer-events-none'}`}
+                      title="Clear to_account"
+                    >
+                      <X className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
                   {errors.to_account && (
                     <p className="mt-1 text-sm text-red-600">{errors.to_account}</p>
                   )}
