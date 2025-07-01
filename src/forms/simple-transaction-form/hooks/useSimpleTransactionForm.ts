@@ -110,12 +110,15 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
   /* --------------------------------------------------------
    *  Internal mutators
    * ------------------------------------------------------*/
-  const setPrivateForCurrent = (update: Partial<PrivateFields>) => {
-    setPerType((prev) => ({
-      ...prev,
-      [transactionType]: { ...prev[transactionType], ...update },
-    }));
-  };
+  const setPrivateForCurrent = useCallback(
+    (update: Partial<PrivateFields>) => {
+      setPerType((prev) => ({
+        ...prev,
+        [transactionType]: { ...prev[transactionType], ...update },
+      }));
+    },
+    [transactionType]
+  );
 
   const handleFieldChange = useCallback(
     (field: keyof SimpleTransactionFormShape, value: string) => {
@@ -136,7 +139,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         setShared((prev) => ({ ...prev, [field]: value } as SharedFields));
       } else {
         // Private slice update with extra rules for transfers & category sync
-        let nextPrivate = {
+        const nextPrivate = {
           ...((perType[transactionType] || {}) as PrivateFields),
           [field]: value,
         } as PrivateFields;
@@ -169,7 +172,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         const newPrivate: Partial<PrivateFields> = {};
         (Object.keys(synced) as (keyof SimpleTransactionFormShape)[]).forEach((k) => {
           if (!sharedKeys.includes(k) && k !== "transaction_type") {
-            // @ts-ignore – k in newPrivate by construction
+            // @ts-expect-error – k in newPrivate by construction
             newPrivate[k] = synced[k];
           }
         });
@@ -182,8 +185,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         setErrors((prev) => ({ ...prev, [field as string]: "" }));
       }
     },
-    // We rely on transactionType & shared/perType through hooks setters, so deps safe
-    [perType, shared, transactionType, errors]
+    [setPrivateForCurrent, errors]
   );
 
   const handleAmountChange = (value: string) => {
@@ -199,16 +201,12 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         setPrivateForCurrent({ [field]: value } as unknown as Partial<PrivateFields>);
       }
     },
-    [transactionType]
+    [setPrivateForCurrent]
   );
 
   const handleNumberChange = (field: keyof SimpleTransactionFormShape, value: number) => {
-    if (sharedKeys.includes(field)) {
-      // @ts-ignore
-      setShared((prev) => ({ ...prev, [field]: value }));
-    } else {
-      setPrivateForCurrent({ [field]: value } as unknown as Partial<PrivateFields>);
-    }
+    // Currently only tax_rate uses number path and belongs to private slice
+    setPrivateForCurrent({ [field]: value } as unknown as Partial<PrivateFields>);
   };
 
   /* --------------------------------------------------------
