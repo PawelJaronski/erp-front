@@ -4,6 +4,7 @@ import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
 import { syncCategory, FieldKey } from "../utils/syncCategory";
 import { buildSimpleTransactionPayload } from "../utils/payload";
+import { getCounterAccount } from "../utils/transferAccounts";
 
 export interface UseSimpleTransactionFormReturn {
   fields: SimpleTransactionFormShape;
@@ -143,20 +144,13 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
           [field]: value,
         } as PrivateFields;
 
-        // Keep accounts different when transfer – simple swap when duplicate
+        // Keep accounts different when transfer
         if (transactionType === "simple_transfer") {
-          const oldPrivate = perType[transactionType] as PrivateFields;
-
-          // If the user sets 'account' to the current 'to_account', swap them
-          if (field === "account" && value === oldPrivate.to_account) {
-            nextPrivate.to_account = oldPrivate.account;
+          if (field === "account" && value === nextPrivate.to_account) {
+            nextPrivate.to_account = getCounterAccount(value);
           }
-
-          // If the user sets 'to_account' to the current 'account', swap them
-          if (field === "to_account" && value === oldPrivate.account) {
-            // oldPrivate.to_account can be undefined (e.g. not yet selected)
-            // Fallback to empty string to satisfy the non-optional `account` type
-            nextPrivate.account = oldPrivate.to_account ?? "";
+          if (field === "to_account" && value === nextPrivate.account) {
+            nextPrivate.account = getCounterAccount(value);
           }
         }
 
@@ -191,8 +185,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         setErrors((prev) => ({ ...prev, [field as string]: "" }));
       }
     },
-    // Include dynamic deps to ensure the latest state is used inside the callback
-    [setPrivateForCurrent, errors, perType, shared, transactionType]
+    [setPrivateForCurrent, errors]
   );
 
   const handleAmountChange = (value: string) => {
@@ -248,9 +241,8 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     setIsSubmitting(true);
     try {
       const payload = buildSimpleTransactionPayload(mergedFields);
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiUrl) throw new Error("API URL is not set");
-      const res = await fetch(`${apiUrl}/add-transaction`,
+      const res = await fetch(
+        "https://jaronski-erp-backend-production.up.railway.app/add-transaction",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
