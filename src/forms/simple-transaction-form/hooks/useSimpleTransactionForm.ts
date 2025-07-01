@@ -50,7 +50,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
 
   const availableCategories = useMemo(
     () => computeAvailableCategories(fields),
-    [fields.category_group, fields.category]
+    [fields]
   );
 
   const handleFieldChange = useCallback(
@@ -59,7 +59,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         if (field === "transaction_type" && value === "simple_transfer") {
           return {
             ...prev,
-            transaction_type: value as any,
+            transaction_type: value,
             account: "mbank_firmowe",
             to_account: "mbank_osobiste",
           };
