@@ -226,7 +226,7 @@ const SimpleTransactionForm = () => {
             </div>
 
             {/* category row – invisible placeholder when transfer to avoid layout jump */}
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${isTransfer ? 'invisible' : ''}`}>
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${isTransfer ? 'h-0 overflow-hidden opacity-0 pointer-events-none select-none' : ''}`}>
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   category_group
