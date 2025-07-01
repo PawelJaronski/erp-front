@@ -4,7 +4,6 @@ import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
 import { syncCategory, FieldKey } from "../utils/syncCategory";
 import { buildSimpleTransactionPayload } from "../utils/payload";
-import { getCounterAccount } from "../utils/transferAccounts";
 
 export interface UseSimpleTransactionFormReturn {
   fields: SimpleTransactionFormShape;
@@ -144,15 +143,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
           [field]: value,
         } as PrivateFields;
 
-        // Keep accounts different when transfer
-        if (transactionType === "simple_transfer") {
-          if (field === "account" && value === nextPrivate.to_account) {
-            nextPrivate.to_account = getCounterAccount(value);
-          }
-          if (field === "to_account" && value === nextPrivate.account) {
-            nextPrivate.account = getCounterAccount(value);
-          }
-        }
+
 
         // Sync category ↔ group (works on merged tmp object)
         const tmpMerged = {
