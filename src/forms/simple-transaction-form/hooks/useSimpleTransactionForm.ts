@@ -4,6 +4,7 @@ import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
 import { syncCategory } from "../utils/syncCategory";
 import { buildSimpleTransactionPayload } from "../utils/payload";
+import { getCounterAccount } from "../utils/transferAccounts";
 
 export interface UseSimpleTransactionFormReturn {
   fields: SimpleTransactionFormShape;
@@ -56,16 +57,27 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
   const handleFieldChange = useCallback(
     (field: keyof SimpleTransactionFormShape, value: string) => {
       setFields((prev: SimpleTransactionFormShape) => {
-        if (field === "transaction_type" && value === "simple_transfer") {
-          return {
-            ...prev,
-            transaction_type: value,
-            account: "mbank_firmowe",
-            to_account: "mbank_osobiste",
-          };
+        if (field === "transaction_type") {
+          if (value === "simple_transfer") {
+            const defaultTo = prev.to_account && prev.to_account !== prev.account ? prev.to_account : getCounterAccount(prev.account);
+            return { ...prev, transaction_type: value, to_account: defaultTo };
+          } else {
+            return { ...prev, transaction_type: value };
+          }
         }
 
-        const synced = syncCategory(prev, field, value, (cat) => {
+        const next = { ...prev, [field]: value } as SimpleTransactionFormShape;
+
+        if (prev.transaction_type === "simple_transfer" || next.transaction_type === "simple_transfer") {
+          if (field === "account" && value === next.to_account) {
+            next.to_account = getCounterAccount(value);
+          }
+          if (field === "to_account" && value === next.account) {
+            next.account = getCounterAccount(value);
+          }
+        }
+
+        const synced = syncCategory(next, field, value, (cat) => {
           const found = categoriesData.find((c) => c.value === cat);
           return found?.group;
         });
