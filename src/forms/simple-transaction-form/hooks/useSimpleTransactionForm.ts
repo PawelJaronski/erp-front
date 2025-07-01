@@ -4,7 +4,6 @@ import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
 import { syncCategory, FieldKey } from "../utils/syncCategory";
 import { buildSimpleTransactionPayload } from "../utils/payload";
-import { getCounterAccount } from "../utils/transferAccounts";
 
 export interface UseSimpleTransactionFormReturn {
   fields: SimpleTransactionFormShape;
@@ -144,13 +143,20 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
           [field]: value,
         } as PrivateFields;
 
-        // Keep accounts different when transfer
+        // Keep accounts different when transfer – simple swap when duplicate
         if (transactionType === "simple_transfer") {
-          if (field === "account" && value === nextPrivate.to_account) {
-            nextPrivate.to_account = getCounterAccount(value);
+          const oldPrivate = perType[transactionType] as PrivateFields;
+
+          // If the user sets 'account' to the current 'to_account', swap them
+          if (field === "account" && value === oldPrivate.to_account) {
+            nextPrivate.to_account = oldPrivate.account;
           }
-          if (field === "to_account" && value === nextPrivate.account) {
-            nextPrivate.account = getCounterAccount(value);
+
+          // If the user sets 'to_account' to the current 'account', swap them
+          if (field === "to_account" && value === oldPrivate.account) {
+            // oldPrivate.to_account can be undefined (e.g. not yet selected)
+            // Fallback to empty string to satisfy the non-optional `account` type
+            nextPrivate.account = oldPrivate.to_account ?? "";
           }
         }
 
@@ -185,7 +191,8 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         setErrors((prev) => ({ ...prev, [field as string]: "" }));
       }
     },
-    [setPrivateForCurrent, errors]
+    // Include dynamic deps to ensure the latest state is used inside the callback
+    [setPrivateForCurrent, errors, perType, shared, transactionType]
   );
 
   const handleAmountChange = (value: string) => {
