@@ -23,7 +23,6 @@ src/
         payload.ts
         staticData.ts
         syncCategory.ts
-        transferAccounts.ts
         validation.ts
       __tests__/
         amount.test.ts
@@ -321,7 +320,6 @@ import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
 import { syncCategory, FieldKey } from "../utils/syncCategory";
 import { buildSimpleTransactionPayload } from "../utils/payload";
-import { getCounterAccount } from "../utils/transferAccounts";
 
 export interface UseSimpleTransactionFormReturn {
   fields: SimpleTransactionFormShape;
@@ -460,16 +458,6 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
           ...((perType[transactionType] || {}) as PrivateFields),
           [field]: value,
         } as PrivateFields;
-
-        // Keep accounts different when transfer
-        if (transactionType === "simple_transfer") {
-          if (field === "account" && value === nextPrivate.to_account) {
-            nextPrivate.to_account = getCounterAccount(value);
-          }
-          if (field === "to_account" && value === nextPrivate.account) {
-            nextPrivate.account = getCounterAccount(value);
-          }
-        }
 
         // Sync category ↔ group (works on merged tmp object)
         const tmpMerged = {
@@ -854,26 +842,6 @@ export function syncCategory(
   // selected category intact, so we intentionally **do nothing** here.
 
   return next;
-}
-```
-
-### `src/forms/simple-transaction-form/utils/transferAccounts.ts`
-Simple helper that maps one bank account to its "opposite" for transfers.
-
-```ts
-export function getCounterAccount(account: string): string {
-  switch (account) {
-    case "mbank_firmowe":
-      return "mbank_osobiste";
-    case "mbank_osobiste":
-      return "mbank_firmowe";
-    case "cash":
-      return "mbank_osobiste";
-    case "sumup":
-      return "mbank_osobiste";
-    default:
-      return account;
-  }
 }
 ```
 

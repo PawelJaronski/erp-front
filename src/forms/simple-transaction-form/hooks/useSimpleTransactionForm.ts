@@ -248,8 +248,9 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     setIsSubmitting(true);
     try {
       const payload = buildSimpleTransactionPayload(mergedFields);
-      const res = await fetch(
-        "https://jaronski-erp-backend-production.up.railway.app/add-transaction",
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) throw new Error("API URL is not set");
+      const res = await fetch(`${apiUrl}/add-transaction`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
