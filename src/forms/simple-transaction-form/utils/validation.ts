@@ -41,8 +41,8 @@ export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape
     if (fields.to_account && fields.to_account === fields.account) {
       errors.to_account = "From and To accounts must differ";
     }
-  } else {
-    // Expense / income rules – validate categories
+  } else if (fields.transaction_type !== "payment_broker_transfer") {
+    // Expense / income rules – validate categories (NOT for broker transfer)
     const finalCategoryGroup = fields.category_group === "other" ? fields.custom_category_group ?? "" : fields.category_group;
     const finalCategory = fields.category === "other" ? fields.custom_category ?? "" : fields.category;
 
