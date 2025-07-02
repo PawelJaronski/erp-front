@@ -96,5 +96,15 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
     }
   }
 
+  // Usuń pola o wartości null, undefined lub pusty string
+  Object.keys(payload).forEach(
+    (key) => {
+      const k = key as keyof typeof payload;
+      if (payload[k] === undefined || payload[k] === null || payload[k] === "") {
+        delete (payload as any)[k];
+      }
+    }
+  );
+
   return payload;
 }
