@@ -6,6 +6,8 @@ import { syncCategory, FieldKey } from "../utils/syncCategory";
 import { buildSimpleTransactionPayload } from "../utils/payload";
 import { fetchSalesForDate, SalesData } from "../utils/sales";
 
+const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+
 export interface UseSimpleTransactionFormReturn {
   fields: SimpleTransactionFormShape;
   errors: Record<string, string>;
@@ -30,95 +32,109 @@ export interface UseSimpleTransactionFormReturn {
 
 const defaultDate = new Date().toISOString().split("T")[0];
 
-// Shared fields independent of transaction type
-const sharedKeys: (keyof SimpleTransactionFormShape)[] = [
-  "gross_amount",
-  "business_reference",
-  "item",
-  "note",
-  "business_timestamp",
-];
+// NOWE STAŁE
+const defaultSimpleExpenseState = {
+  gross_amount: "",
+  account: "mbank_osobiste",
+  category_group: "opex",
+  category: "",
+  business_reference: "",
+  item: "",
+  note: "",
+  business_timestamp: defaultDate,
+  tax_rate: 23,
+  include_tax: false,
+  custom_category_group: "",
+  custom_category: "",
+};
 
-type SharedFields = Pick<
-  SimpleTransactionFormShape,
-  "gross_amount" | "business_reference" | "item" | "note" | "business_timestamp"
->;
+const defaultSimpleIncomeState = {
+  gross_amount: "",
+  account: "mbank_osobiste",
+  category_group: "opex",
+  category: "",
+  business_reference: "",
+  item: "",
+  note: "",
+  business_timestamp: defaultDate,
+  tax_rate: 23,
+  include_tax: false,
+  custom_category_group: "",
+  custom_category: "",
+};
 
-type PrivateFields = Omit<SimpleTransactionFormShape, keyof SharedFields | "transaction_type">;
+const defaultSimpleTransferState = {
+  account: "mbank_firmowe",
+  to_account: "mbank_osobiste",
+  business_reference: "",
+  item: "",
+  note: "",
+  business_timestamp: defaultDate,
+};
 
-type PerTypeStore = Record<string, Partial<PrivateFields>>;
-
-function defaultPrivateForType(type: string): Partial<PrivateFields> {
-  if (type === "simple_transfer") {
-    return {
-      account: "mbank_firmowe",
-      to_account: "mbank_osobiste",
-      category_group: "",
-      category: "",
-    };
-  } else if (type === "payment_broker_transfer") {
-    return {
-      account: "paynow",
-      to_account: "mbank_firmowe",
-      category_group: "",
-      category: "",
-      transfer_date: defaultDate,
-      sales_date: (() => {
-        const d = new Date(defaultDate);
-        d.setDate(d.getDate() - 1);
-        return d.toISOString().split("T")[0];
-      })(),
-      paynow_transfer: "",
-      autopay_transfer: "",
-    };
-  }
-  return {
-    account: "mbank_osobiste",
-    category_group: "opex",
-    category: "",
-    custom_category_group: "",
-    custom_category: "",
-    include_tax: false,
-    tax_rate: 23,
-  };
-}
+const defaultPaymentBrokerTransferState = {
+  paynow_transfer: "",
+  autopay_transfer: "",
+  transfer_date: defaultDate,
+  sales_date: yesterday, 
+  business_reference: "",
+  item: "",
+  note: "",
+};
 
 export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
-  /* --------------------------------------------------------
-   *  State – shared and per-type private slices
-   * ------------------------------------------------------*/
-  const [shared, setShared] = useState<SharedFields>({
-    gross_amount: "",
-    business_reference: "",
-    item: "",
-    note: "",
-    business_timestamp: defaultDate,
-  });
+  const [currentView, setCurrentView] = useState<"simple_expense" | "simple_income" | "simple_transfer" | "payment_broker_transfer">("simple_expense");
 
-  const [perType, setPerType] = useState<PerTypeStore>({
-    simple_expense: defaultPrivateForType("simple_expense"),
-    simple_income: defaultPrivateForType("simple_income"),
-    simple_transfer: defaultPrivateForType("simple_transfer"),
-    payment_broker_transfer: defaultPrivateForType("payment_broker_transfer"),
-  });
+  const [simpleExpenseState, setSimpleExpenseState] = useState(defaultSimpleExpenseState);
+  const [simpleIncomeState, setSimpleIncomeState] = useState(defaultSimpleIncomeState);
+  const [simpleTransferState, setSimpleTransferState] = useState(defaultSimpleTransferState);
+  const [paymentBrokerTransferState, setPaymentBrokerTransferState] = useState(defaultPaymentBrokerTransferState);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Active transaction type
-  const [transactionType, setTransactionType] = useState<string>("simple_expense");
+  const getCurrentViewData = useCallback(() => {
+    switch (currentView) {
+      case "simple_expense": 
+        return simpleExpenseState;
+      case "simple_income": 
+        return simpleIncomeState;
+      case "simple_transfer": 
+        return simpleTransferState;
+      case "payment_broker_transfer": 
+        return paymentBrokerTransferState;
+      default:
+        return simpleExpenseState;
+    }
+  }, [currentView, simpleExpenseState, simpleIncomeState, simpleTransferState, paymentBrokerTransferState]);
 
-  /* --------------------------------------------------------
-   *  Derived helpers
-   * ------------------------------------------------------*/
+  const getCurrentViewSetter = useCallback(() => {
+    switch (currentView) {
+      case "simple_expense": 
+        return setSimpleExpenseState;
+      case "simple_income": 
+        return setSimpleIncomeState;
+      case "simple_transfer": 
+        return setSimpleTransferState;
+      case "payment_broker_transfer": 
+        return setPaymentBrokerTransferState;
+      default:
+        return setSimpleExpenseState;
+    }
+  }, [currentView]);
+
+  const updateCurrentViewField = useCallback((field: string, value: string | number | boolean) => {
+    const setter = getCurrentViewSetter();
+    setter((prev: any) => ({ ...prev, [field]: value }));
+  }, [getCurrentViewSetter]);
+
   const mergedFields: SimpleTransactionFormShape = useMemo(() => {
+    const currentData = getCurrentViewData();
     return {
-      transaction_type: transactionType,
-      ...shared,
-      ...perType[transactionType],
+      transaction_type: currentView,
+      ...currentData,
     } as SimpleTransactionFormShape;
-  }, [shared, perType, transactionType]);
+  }, [getCurrentViewData, currentView]);
 
   const availableCategories = useMemo(
     () => computeAvailableCategories(mergedFields),
@@ -170,113 +186,48 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
   // Remember which of the two date fields user modified last
   const lastDateChangedRef = useRef<"transfer_date" | "sales_date" | null>(null);
 
-  /* --------------------------------------------------------
-   *  Internal mutators
-   * ------------------------------------------------------*/
-  const setPrivateForCurrent = useCallback(
-    (update: Partial<PrivateFields>) => {
-      setPerType((prev) => ({
-        ...prev,
-        [transactionType]: { ...prev[transactionType], ...update },
-      }));
-    },
-    [transactionType]
-  );
-
   const handleFieldChange = useCallback(
     (field: keyof SimpleTransactionFormShape, value: string) => {
       // Special handling – switching view
       if (field === "transaction_type") {
-        const newType = value;
-        // Lazily initialise defaults only the first time we enter given type
-        setPerType((prev) => {
-          if (prev[newType]) return prev;
-          return { ...prev, [newType]: defaultPrivateForType(newType) };
-        });
-        setTransactionType(newType);
+        setCurrentView(value as any);
         return;
       }
-
-      // Shared slice update
-      if (sharedKeys.includes(field)) {
-        setShared((prev) => ({ ...prev, [field]: value } as SharedFields));
-      } else {
-        // Private slice update with extra rules for transfers & category sync
-        const nextPrivate = {
-          ...((perType[transactionType] || {}) as PrivateFields),
-          [field]: value,
-        } as PrivateFields;
-
-        // Sync category ↔ group (works on merged tmp object)
-        const tmpMerged = {
-          ...shared,
-          ...nextPrivate,
-          transaction_type: transactionType,
-        } as SimpleTransactionFormShape;
-
-        const synced = syncCategory(
-          tmpMerged,
-          field as FieldKey,
-          value,
-          (cat) => categoriesData.find((c) => c.value === cat)?.group
-        );
-
-        // Extract back private slice after sync
-        const newPrivate: Partial<PrivateFields> = {};
-        (Object.keys(synced) as (keyof SimpleTransactionFormShape)[]).forEach((k) => {
-          if (!sharedKeys.includes(k) && k !== "transaction_type") {
-            // @ts-expect-error – k in newPrivate by construction
-            newPrivate[k] = synced[k];
-          }
-        });
-
-        setPrivateForCurrent(newPrivate);
-      }
-
-      // Clear validation error for this field when user modifies it
+      updateCurrentViewField(field, value);
       if (errors[field as string]) {
         setErrors((prev) => ({ ...prev, [field as string]: "" }));
       }
 
-      // Track which date was modified last (for auto-adjust logic)
       if (field === "transfer_date" || field === "sales_date") {
         lastDateChangedRef.current = field;
       }
-    },
-    [setPrivateForCurrent, errors, shared, perType, transactionType]
+    }, [updateCurrentViewField, errors]
   );
-
   const handleAmountChange = (value: string) => {
     const clean = value.replace(/[^0-9,.-]/g, "");
-    handleFieldChange("gross_amount", clean);
+    updateCurrentViewField("gross_amount", clean);
   };
 
   const handleBooleanChange = useCallback(
     (field: keyof SimpleTransactionFormShape, value: boolean) => {
-      if (sharedKeys.includes(field)) {
-        setShared((prev) => ({ ...prev, [field]: value } as SharedFields));
-      } else {
-        setPrivateForCurrent({ [field]: value } as unknown as Partial<PrivateFields>);
-      }
-    },
-    [setPrivateForCurrent]
+      updateCurrentViewField(field, value);
+    }, [updateCurrentViewField]
   );
 
   const handleNumberChange = (field: keyof SimpleTransactionFormShape, value: number) => {
-    // Currently only tax_rate uses number path and belongs to private slice
-    setPrivateForCurrent({ [field]: value } as unknown as Partial<PrivateFields>);
+    updateCurrentViewField(field, value);
   };
 
   /* --------------------------------------------------------
    *  Auto-adjust date gap effect – ensures transfer_date ≥ sales_date + 1d
    * ------------------------------------------------------*/
   useEffect(() => {
-    if (transactionType !== "payment_broker_transfer") return;
-
+    if (currentView !== "payment_broker_transfer") return;
+  
     const T = mergedFields.transfer_date;
     const S = mergedFields.sales_date;
     if (!T || !S) return; // potrzebujemy obu dat
-
+  
     const toIso = (y: number, m: number, d: number) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const addDays = (dateStr: string, delta: number) => {
       const [y, m, d] = dateStr.split("-").map(Number);
@@ -284,40 +235,30 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
       const nd = new Date(utc);
       return toIso(nd.getUTCFullYear(), nd.getUTCMonth(), nd.getUTCDate());
     };
-
+  
     const parseUTC = (dateStr: string) => {
       const [y, m, d] = dateStr.split("-").map(Number);
       return Date.UTC(y, m - 1, d);
     };
-
+  
     const gapDays = (parseUTC(T) - parseUTC(S)) / 86400000;
     if (gapDays >= 1) return; // reguła spełniona – brak zmian
-
+  
     // reguła złamana (S ≥ T) – cofamy sales_date na dzień przed transfer_date
     const newSales = addDays(T, -1);
-    if (newSales !== S) setPrivateForCurrent({ sales_date: newSales });
-  }, [transactionType, mergedFields.transfer_date, mergedFields.sales_date, setPrivateForCurrent]);
+    if (newSales !== S) updateCurrentViewField("sales_date", newSales);
+  }, [currentView, mergedFields.transfer_date, mergedFields.sales_date, updateCurrentViewField]);
+
 
   /* --------------------------------------------------------
    *  Control helpers – reset & submit
    * ------------------------------------------------------*/
   const reset = () => {
-    setShared({
-      gross_amount: "",
-      business_reference: "",
-      item: "",
-      note: "",
-      business_timestamp: defaultDate,
-    });
-
-    setPerType({
-      simple_expense: defaultPrivateForType("simple_expense"),
-      simple_income: defaultPrivateForType("simple_income"),
-      simple_transfer: defaultPrivateForType("simple_transfer"),
-      payment_broker_transfer: defaultPrivateForType("payment_broker_transfer"),
-    });
-
-    setTransactionType("simple_expense");
+    setSimpleExpenseState(defaultSimpleExpenseState);
+    setSimpleIncomeState(defaultSimpleIncomeState);
+    setSimpleTransferState(defaultSimpleTransferState);
+    setPaymentBrokerTransferState(defaultPaymentBrokerTransferState);
+    setCurrentView("simple_expense");
     setErrors({});
   };
 
