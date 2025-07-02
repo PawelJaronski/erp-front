@@ -322,7 +322,10 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
   };
 
   const submit = async (): Promise<boolean> => {
+    console.log('--- SUBMIT start ---', mergedFields);
+
     let validationErrors = validateSimpleTransactionForm(mergedFields);
+    console.log('Validation errors:', validationErrors);
 
     // Additional Phase 3 rule: ensure paynow+autopay ≤ sales total for broker transfers
     if (mergedFields.transaction_type === "payment_broker_transfer") {
@@ -353,6 +356,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     setIsSubmitting(true);
     try {
       const payload = buildSimpleTransactionPayload(mergedFields);
+      console.log('Payload wysyłany do backendu:', payload);
       const res = await fetch(
         "https://jaronski-erp-backend-production.up.railway.app/add-transaction",
         {
