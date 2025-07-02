@@ -1,8 +1,7 @@
-  import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { categoriesData, accounts, categoryGroups } from "../utils/staticData";
 import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
-import { syncCategory, FieldKey } from "../utils/syncCategory";
 import { buildSimpleTransactionPayload } from "../utils/payload";
 import { fetchSalesForDate, SalesData } from "../utils/sales";
 
