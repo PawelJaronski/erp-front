@@ -362,7 +362,17 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         }
       );
 
-      if (!res.ok) throw new Error("Server error");
+      if (!res.ok) {
+        let backendMsg = "Unknown error";
+        try {
+          const errJson = await res.json();
+          backendMsg = JSON.stringify(errJson);
+        } catch (_) {
+          const text = await res.text();
+          backendMsg = text;
+        }
+        throw new Error(`Backend error ${res.status}: ${backendMsg}`);
+      }
 
       // success – reset but keep current account selection for convenience
       reset();
