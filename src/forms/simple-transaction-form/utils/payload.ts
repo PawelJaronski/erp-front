@@ -75,11 +75,15 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
     const autopay = parseAmount(form.autopay_transfer || "0");
     const total = paynow + autopay;
 
-    payload.gross_amount = total;
+    payload.gross_amount = normalizeAmount(total.toString());
 
     payload.business_timestamp = form.transfer_date ?? "";
-    payload.transfer_date = form.transfer_date ?? "";
-    payload.sales_date = form.sales_date ?? "";
+    if (form.transfer_date) {
+      payload.transfer_date = form.transfer_date;
+    }
+    if (form.sales_date) {
+      payload.sales_date = form.sales_date;
+    }
 
     payload.paynow_transfer = paynow;
     payload.autopay_transfer = autopay;
