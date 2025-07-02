@@ -1,34 +1,48 @@
+## **Payment Broker Transfer Implementation Plan**
 
-> Refactor state handling and fix layout jumps for SimpleTransactionForm.
+### **Agent Initial Verification Tasks**:
 
-### 1  State-management refactor
-* Add **shared slice** containing only:
-  `gross_amount`, `business_reference`, `item`, `note`, `business_timestamp`.
-* Add **perType map** keyed by `transaction_type` that stores the remaining private fields.
-* On every field change update either `shared` or the active `perType[type]`.
-* On `transaction_type` switch:
-  * Persist current view's private fields into its slot.
-  * Load or initialise next view's private fields (transfer gets `mbank_firmowe` → `mbank_osobiste` defaults).
-  * Merge with `shared` and feed to the component.
+Before implementing, the agent must:
 
-### 2  Layout stabilisation (CSS Grid)
-* Replace placeholder div hacks with a single grid template that always reserves space for every row/column.
-* Hidden controls get `visibility:hidden` so the grid footprint is constant.
-* VAT column becomes an invisible cell when transfer is active; `business_timestamp` remains right-aligned.
+1. **Audit existing design patterns**: Radio buttons, date inputs, amount fields, loading states, error display
+2. **Review existing form architecture**: useSimpleTransactionForm hook structure, conditional rendering patterns, validation approach
+3. **Check API integration patterns**: Existing fetch usage, error handling, loading state management
+4. **Verify naming conventions**: snake_case usage throughout existing interface
 
-### 3  Success notification
-* For transfers show `Konto: A → B`.
-* For expense/income show `Kategoria: X (grp) — Konto: A`.
+### **Phase 1: Foundation (Steps 1-3)**
 
-### 4  Default / cache rules
-* Apply From→To defaults **only the first time** you enter transfer.
-* Remember each view's private edits; never overwrite them when toggling.
+**Goal**: User can select payment broker transfer and interact with specific fields
 
-### 5  (Opt) Unit tests
-* Tests for per-type caching and shared slice.
-* Test payload builder skips VAT for transfers.
+1. **Add payment_broker_transfer to transaction type options** ✅ DONE
+2. **Extend useSimpleTransactionForm hook for broker state** ✅ DONE
+3. **Add conditional broker fields to SimpleTransactionForm UI** ✅ DONE
 
-### 6  Visual QA checklist
-* No vertical jump when toggling views.
-* `business_timestamp` always on the right.
-* Editing in one view doesn't leak private fields to others.
+_Result_: broker-transfer widok działa, pola kwot i dat renderują się poprawnie.
+
+### **Phase 2: Data Integration (Steps 4-6)**
+
+**Goal**: Automatic sales lookup with commission preview working
+
+4. **Add sales lookup API integration** ✅ DONE (Supabase RPC `sum_shop_sales_on_day_pl_paynow` + caching)
+5. **Implement auto-fetch on sales_date changes** ✅ DONE (useEffect + salesLoading)
+6. **Add real-time commission calculation display** ✅ DONE
+
+### **Phase 3: Business Logic (Steps 7-9)**
+
+**Goal**: Complete working payment broker transfer with all business rules
+
+7. **Implement date auto-adjustment logic** ✅ DONE (minimal rule: sales_date = transfer_date – 1 d if necessary)
+8. **Add validation and error handling** ⬜ PARTIAL (date gap + amount validation done; sales lookup errors TBD)
+9. **Complete payload building and submission** ⬜ TODO
+
+Next immediate tasks:
+• Finalise payload & submit tests (Phase 3-9)
+
+### **Critical Requirements for Agent**:
+
+- **Design Consistency**: Match existing component styling exactly
+- **Naming Convention**: Use snake_case for all labels and field names
+- **Functional Increments**: Each step must produce testable, visible results
+- **Pattern Following**: Extend existing patterns, don't create new ones
+
+**Agent, begin with verification of existing patterns, then proceed with Phase 1 implementation.**

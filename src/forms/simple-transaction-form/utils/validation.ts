@@ -15,6 +15,13 @@ export interface SimpleTransactionFormShape {
   item?: string;
   note?: string;
   to_account?: string;
+  /**
+   * Payment broker transfer–specific fields (Phase 1)
+   */
+  transfer_date?: string;
+  sales_date?: string;
+  paynow_transfer?: string;
+  autopay_transfer?: string;
 }
 
 /**
@@ -43,10 +50,43 @@ export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape
     if (!finalCategory.trim()) errors.category = "Select or enter category";
   }
 
-  if (!fields.business_timestamp.trim()) errors.business_timestamp = "Select date";
+  if (fields.transaction_type !== "payment_broker_transfer" && !fields.business_timestamp.trim()) {
+    errors.business_timestamp = "Select date";
+  }
 
-  const amountError = validateAmount(fields.gross_amount);
-  if (amountError) errors.gross_amount = amountError;
+  // Broker transfer requires transfer_date instead
+  if (fields.transaction_type === "payment_broker_transfer") {
+    if (!fields.transfer_date?.trim()) {
+      errors.transfer_date = "Select transfer date";
+    }
+    if (!fields.sales_date?.trim()) {
+      errors.sales_date = "Select sales date";
+    }
+
+    if (fields.transfer_date && fields.sales_date) {
+      const t = new Date(fields.transfer_date).getTime();
+      const s = new Date(fields.sales_date).getTime();
+      if (t - s < 86400000) {
+        errors.transfer_date = "transfer_date must be at least 1 day after sales_date";
+      }
+    }
+
+    // Require at least one of paynow or autopay amount
+    const paynowError = fields.paynow_transfer ? validateAmount(fields.paynow_transfer) : "";
+    const autopayError = fields.autopay_transfer ? validateAmount(fields.autopay_transfer) : "";
+
+    if (paynowError) errors.paynow_transfer = paynowError;
+    if (autopayError) errors.autopay_transfer = autopayError;
+
+    if (!fields.paynow_transfer?.trim() && !fields.autopay_transfer?.trim()) {
+      errors.paynow_transfer = "Enter at least one amount";
+    }
+  }
+
+  if (fields.transaction_type !== "payment_broker_transfer") {
+    const amountError = validateAmount(fields.gross_amount);
+    if (amountError) errors.gross_amount = amountError;
+  }
 
   return errors;
 }

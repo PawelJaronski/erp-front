@@ -1,9 +1,10 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { categoriesData, accounts, categoryGroups } from "../utils/staticData";
 import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
 import { syncCategory, FieldKey } from "../utils/syncCategory";
 import { buildSimpleTransactionPayload } from "../utils/payload";
+import { fetchSalesForDate, SalesData } from "../utils/sales";
 
 export interface UseSimpleTransactionFormReturn {
   fields: SimpleTransactionFormShape;
@@ -22,6 +23,8 @@ export interface UseSimpleTransactionFormReturn {
     categoryGroups: typeof categoryGroups;
     categories: typeof categoriesData;
     availableCategories: { value: string; group: string }[];
+    salesData?: SalesData | null;
+    salesLoading?: boolean;
   };
 }
 
@@ -53,6 +56,21 @@ function defaultPrivateForType(type: string): Partial<PrivateFields> {
       category_group: "",
       category: "",
     };
+  } else if (type === "payment_broker_transfer") {
+    return {
+      account: "paynow",
+      to_account: "mbank_firmowe",
+      category_group: "",
+      category: "",
+      transfer_date: defaultDate,
+      sales_date: (() => {
+        const d = new Date(defaultDate);
+        d.setDate(d.getDate() - 1);
+        return d.toISOString().split("T")[0];
+      })(),
+      paynow_transfer: "",
+      autopay_transfer: "",
+    };
   }
   return {
     account: "mbank_osobiste",
@@ -81,6 +99,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     simple_expense: defaultPrivateForType("simple_expense"),
     simple_income: defaultPrivateForType("simple_income"),
     simple_transfer: defaultPrivateForType("simple_transfer"),
+    payment_broker_transfer: defaultPrivateForType("payment_broker_transfer"),
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -105,6 +124,51 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     () => computeAvailableCategories(mergedFields),
     [mergedFields]
   );
+
+  /* --------------------------------------------------------
+   *  Phase 2 – sales lookup cache & loading
+   * ------------------------------------------------------*/
+  const [salesCache, setSalesCache] = useState<Record<string, SalesData>>({});
+  const [salesLoading, setSalesLoading] = useState(false);
+
+  const currentSales: SalesData | null = useMemo(() => {
+    if (mergedFields.transaction_type !== "payment_broker_transfer") return null;
+    return salesCache[mergedFields.sales_date ?? ""] || null;
+  }, [mergedFields.transaction_type, mergedFields.sales_date, salesCache]);
+
+  // Automatically fetch sales when sales_date changes for broker transfer
+  useEffect(() => {
+    const date = mergedFields.sales_date;
+    if (mergedFields.transaction_type !== "payment_broker_transfer" || !date) return;
+    if (salesCache[date]) return; // already cached
+
+    let cancelled = false;
+    setSalesLoading(true);
+    fetchSalesForDate(date)
+      .then((data) => {
+        if (cancelled) return;
+        setSalesCache((prev) => ({ ...prev, [date]: data }));
+      })
+      .catch((err) => {
+        console.error("Sales fetch error:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setSalesLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      // Prevent stale loading state when request is abandoned due to date change
+      setSalesLoading(false);
+    };
+  }, [mergedFields.transaction_type, mergedFields.sales_date, salesCache]);
+
+  /* --------------------------------------------------------
+   *  Phase 3 – auto-adjust transfer/sales dates (broker transfer)
+   * ------------------------------------------------------*/
+
+  // Remember which of the two date fields user modified last
+  const lastDateChangedRef = useRef<"transfer_date" | "sales_date" | null>(null);
 
   /* --------------------------------------------------------
    *  Internal mutators
@@ -143,8 +207,6 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
           [field]: value,
         } as PrivateFields;
 
-
-
         // Sync category ↔ group (works on merged tmp object)
         const tmpMerged = {
           ...shared,
@@ -175,6 +237,11 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
       if (errors[field as string]) {
         setErrors((prev) => ({ ...prev, [field as string]: "" }));
       }
+
+      // Track which date was modified last (for auto-adjust logic)
+      if (field === "transfer_date" || field === "sales_date") {
+        lastDateChangedRef.current = field;
+      }
     },
     [setPrivateForCurrent, errors]
   );
@@ -201,6 +268,37 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
   };
 
   /* --------------------------------------------------------
+   *  Auto-adjust date gap effect – ensures transfer_date ≥ sales_date + 1d
+   * ------------------------------------------------------*/
+  useEffect(() => {
+    if (transactionType !== "payment_broker_transfer") return;
+
+    const T = mergedFields.transfer_date;
+    const S = mergedFields.sales_date;
+    if (!T || !S) return; // potrzebujemy obu dat
+
+    const toIso = (y: number, m: number, d: number) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    const addDays = (dateStr: string, delta: number) => {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const utc = Date.UTC(y, m - 1, d) + delta * 86400000;
+      const nd = new Date(utc);
+      return toIso(nd.getUTCFullYear(), nd.getUTCMonth(), nd.getUTCDate());
+    };
+
+    const parseUTC = (dateStr: string) => {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      return Date.UTC(y, m - 1, d);
+    };
+
+    const gapDays = (parseUTC(T) - parseUTC(S)) / 86400000;
+    if (gapDays >= 1) return; // reguła spełniona – brak zmian
+
+    // reguła złamana (S ≥ T) – cofamy sales_date na dzień przed transfer_date
+    const newSales = addDays(T, -1);
+    if (newSales !== S) setPrivateForCurrent({ sales_date: newSales });
+  }, [transactionType, mergedFields.transfer_date, mergedFields.sales_date, setPrivateForCurrent]);
+
+  /* --------------------------------------------------------
    *  Control helpers – reset & submit
    * ------------------------------------------------------*/
   const reset = () => {
@@ -216,6 +314,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
       simple_expense: defaultPrivateForType("simple_expense"),
       simple_income: defaultPrivateForType("simple_income"),
       simple_transfer: defaultPrivateForType("simple_transfer"),
+      payment_broker_transfer: defaultPrivateForType("payment_broker_transfer"),
     });
 
     setTransactionType("simple_expense");
@@ -223,7 +322,29 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
   };
 
   const submit = async (): Promise<boolean> => {
-    const validationErrors = validateSimpleTransactionForm(mergedFields);
+    let validationErrors = validateSimpleTransactionForm(mergedFields);
+
+    // Additional Phase 3 rule: ensure paynow+autopay ≤ sales total for broker transfers
+    if (mergedFields.transaction_type === "payment_broker_transfer") {
+      const sales = currentSales?.total ?? null;
+
+      const toNum = (v?: string) => {
+        if (!v) return 0;
+        const cleaned = v.replace(/\s/g, "").replace(/,/g, ".");
+        const n = parseFloat(cleaned);
+        return isNaN(n) ? 0 : n;
+      };
+
+      const transfers = toNum(mergedFields.paynow_transfer) + toNum(mergedFields.autopay_transfer);
+
+      if (sales !== null && transfers > sales) {
+        validationErrors = {
+          ...validationErrors,
+          paynow_transfer: "Łączna kwota przelewów nie może przekraczać sprzedaży",
+        };
+      }
+    }
+
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length !== 0) {
       return false;
@@ -274,6 +395,8 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
       categoryGroups,
       categories: categoriesData,
       availableCategories,
+      salesData: currentSales,
+      salesLoading,
     },
   };
 } 

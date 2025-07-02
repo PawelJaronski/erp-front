@@ -12,7 +12,7 @@ const SimpleTransactionForm = () => {
     submit,
     reset: resetFormFromHook,
     handlers: { handleFieldChange, handleAmountChange, handleBooleanChange, handleNumberChange },
-    dataSources: { accounts, categoryGroups, availableCategories },
+    dataSources: { accounts, categoryGroups, availableCategories, salesData, salesLoading },
   } = useSimpleTransactionForm();
 
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | null>(null);
@@ -23,9 +23,36 @@ const SimpleTransactionForm = () => {
     category?: string;
     gross_amount: string;
     transaction_type: string;
+    transfer_date?: string;
+    sales_date?: string;
+    paynow_transfer?: string;
+    autopay_transfer?: string;
   } | null>(null);
 
-  const isTransfer = formData.transaction_type === "simple_transfer";
+  const isSimpleTransfer = formData.transaction_type === "simple_transfer";
+  const isBrokerTransfer = formData.transaction_type === "payment_broker_transfer";
+  const isTransfer = isSimpleTransfer || isBrokerTransfer;
+
+  // Helper parsing for broker commission preview
+  const parseAmount = (val?: string): number => {
+    if (!val) return 0;
+    const cleaned = val.replace(/\s/g, "").replace(/,/g, ".");
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  };
+
+  const paynowValue = parseAmount(formData.paynow_transfer);
+  const autopayValue = parseAmount(formData.autopay_transfer);
+  const transfersSum = paynowValue + autopayValue;
+
+  const formatDate = (iso?: string) => {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return `${d}.${m}.${y}`;
+  };
+
+  const salesTotal = salesData?.total ?? null;
+  const commissionPreview = salesTotal !== null ? salesTotal - transfersSum : null;
 
   const resetField = (field: keyof typeof formData) => {
     handleFieldChange(field, '');
@@ -49,6 +76,10 @@ const SimpleTransactionForm = () => {
         category: formData.category,
         gross_amount: formData.gross_amount,
         transaction_type: formData.transaction_type,
+        transfer_date: formData.transfer_date,
+        sales_date: formData.sales_date,
+        paynow_transfer: formData.paynow_transfer,
+        autopay_transfer: formData.autopay_transfer,
       });
     } else {
       // Only show error banner if there are no validation errors (server/network)
@@ -152,10 +183,22 @@ const SimpleTransactionForm = () => {
                   />
                   <span>transfer</span>
                 </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="transaction_type"
+                    value="payment_broker_transfer"
+                    checked={formData.transaction_type === "payment_broker_transfer"}
+                    onChange={(e) => handleFieldChange('transaction_type', e.target.value)}
+                    className="mr-2"
+                  />
+                  <span>broker transfer</span>
+                </label>
               </div>
             </div>
 
-            {/* Account (and optional to_account) row – always two columns on md+ to keep consistent width */}
+            {/* Account (and optional to_account) row – hidden for broker transfer */}
+            {!isBrokerTransfer && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -189,7 +232,7 @@ const SimpleTransactionForm = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.account}</p>
                 )}
               </div>
-              {isTransfer && (
+              {isSimpleTransfer && (
                 <div className="flex-1">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     to_account
@@ -224,8 +267,9 @@ const SimpleTransactionForm = () => {
                 </div>
               )}
             </div>
+            )}
 
-            {/* category row – invisible placeholder when transfer to avoid layout jump */}
+            {/* category row – invisible placeholder when transfer/broker transfer to avoid layout jump */}
             <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${isTransfer ? 'h-0 overflow-hidden opacity-0 pointer-events-none select-none' : ''}`}>
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -311,7 +355,8 @@ const SimpleTransactionForm = () => {
               </div>
             </div>
 
-            {/* gross_amount + business_reference in one row */}
+            {/* gross_amount + business_reference in one row – hidden for broker transfer */}
+            {!isBrokerTransfer && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex-1">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -328,102 +373,201 @@ const SimpleTransactionForm = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.gross_amount}</p>
                 )}
               </div>
-              <div className="flex-1">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  business_reference
-                </label>
-                <input
-                  type="text"
-                  value={formData.business_reference || ""}
-                  onChange={(e) => handleFieldChange('business_reference', e.target.value)}
-                  placeholder="Invoice number, order ID, etc."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
-                />
-              </div>
+              {!isBrokerTransfer && (
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    business_reference
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.business_reference || ""}
+                    onChange={(e) => handleFieldChange('business_reference', e.target.value)}
+                    placeholder="Invoice number, order ID, etc."
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+                  />
+                </div>
+              )}
             </div>
+            )}
 
-            {/* item + note in one row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex-1">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  item
-                </label>
-                <input
-                  type="text"
-                  value={formData.item || ""}
-                  onChange={(e) => handleFieldChange('item', e.target.value)}
-                  placeholder="What was purchased/sold"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
-                />
+            {/* item + note row hidden for broker transfer */}
+            {!isBrokerTransfer && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    item
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.item || ""}
+                    onChange={(e) => handleFieldChange('item', e.target.value)}
+                    placeholder="What was purchased/sold"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    note
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.note || ""}
+                    onChange={(e) => handleFieldChange('note', e.target.value)}
+                    placeholder="Additional details"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+                  />
+                </div>
               </div>
-              <div className="flex-1">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  note
-                </label>
-                <input
-                  type="text"
-                  value={formData.note || ""}
-                  onChange={(e) => handleFieldChange('note', e.target.value)}
-                  placeholder="Additional details"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
-                />
-              </div>
-            </div>
+            )}
 
-            {/* include_vat (switch) + business_timestamp in one row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              <div className={`flex flex-col ${isTransfer ? 'h-0 overflow-hidden opacity-0 pointer-events-none select-none' : ''}`}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  include_vat
-                </label>
-                {/* Layout: vertical on mobile (rates under switch), horizontal on md+ */}
-                <div className="flex flex-col md:flex-row items-start gap-2 md:gap-2">
-                  <button
-                    type="button"
-                    aria-pressed={formData.include_tax}
-                    onClick={() => handleBooleanChange('include_tax', !formData.include_tax)}
-                    className={`relative inline-flex h-8 w-16 border-2 border-transparent rounded-full cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-0 ${formData.include_tax ? 'bg-blue-600' : 'bg-gray-200'}`}
-                  >
-                    <span
-                      className={`inline-block h-7 w-7 rounded-full bg-white shadow transform ring-0 transition duration-200 ease-in-out ${formData.include_tax ? 'translate-x-8' : 'translate-x-0'}`}
-                    />
-                  </button>
+            {/* include_vat (switch) + business_timestamp in one row – hidden for broker transfer */}
+            {!isBrokerTransfer && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                <div className={`flex flex-col ${isTransfer ? 'h-0 overflow-hidden opacity-0 pointer-events-none select-none' : ''}`}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    include_vat
+                  </label>
+                  {/* Layout: vertical on mobile (rates under switch), horizontal on md+ */}
+                  <div className="flex flex-col md:flex-row items-start gap-2 md:gap-2">
+                    <button
+                      type="button"
+                      aria-pressed={formData.include_tax}
+                      onClick={() => handleBooleanChange('include_tax', !formData.include_tax)}
+                      className={`relative inline-flex h-8 w-16 border-2 border-transparent rounded-full cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-0 ${formData.include_tax ? 'bg-blue-600' : 'bg-gray-200'}`}
+                    >
+                      <span
+                        className={`inline-block h-7 w-7 rounded-full bg-white shadow transform ring-0 transition duration-200 ease-in-out ${formData.include_tax ? 'translate-x-8' : 'translate-x-0'}`}
+                      />
+                    </button>
 
-                  {/* VAT rate buttons – show only when VAT included */}
-                  {formData.include_tax && (
-                    <div className="flex gap-2 mt-2 md:mt-0">
-                      {[0, 5, 8, 23].map((rate) => (
-                        <button
-                          key={rate}
-                          type="button"
-                          tabIndex={0}
-                          onClick={() => handleNumberChange('tax_rate', rate)}
-                          className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 cursor-pointer ${
-                            formData.tax_rate === rate
-                              ? 'bg-blue-600 text-white border-blue-700'
-                              : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100'
-                          }`}
-                        >
-                          {rate}
-                        </button>
-                      ))}
-                    </div>
+                    {/* VAT rate buttons – show only when VAT included */}
+                    {formData.include_tax && (
+                      <div className="flex gap-2 mt-2 md:mt-0">
+                        {[0, 5, 8, 23].map((rate) => (
+                          <button
+                            key={rate}
+                            type="button"
+                            tabIndex={0}
+                            onClick={() => handleNumberChange('tax_rate', rate)}
+                            className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 cursor-pointer ${
+                              formData.tax_rate === rate
+                                ? 'bg-blue-600 text-white border-blue-700'
+                                : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100'
+                            }`}
+                          >
+                            {rate}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    business_timestamp
+                  </label>
+                  <DateInput
+                    value={formData.business_timestamp}
+                    onChange={(val) => handleFieldChange('business_timestamp', val)}
+                  />
+                  {errors.business_timestamp && (
+                    <p className="mt-1 text-sm text-red-600">{errors.business_timestamp}</p>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  business_timestamp
-                </label>
-                <DateInput
-                  value={formData.business_timestamp}
-                  onChange={(val) => handleFieldChange('business_timestamp', val)}
-                />
-                {errors.business_timestamp && (
-                  <p className="mt-1 text-sm text-red-600">{errors.business_timestamp}</p>
-                )}
-              </div>
-            </div>
+            )}
+
+            {/* Broker-specific fields – only dates for now */}
+            {isBrokerTransfer && (
+              <>
+                {/* paynow_transfer & autopay_transfer */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      paynow_transfer (zł)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.paynow_transfer || ''}
+                      onChange={(e) => {
+                        const clean = e.target.value.replace(/[^0-9,.-]/g, '');
+                        handleFieldChange('paynow_transfer', clean);
+                      }}
+                      placeholder="0,00"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+                     />
+                    {errors.paynow_transfer && (
+                      <p className="mt-1 text-sm text-red-600">{errors.paynow_transfer}</p>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      autopay_transfer (zł)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.autopay_transfer || ''}
+                      onChange={(e) => {
+                        const clean = e.target.value.replace(/[^0-9,.-]/g, '');
+                        handleFieldChange('autopay_transfer', clean);
+                      }}
+                      placeholder="0,00"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+                     />
+                    {errors.autopay_transfer && (
+                      <p className="mt-1 text-sm text-red-600">{errors.autopay_transfer}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* transfer_date & sales_date */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      transfer_date
+                    </label>
+                    <DateInput
+                      value={formData.transfer_date || ''}
+                      onChange={(val) => handleFieldChange('transfer_date', val)}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      sales_date
+                    </label>
+                    <DateInput
+                      value={formData.sales_date || ''}
+                      onChange={(val) => handleFieldChange('sales_date', val)}
+                    />
+                  </div>
+                </div>
+
+                {/* Sales summary & commission preview */}
+                <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg flex items-center gap-3">
+                  {salesLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+                      <span className="text-sm text-gray-600">Fetching sales…</span>
+                    </>
+                  ) : salesTotal !== null ? (
+                    <div className="text-sm text-gray-700 space-y-1">
+                      <p>
+                        Sprzedaż za <strong>{formatDate(formData.sales_date)}</strong>: <strong>{salesTotal.toFixed(2)} zł</strong>
+                      </p>
+                      <p>
+                        Suma przelewów: <strong>{transfersSum.toFixed(2)} zł</strong>
+                      </p>
+                      <p>
+                        Prowizja:{' '}
+                        <strong>{commissionPreview!.toFixed(2)} zł</strong>
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-gray-600">Brak danych o sprzedaży (wybierz datę)</span>
+                  )}
+                </div>
+              </>
+            )}
 
             {/* Submit and Reset Buttons */}
             <div className="pt-4 flex gap-3">

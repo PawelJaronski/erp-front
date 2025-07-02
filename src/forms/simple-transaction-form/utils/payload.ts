@@ -1,5 +1,5 @@
 import { SimpleTransactionFormShape } from "./validation";
-import { normalizeAmount } from "./amount";
+import { normalizeAmount, parseAmount } from "./amount";
 
 interface SimpleTransactionPayload {
   transaction_type: string;
@@ -7,7 +7,7 @@ interface SimpleTransactionPayload {
   account: string;
   category_group: string;
   category: string;
-  gross_amount: string;
+  gross_amount?: string | number;
   business_timestamp: string;
   business_reference?: string;
   item?: string;
@@ -15,6 +15,10 @@ interface SimpleTransactionPayload {
   include_tax?: boolean;
   tax_rate?: number;
   to_account?: string;
+  paynow_transfer?: number;
+  autopay_transfer?: number;
+  transfer_date?: string;
+  sales_date?: string;
 }
 
 /**
@@ -29,7 +33,7 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
   let finalCategoryGroup: string = category_group;
   let finalCategory: string = category;
 
-  if (form.transaction_type === "simple_transfer") {
+  if (form.transaction_type === "simple_transfer" || form.transaction_type === "payment_broker_transfer") {
     event_type = "transfer";
     finalCategoryGroup = "internal_transfer";
     finalCategory = "outgoing_transfer";
@@ -43,7 +47,6 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
     account: form.account,
     category_group: finalCategoryGroup,
     category: finalCategory,
-    gross_amount: normalizeAmount(form.gross_amount),
     business_timestamp: form.business_timestamp,
   };
 
@@ -57,13 +60,36 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
   if (form.note?.trim()) {
     payload.note = form.note;
   }
-  if (form.transaction_type !== "simple_transfer" && form.include_tax) {
+  if (!["simple_transfer", "payment_broker_transfer"].includes(form.transaction_type) && form.include_tax) {
     payload.include_tax = form.include_tax;
     payload.tax_rate = form.tax_rate;
   }
 
-  if (form.transaction_type === "simple_transfer") {
-    payload.to_account = form.to_account ?? "";
+  if (form.transaction_type === "payment_broker_transfer") {
+    // Static mapping per backend contract
+    payload.category_group = "payment_broker_transfer";
+    payload.category = "paynow_payout";
+    payload.account = "paynow";
+
+    const paynow = parseAmount(form.paynow_transfer || "0");
+    const autopay = parseAmount(form.autopay_transfer || "0");
+    const total = paynow + autopay;
+
+    payload.gross_amount = total;
+
+    payload.business_timestamp = form.transfer_date ?? "";
+    payload.transfer_date = form.transfer_date ?? "";
+    payload.sales_date = form.sales_date ?? "";
+
+    payload.paynow_transfer = paynow;
+    payload.autopay_transfer = autopay;
+  } else {
+    // For all other transaction types we send gross_amount as string
+    payload.gross_amount = normalizeAmount(form.gross_amount);
+
+    if (form.transaction_type === "simple_transfer") {
+      payload.to_account = form.to_account ?? "";
+    }
   }
 
   return payload;
