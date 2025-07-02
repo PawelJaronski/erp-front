@@ -101,7 +101,7 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
     (key) => {
       const k = key as keyof typeof payload;
       if (payload[k] === undefined || payload[k] === null || payload[k] === "") {
-        delete (payload as any)[k];
+        delete ((payload as unknown) as Record<string, unknown>)[k];
       }
     }
   );
