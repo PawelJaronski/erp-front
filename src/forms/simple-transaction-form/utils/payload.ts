@@ -85,8 +85,8 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
       payload.sales_date = form.sales_date;
     }
 
-    payload.paynow_transfer = paynow;
-    payload.autopay_transfer = autopay;
+    payload.paynow_transfer = paynow.toString();
+    payload.autopay_transfer = autopay.toString();
   } else {
     // For all other transaction types we send gross_amount as string
     payload.gross_amount = normalizeAmount(form.gross_amount);
