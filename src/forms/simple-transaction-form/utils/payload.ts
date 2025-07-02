@@ -15,8 +15,8 @@ interface SimpleTransactionPayload {
   include_tax?: boolean;
   tax_rate?: number;
   to_account?: string;
-  paynow_transfer?: number;
-  autopay_transfer?: number;
+  paynow_transfer?: string;
+  autopay_transfer?: string;
   transfer_date?: string;
   sales_date?: string;
 }
