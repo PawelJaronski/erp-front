@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+  import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { categoriesData, accounts, categoryGroups } from "../utils/staticData";
 import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
@@ -243,7 +243,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         lastDateChangedRef.current = field;
       }
     },
-    [setPrivateForCurrent, errors]
+    [setPrivateForCurrent, errors, shared, perType, transactionType]
   );
 
   const handleAmountChange = (value: string) => {
@@ -367,7 +367,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
         try {
           const errJson = await res.json();
           backendMsg = JSON.stringify(errJson);
-        } catch (_) {
+        } catch {
           const text = await res.text();
           backendMsg = text;
         }
