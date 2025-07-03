@@ -52,13 +52,13 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
 
   // Add optional fields only if they have values
   if (form.business_reference?.trim()) {
-    payload.business_reference = form.business_reference;
+    payload.business_reference = form.business_reference?.trim() || "";
   }
   if (form.item?.trim()) {
-    payload.item = form.item;
+    payload.item = form.item?.trim() || "";
   }
   if (form.note?.trim()) {
-    payload.note = form.note;
+    payload.note = form.note?.trim() || "";
   }
   if (!["simple_transfer", "payment_broker_transfer"].includes(form.transaction_type) && form.include_tax) {
     payload.include_tax = form.include_tax;
@@ -89,7 +89,7 @@ export function buildSimpleTransactionPayload(form: SimpleTransactionFormShape):
     payload.autopay_transfer = autopay.toString();
   } else {
     // For all other transaction types we send gross_amount as string
-    payload.gross_amount = normalizeAmount(form.gross_amount);
+    payload.gross_amount = normalizeAmount(form.gross_amount || "");
 
     if (form.transaction_type === "simple_transfer") {
       payload.to_account = form.to_account ?? "";
