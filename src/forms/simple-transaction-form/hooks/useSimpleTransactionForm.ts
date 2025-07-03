@@ -107,23 +107,12 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     }
   }, [currentView, simpleExpenseState, simpleIncomeState, simpleTransferState, paymentBrokerTransferState]);
 
-  const getCurrentViewSetter = useCallback(() => {
-    switch (currentView) {
-      case "simple_expense": 
-        return setSimpleExpenseState;
-      case "simple_income": 
-        return setSimpleIncomeState;
-      case "simple_transfer": 
-        return setSimpleTransferState;
-      case "payment_broker_transfer": 
-        return setPaymentBrokerTransferState;
-      default:
-        return setSimpleExpenseState;
-    }
-  }, [currentView]);
-
   const updateCurrentViewField = useCallback((field: string, value: string | number | boolean) => {
-    let setter: Dispatch<SetStateAction<any>>;
+    let setter:
+      | Dispatch<SetStateAction<typeof defaultSimpleExpenseState>>
+      | Dispatch<SetStateAction<typeof defaultSimpleIncomeState>>
+      | Dispatch<SetStateAction<typeof defaultSimpleTransferState>>
+      | Dispatch<SetStateAction<typeof defaultPaymentBrokerTransferState>>;
     switch (currentView) {
       case "simple_expense":
         setter = setSimpleExpenseState as Dispatch<SetStateAction<typeof defaultSimpleExpenseState>>;
