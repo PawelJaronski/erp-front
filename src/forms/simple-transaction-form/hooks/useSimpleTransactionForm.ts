@@ -198,6 +198,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
       // Special handling – switching view
       if (field === "transaction_type") {
         setCurrentView(value as "simple_expense" | "simple_income" | "simple_transfer" | "payment_broker_transfer");
+        setErrors({});
         return;
       }
       updateCurrentViewField(field, value);
@@ -261,20 +262,10 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
    *  Control helpers – reset & submit
    * ------------------------------------------------------*/
   const reset = () => {
-    switch (currentView) {
-      case "simple_expense":
-        setSimpleExpenseState(defaultSimpleExpenseState);
-        break;
-      case "simple_income":
-        setSimpleIncomeState(defaultSimpleIncomeState);
-        break;
-      case "simple_transfer":
-        setSimpleTransferState(defaultSimpleTransferState);
-        break;
-      case "payment_broker_transfer":
-        setPaymentBrokerTransferState(defaultPaymentBrokerTransferState);
-        break;
-    }
+    setSimpleExpenseState(defaultSimpleExpenseState);
+    setSimpleIncomeState(defaultSimpleIncomeState);
+    setSimpleTransferState(defaultSimpleTransferState);
+    setPaymentBrokerTransferState(defaultPaymentBrokerTransferState);
     setErrors({});
   };
 

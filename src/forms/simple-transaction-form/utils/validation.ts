@@ -31,7 +31,9 @@ export interface SimpleTransactionFormShape {
 export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape): Record<string, string> {
   const errors: Record<string, string> = {};
 
-  if (!(fields.account?.trim() || "")) errors.account = "Select account";
+  if (fields.transaction_type !== "payment_broker_transfer" && !(fields.account?.trim() || "")) {
+    errors.account = "Select account";
+  }
 
   // Transfer-specific rules
   const isTransfer = fields.transaction_type === "simple_transfer";
