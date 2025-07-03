@@ -1,260 +1,108 @@
-# Refaktoryzacja architektury formularza - Plan krok po kroku
+---
 
-## **Cel refaktoryzacji**
+## [UX/Frontend] Refactor transaction confirmation notification system
 
-Zastąpienie obecnej skomplikowanej architektury `shared` + `perType` prostszą, bardziej intuicyjną architekturą z **niezależnymi widokami**. Każdy widok (expense, income, transfer, broker_transfer) będzie miał swój własny, niezależny stan.
+### Problem
+Currently, the confirmation notification (success message) after submitting a transaction is tightly coupled to the fields of simple_expense/income/transfer. For new transaction types (e.g., payment_broker_transfer), the notification displays empty or irrelevant fields (e.g., "Kwota: zł", "Kategoria:", "Konto:"). This approach does not scale and requires manual if-else logic for every new type, making the code hard to maintain and error-prone.
 
-## **Problemy obecnej architektury**
+### Goal
+- Make the notification system modular and type-aware, so each transaction type can have its own dedicated confirmation template.
+- Avoid code duplication and excessive if-else logic in the main form component.
+- Make it easy to add new transaction types and their custom notification layouts in the future.
+- Ensure that existing notifications for expense, income, and transfer are not broken.
 
-1. **"Shared" nie są naprawdę shared** - broker_transfer ma zupełnie inne pola
-2. **Splątanie widoków** - reset jednego wpływa na inne
-3. **Dziwaczny reset** - zawsze przełącza na expense zamiast resetować aktualny widok
-4. **Nadmierna komplikacja** - skomplikowana logika łączenia stanów
+### Proposed solution
+- Extract the notification rendering logic into a separate function or component (e.g., `renderNotification(data)` or `<TransactionNotification data={...} />`).
+- Use a switch or mapping based on `transaction_type` to render the appropriate template for each type.
+- For example:
 
-## **Nowa architektura**
+```tsx
+function renderNotification(data) {
+  switch (data.transaction_type) {
+    case "simple_expense":
+    case "simple_income":
+      // ...
+      break;
+    case "simple_transfer":
+      // ...
+      break;
+    case "payment_broker_transfer":
+      // ...
+      break;
+    // ...future types
+  }
+}
+```
+- Use only the relevant fields for each type (e.g., show paynow/autopay/commission for broker transfer, not category/account).
+- Keep the notification logic clean and maintainable.
 
-### **Struktura stanu**
-```typescript
-// Zamiast: shared + perType + transactionType
-// Będzie: niezależne stany dla każdego widoku
+### Acceptance criteria
+- Each transaction type displays a meaningful, type-specific confirmation notification after submit.
+- No empty or irrelevant fields are shown in the notification.
+- Adding a new transaction type requires only adding a new case/template, not modifying the main form logic.
+- Existing notifications for expense, income, and transfer remain correct.
 
-const [currentView, setCurrentView] = useState<"simple_expense" | "simple_income" | "simple_transfer" | "payment_broker_transfer">("simple_expense");
+### Example implementation
 
-const [simpleExpenseState, setSimpleExpenseState] = useState({
-  gross_amount: "",
-  account: "mbank_osobiste",
-  category_group: "opex",
-  category: "",
-  business_reference: "",
-  item: "",
-  note: "",
-  business_timestamp: defaultDate,
-  include_tax: false,
-  tax_rate: 23,
-  custom_category_group: "",
-  custom_category: "",
-});
+Below is a ready-to-use example of a type-aware notification rendering function for transaction confirmations. This approach keeps the notification logic clean, maintainable, and easy to extend for new transaction types.
 
-const [simpleIncomeState, setSimpleIncomeState] = useState({
-  gross_amount: "",
-  account: "mbank_osobiste", 
-  category_group: "opex",
-  category: "",
-  business_reference: "",
-  item: "",
-  note: "",
-  business_timestamp: defaultDate,
-  include_tax: false,
-  tax_rate: 23,
-  custom_category_group: "",
-  custom_category: "",
-});
+```tsx
+// In your form component file (e.g., SimpleTransactionForm.tsx):
 
-const [simpleTransferState, setSimpleTransferState] = useState({
-  account: "mbank_firmowe",
-  to_account: "mbank_osobiste",
-  business_reference: "",
-  item: "",
-  note: "",
-  business_timestamp: defaultDate,
-});
+/**
+ * Renders a type-specific confirmation notification for a submitted transaction.
+ * Extend this function with new cases as you add more transaction types.
+ */
+function renderNotification(data: typeof lastSubmitted) {
+  if (!data) return null;
 
-const [paymentBrokerTransferState, setPaymentBrokerTransferState] = useState({
-  paynow_transfer: "",
-  autopay_transfer: "",
-  transfer_date: defaultDate,
-  sales_date: yesterday,
-  business_reference: "",
-  item: "",
-  note: "",
-});
+  switch (data.transaction_type) {
+    case "simple_expense":
+    case "simple_income":
+      return (
+        <>
+          Amount: <strong>{data.gross_amount} zł</strong> <br />
+          Category: <strong>{data.category}</strong>
+          {data.category_group ? ` (${data.category_group})` : ""} <br />
+          Account: <strong>{data.account}</strong>
+        </>
+      );
+    case "simple_transfer":
+      return (
+        <>
+          Amount: <strong>{data.gross_amount} zł</strong> <br />
+          From: <strong>{data.account}</strong> → <strong>{data.to_account}</strong>
+        </>
+      );
+    case "payment_broker_transfer":
+      return (
+        <>
+          Paynow: <strong>{data.paynow_transfer} zł</strong> <br />
+          Autopay: <strong>{data.autopay_transfer} zł</strong> <br />
+          Transfer date: <strong>{data.transfer_date}</strong> <br />
+          Sales date: <strong>{data.sales_date}</strong>
+        </>
+      );
+    // Add more cases here for future transaction types
+    default:
+      return null;
+  }
+}
 ```
 
-## **Plan refaktoryzacji - Etapy**
+**Usage in the component:**
 
-### **Etap 1: Przygotowanie i analiza** ✅
+Replace the current notification details with:
 
-**Cel**: Zrozumienie wszystkich zależności i przygotowanie planu
+```tsx
+<p className="text-sm text-gray-700 mt-1">
+  {renderNotification(lastSubmitted)}
+</p>
+```
 
-1. **Audyt obecnego kodu**
-   - Przeanalizuj wszystkie miejsca używające `shared`, `perType`, `transactionType`
-   - Zidentyfikuj wszystkie pola używane w każdym widoku
-   - Sprawdź jak `mergedFields` jest używane w komponencie
+**How to extend:**
+- When adding a new transaction type, add a new `case` to `renderNotification` with the relevant fields.
+- Do not modify the main form logic or notification markup elsewhere.
+- This keeps the notification system scalable and easy to maintain.
 
-2. **Analiza zależności**
-   - Sprawdź `useEffect` zależne od `transactionType`
-   - Przeanalizuj cache sales data
-   - Zidentyfikuj funkcje walidacji specyficzne dla typów
-
-3. **Przygotowanie typów TypeScript**
-   - Zdefiniuj interfejsy dla każdego widoku
-   - Zaktualizuj `SimpleTransactionFormShape`
-
-### **Etap 2: Refaktoryzacja stanu w hooku** ⬜
-
-**Cel**: Zastąpienie obecnej architektury stanu nową
-
-1. **Zastąpienie stanu**
-   - Usuń `shared`, `perType`, `transactionType`
-   - Dodaj `currentView` i stany dla każdego widoku
-   - Zaktualizuj `defaultPrivateForType` → `defaultStateForView`
-
-2. **Refaktoryzacja `mergedFields`**
-   - Zastąp `useMemo` z `shared` + `perType` + `transactionType`
-   - Nowa logika: `getCurrentViewData()` zwracająca dane aktualnego widoku
-
-3. **Aktualizacja handlerów**
-   - `handleFieldChange` - nowa logika dla aktualnego widoku
-   - `handleAmountChange` - specyficzne dla widoków z kwotami
-   - `handleBooleanChange` - specyficzne dla expense/income
-
-### **Etap 3: Refaktoryzacja funkcji kontrolnych** ⬜
-
-**Cel**: Aktualizacja reset, submit i przełączania widoków
-
-1. **Nowa funkcja `resetCurrentView`**
-   ```typescript
-   const resetCurrentView = () => {
-     switch (currentView) {
-       case "simple_expense":
-         setSimpleExpenseState(defaultSimpleExpenseState);
-         break;
-       case "simple_income":
-         setSimpleIncomeState(defaultSimpleIncomeState);
-         break;
-       case "simple_transfer":
-         setSimpleTransferState(defaultSimpleTransferState);
-         break;
-       case "payment_broker_transfer":
-         setPaymentBrokerTransferState(defaultPaymentBrokerTransferState);
-         break;
-     }
-     setErrors({});
-   };
-   ```
-
-2. **Nowa funkcja `switchView`**
-   ```typescript
-   const switchView = (newView: "simple_expense" | "simple_income" | "simple_transfer" | "payment_broker_transfer") => {
-     setCurrentView(newView);
-     // NIE resetuj niczego!
-   };
-   ```
-
-3. **Aktualizacja `submit`**
-   - Użyj `getCurrentViewData()` zamiast `mergedFields`
-   - Specyficzna walidacja per widok
-   - Po sukcesie: `resetCurrentView()` zamiast `reset()`
-
-### **Etap 4: Refaktoryzacja komponentu** ⬜
-
-**Cel**: Aktualizacja UI do nowej architektury
-
-1. **Aktualizacja radio buttons**
-   - `onChange` → `switchView()` zamiast `handleFieldChange('transaction_type')`
-   - `checked` → `currentView === "expense"` zamiast `transactionType`
-
-2. **Aktualizacja renderowania pól**
-   - Użyj `getCurrentViewData()` zamiast `formData`
-   - Specyficzne renderowanie per widok
-
-3. **Aktualizacja reset button**
-   - `onClick` → `resetCurrentView()` zamiast `reset()`
-
-### **Etap 5: Refaktoryzacja walidacji** ⬜
-
-**Cel**: Dostosowanie walidacji do nowej architektury
-
-1. **Nowe funkcje walidacji**
-   - `validateSimpleExpenseForm(simpleExpenseState)`
-   - `validateSimpleIncomeForm(simpleIncomeState)`
-   - `validateSimpleTransferForm(simpleTransferState)`
-   - `validatePaymentBrokerTransferForm(paymentBrokerTransferState)`
-
-2. **Aktualizacja `validateSimpleTransactionForm`**
-   - Użyj odpowiedniej funkcji walidacji na podstawie `currentView`
-
-### **Etap 6: Refaktoryzacja payload building** ⬜
-
-**Cel**: Dostosowanie budowania payload do nowej architektury
-
-1. **Aktualizacja nazwy funkcji payload**
-   - Zmień `buildSimpleTransactionPayload` → `buildTransactionPayload`
-   - Funkcja już obsługuje wszystkie typy, tylko nazwa jest myliąca
-
-2. **Opcjonalnie: Podział na osobne funkcje**
-   - `buildSimpleExpensePayload(simpleExpenseState)`
-   - `buildSimpleIncomePayload(simpleIncomeState)`
-   - `buildSimpleTransferPayload(simpleTransferState)`
-   - `buildPaymentBrokerTransferPayload(paymentBrokerTransferState)`
-
-### **Etap 7: Refaktoryzacja efektów i cache** ⬜
-
-**Cel**: Dostosowanie useEffect i cache do nowej architektury
-
-1. **Sales data cache**
-   - Zależność od `paymentBrokerTransferState.sales_date` zamiast `mergedFields.sales_date`
-   - Fetch tylko gdy `currentView === "payment_broker_transfer"`
-
-2. **Auto-adjust dates effect**
-   - Zależność od `paymentBrokerTransferState` zamiast `mergedFields`
-   - Działaj tylko gdy `currentView === "payment_broker_transfer"`
-
-### **Etap 8: Testowanie i debugowanie** ⬜
-
-**Cel**: Upewnienie się, że wszystko działa poprawnie
-
-1. **Testy funkcjonalne**
-   - Przełączanie między widokami zachowuje dane
-   - Reset resetuje tylko aktualny widok
-   - Submit działa dla wszystkich typów
-   - Walidacja działa poprawnie
-
-2. **Testy edge cases**
-   - Przełączanie z wypełnionymi danymi
-   - Reset po submit
-   - Błędy walidacji
-   - Cache sales data
-
-3. **Debugowanie**
-   - Sprawdź czy nie ma wycieków pamięci
-   - Sprawdź czy wszystkie pola renderują się poprawnie
-   - Sprawdź czy błędy są wyświetlane poprawnie
-
-### **Etap 9: Czyszczenie i optymalizacja** ⬜
-
-**Cel**: Usunięcie nieużywanego kodu i optymalizacja
-
-1. **Usunięcie nieużywanego kodu**
-   - Usuń `shared`, `perType`, `transactionType`
-   - Usuń `defaultPrivateForType`
-   - Usuń stary `reset()`
-
-2. **Optymalizacja**
-   - Sprawdź czy wszystkie `useCallback` i `useMemo` są nadal potrzebne
-   - Zoptymalizuj renderowanie komponentu
-
-3. **Dokumentacja**
-   - Zaktualizuj komentarze w kodzie
-   - Zaktualizuj README jeśli potrzeba
-
-## **Korzyści z nowej architektury**
-
-1. **Prawdziwa niezależność widoków** - reset jednego nie wpływa na inne
-2. **Intuicyjne zachowanie** - reset = "wyczyść ten widok"
-3. **Lepsze UX** - użytkownik może przerwać pracę w jednym widoku i wrócić
-4. **Prostsza logika** - brak skomplikowanego łączenia stanów
-5. **Łatwiejsze utrzymanie** - każdy widok ma swój własny, jasno zdefiniowany stan
-
-## **Potencjalne ryzyka**
-
-1. **Duża zmiana** - refaktoryzacja dotyka wielu plików
-2. **Testowanie** - potrzeba przetestowania wszystkich scenariuszy
-3. **Regresje** - ryzyko wprowadzenia błędów w istniejącej funkcjonalności
-
-## **Strategia wdrażania**
-
-1. **Implementuj etap po etapie** - nie rób wszystkiego na raz
-2. **Testuj po każdym etapie** - upewnij się, że funkcjonalność działa
-3. **Backup** - rób commity po każdym etapie
-4. **Rollback plan** - miej plan powrotu do poprzedniej wersji 
+---
