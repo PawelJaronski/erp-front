@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { categoriesData, accounts, categoryGroups } from "../utils/staticData";
 import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
@@ -123,9 +123,28 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
   }, [currentView]);
 
   const updateCurrentViewField = useCallback((field: string, value: string | number | boolean) => {
-    const setter = getCurrentViewSetter();
-    setter((prev: any) => ({ ...prev, [field]: value }));
-  }, [getCurrentViewSetter]);
+    let setter: Dispatch<SetStateAction<any>>;
+    switch (currentView) {
+      case "simple_expense":
+        setter = setSimpleExpenseState as Dispatch<SetStateAction<typeof defaultSimpleExpenseState>>;
+        setter((prev: typeof defaultSimpleExpenseState) => ({ ...prev, [field]: value }));
+        break;
+      case "simple_income":
+        setter = setSimpleIncomeState as Dispatch<SetStateAction<typeof defaultSimpleIncomeState>>;
+        setter((prev: typeof defaultSimpleIncomeState) => ({ ...prev, [field]: value }));
+        break;
+      case "simple_transfer":
+        setter = setSimpleTransferState as Dispatch<SetStateAction<typeof defaultSimpleTransferState>>;
+        setter((prev: typeof defaultSimpleTransferState) => ({ ...prev, [field]: value }));
+        break;
+      case "payment_broker_transfer":
+        setter = setPaymentBrokerTransferState as Dispatch<SetStateAction<typeof defaultPaymentBrokerTransferState>>;
+        setter((prev: typeof defaultPaymentBrokerTransferState) => ({ ...prev, [field]: value }));
+        break;
+      default:
+        break;
+    }
+  }, [currentView]);
 
   const mergedFields: SimpleTransactionFormShape = useMemo(() => {
     const currentData = getCurrentViewData();
@@ -189,7 +208,7 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
     (field: keyof SimpleTransactionFormShape, value: string) => {
       // Special handling – switching view
       if (field === "transaction_type") {
-        setCurrentView(value as any);
+        setCurrentView(value as "simple_expense" | "simple_income" | "simple_transfer" | "payment_broker_transfer");
         return;
       }
       updateCurrentViewField(field, value);
