@@ -145,7 +145,7 @@ const SimpleTransactionForm = () => {
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
           <div className="space-y-6">
             {/* transaction_type row */}
-            <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:flex-row flex-col w-full">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-nowrap w-full">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 transaction_type
               </label>
