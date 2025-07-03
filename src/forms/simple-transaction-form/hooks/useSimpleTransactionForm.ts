@@ -63,6 +63,7 @@ const defaultSimpleIncomeState = {
 };
 
 const defaultSimpleTransferState = {
+  gross_amount: "",
   account: "mbank_firmowe",
   to_account: "mbank_osobiste",
   business_reference: "",
