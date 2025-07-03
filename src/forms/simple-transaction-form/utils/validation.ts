@@ -31,7 +31,7 @@ export interface SimpleTransactionFormShape {
 export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape): Record<string, string> {
   const errors: Record<string, string> = {};
 
-  if (!fields.account.trim()) errors.account = "Select account";
+  if (!(fields.account?.trim() || "")) errors.account = "Select account";
 
   // Transfer-specific rules
   const isTransfer = fields.transaction_type === "simple_transfer";
@@ -46,20 +46,20 @@ export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape
     const finalCategoryGroup = fields.category_group === "other" ? fields.custom_category_group ?? "" : fields.category_group;
     const finalCategory = fields.category === "other" ? fields.custom_category ?? "" : fields.category;
 
-    if (!finalCategoryGroup.trim()) errors.category_group = "Select or enter category group";
-    if (!finalCategory.trim()) errors.category = "Select or enter category";
+    if (!(finalCategoryGroup?.trim() || "")) errors.category_group = "Select or enter category group";
+    if (!(finalCategory?.trim() || "")) errors.category = "Select or enter category";
   }
 
-  if (fields.transaction_type !== "payment_broker_transfer" && !fields.business_timestamp.trim()) {
+  if (fields.transaction_type !== "payment_broker_transfer" && !(fields.business_timestamp?.trim() || "")) {
     errors.business_timestamp = "Select date";
   }
 
   // Broker transfer requires transfer_date instead
   if (fields.transaction_type === "payment_broker_transfer") {
-    if (!fields.transfer_date?.trim()) {
+    if (!(fields.transfer_date?.trim() || "")) {
       errors.transfer_date = "Select transfer date";
     }
-    if (!fields.sales_date?.trim()) {
+    if (!(fields.sales_date?.trim() || "")) {
       errors.sales_date = "Select sales date";
     }
 
@@ -78,13 +78,13 @@ export function validateSimpleTransactionForm(fields: SimpleTransactionFormShape
     if (paynowError) errors.paynow_transfer = paynowError;
     if (autopayError) errors.autopay_transfer = autopayError;
 
-    if (!fields.paynow_transfer?.trim() && !fields.autopay_transfer?.trim()) {
+    if (!(fields.paynow_transfer?.trim() || "") && !(fields.autopay_transfer?.trim() || "")) {
       errors.paynow_transfer = "Enter at least one amount";
     }
   }
 
   if (fields.transaction_type !== "payment_broker_transfer") {
-    const amountError = validateAmount(fields.gross_amount);
+    const amountError = validateAmount(fields.gross_amount || "");
     if (amountError) errors.gross_amount = amountError;
   }
 

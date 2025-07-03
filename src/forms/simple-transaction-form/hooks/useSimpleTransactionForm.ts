@@ -261,11 +261,20 @@ export function useSimpleTransactionForm(): UseSimpleTransactionFormReturn {
    *  Control helpers – reset & submit
    * ------------------------------------------------------*/
   const reset = () => {
-    setSimpleExpenseState(defaultSimpleExpenseState);
-    setSimpleIncomeState(defaultSimpleIncomeState);
-    setSimpleTransferState(defaultSimpleTransferState);
-    setPaymentBrokerTransferState(defaultPaymentBrokerTransferState);
-    setCurrentView("simple_expense");
+    switch (currentView) {
+      case "simple_expense":
+        setSimpleExpenseState(defaultSimpleExpenseState);
+        break;
+      case "simple_income":
+        setSimpleIncomeState(defaultSimpleIncomeState);
+        break;
+      case "simple_transfer":
+        setSimpleTransferState(defaultSimpleTransferState);
+        break;
+      case "payment_broker_transfer":
+        setPaymentBrokerTransferState(defaultPaymentBrokerTransferState);
+        break;
+    }
     setErrors({});
   };
 
