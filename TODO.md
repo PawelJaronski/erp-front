@@ -1,5 +1,3 @@
----
-
 ## 1. [UX/Frontend] Refactor transaction confirmation notification system
 
 ### Problem
@@ -329,4 +327,290 @@ switch (type) {
 - Po refaktoryzacji dokumentuj API każdego pod-komponentu (propsy, callbacki).
 - Rozważ dodanie testów jednostkowych dla nowych komponentów.
 
-## 4. 
+## 4. [Architektura Full-Stack] Implementacja modułowej architektury "plastry" dla spójności frontend-backend
+
+### Problem
+Obecna architektura frontendu i backendu nie odzwierciedla wspólnych domen biznesowych. Frontend ma monolityczny `SimpleTransactionForm` obsługujący wszystkie typy transakcji, podczas gdy backend prawdopodobnie ma podobnie rozproszoną logikę. Brak spójności w nazewnictwie, strukturze folderów i regułach walidacji między warstwami prowadzi do:
+- Trudności w utrzymaniu kodu
+- Błędów spowodowanych różnicami w walidacji
+- Problemów z dodawaniem nowych typów transakcji
+- Braku możliwości reużycia logiki biznesowej
+
+### Goal
+- Wprowadzenie architektury "plastry" (vertical slices) gdzie frontend i backend odzwierciedlają te same domeny biznesowe
+- Spójność nazewnictwa, typów i reguł walidacji między warstwami
+- Modularność umożliwiająca łatwe dodawanie nowych typów transakcji
+- Reużywalność komponentów i logiki biznesowej
+
+### Proponowana architektura
+
+#### Struktura folderów - Frontend
+```
+erp-front/
+├── src/
+│   ├── features/                    # Plastry domenowe
+│   │   ├── transactions/           # Wszystko o transakcjach
+│   │   │   ├── components/         # Komponenty React
+│   │   │   │   ├── SimpleExpenseForm.tsx
+│   │   │   │   ├── SimpleIncomeForm.tsx
+│   │   │   │   ├── SimpleTransferForm.tsx
+│   │   │   │   └── PaymentBrokerTransferForm.tsx
+│   │   │   ├── hooks/              # Logika biznesowa
+│   │   │   ├── utils/              # Walidacja, transformacje
+│   │   │   ├── types/              # TypeScript interfaces
+│   │   │   └── api/                # API calls
+│   │   │       ├── transactions.ts
+│   │   │       └── contracts.ts    # Backend contracts
+│   │   ├── reports/                # Inny plaster domenowy
+│   │   └── accounts/               # Kolejny plaster
+│   └── shared/                     # Komponenty współdzielone
+│       ├── components/
+│       ├── utils/
+│       └── types/
+```
+
+#### Struktura folderów - Backend
+```
+erp-backend/
+├── src/
+│   ├── transactions/               # Ten sam plaster!
+│   │   ├── models/
+│   │   ├── services/
+│   │   ├── controllers/
+│   │   └── validators/
+│   ├── reports/
+│   └── accounts/
+```
+
+### Wspólne kontrakty API
+
+#### Frontend (`src/features/transactions/types/api-contracts.ts`)
+```typescript
+// Oficjalne kontrakty API - używane przez frontend i backend
+export const TRANSACTION_TYPES = {
+  SIMPLE_EXPENSE: "simple_expense",
+  SIMPLE_INCOME: "simple_income", 
+  SIMPLE_TRANSFER: "simple_transfer",
+  PAYMENT_BROKER_TRANSFER: "payment_broker_transfer",
+  VENDOR_COST: "vendor_cost"
+} as const;
+
+export type TransactionType = typeof TRANSACTION_TYPES[keyof typeof TRANSACTION_TYPES];
+
+export interface TransactionApiContract {
+  transaction_type: TransactionType;
+  event_type: "cost_paid" | "income_received" | "transfer";
+  account: string;
+  category_group: string;
+  category: string;
+  gross_amount: number;
+  business_timestamp: string;
+  business_reference?: string;
+  item?: string;
+  note?: string;
+}
+
+export interface PaymentBrokerTransferContract extends TransactionApiContract {
+  transaction_type: "payment_broker_transfer";
+  paynow_transfer: number;
+  autopay_transfer: number;
+  transfer_date: string;
+  sales_date: string;
+}
+```
+
+#### Backend (Python)
+```python
+from enum import Enum
+from pydantic import BaseModel
+from typing import Literal
+
+class TransactionType(str, Enum):
+    SIMPLE_EXPENSE = "simple_expense"
+    SIMPLE_INCOME = "simple_income"
+    SIMPLE_TRANSFER = "simple_transfer"
+    PAYMENT_BROKER_TRANSFER = "payment_broker_transfer"
+    VENDOR_COST = "vendor_cost"
+
+class TransactionApiContract(BaseModel):
+    transaction_type: TransactionType
+    event_type: Literal["cost_paid", "income_received", "transfer"]
+    account: str
+    category_group: str
+    category: str
+    gross_amount: float
+    business_timestamp: str
+    business_reference: str | None = None
+    item: str | None = None
+    note: str | None = None
+
+class PaymentBrokerTransferContract(TransactionApiContract):
+    transaction_type: Literal["payment_broker_transfer"]
+    paynow_transfer: float
+    autopay_transfer: float
+    transfer_date: str
+    sales_date: str
+```
+
+### Wspólne reguły walidacji
+
+#### Frontend (`src/features/transactions/utils/validation.ts`)
+```typescript
+export const VALIDATION_RULES = {
+  PAYMENT_BROKER_TRANSFER: {
+    MIN_DAYS_BETWEEN_SALES_AND_TRANSFER: 1,
+    MIN_AMOUNT: 0.01,
+    REQUIRED_FIELDS: ["transfer_date", "sales_date", "paynow_transfer", "autopay_transfer"]
+  }
+} as const;
+
+export function validatePaymentBrokerTransfer(data: PaymentBrokerTransferFormData) {
+  const errors: Record<string, string> = {};
+  
+  // Te same reguły co w backendzie
+  if (data.paynow_transfer <= 0 && data.autopay_transfer <= 0) {
+    errors.amount = "At least one transfer amount must be positive";
+  }
+  
+  // Sprawdzenie dat
+  const transferDate = new Date(data.transfer_date);
+  const salesDate = new Date(data.sales_date);
+  const daysDiff = (transferDate.getTime() - salesDate.getTime()) / (1000 * 60 * 60 * 24);
+  
+  if (daysDiff < VALIDATION_RULES.PAYMENT_BROKER_TRANSFER.MIN_DAYS_BETWEEN_SALES_AND_TRANSFER) {
+    errors.transfer_date = "Transfer date must be at least 1 day after sales date";
+  }
+  
+  return errors;
+}
+```
+
+#### Backend (Python)
+```python
+VALIDATION_RULES = {
+    "PAYMENT_BROKER_TRANSFER": {
+        "MIN_DAYS_BETWEEN_SALES_AND_TRANSFER": 1,
+        "MIN_AMOUNT": 0.01,
+        "REQUIRED_FIELDS": ["transfer_date", "sales_date", "paynow_transfer", "autopay_transfer"]
+    }
+}
+
+def validate_payment_broker_transfer(data: dict) -> Dict[str, str]:
+    errors = {}
+    
+    // Te same reguły co w frontendzie
+    if data.get("paynow_transfer", 0) <= 0 and data.get("autopay_transfer", 0) <= 0:
+        errors["amount"] = "At least one transfer amount must be positive"
+    
+    // Sprawdzenie dat
+    transfer_date = datetime.strptime(data["transfer_date"], "%Y-%m-%d")
+    sales_date = datetime.strptime(data["sales_date"], "%Y-%m-%d")
+    days_diff = (transfer_date - sales_date).days
+    
+    if days_diff < VALIDATION_RULES["PAYMENT_BROKER_TRANSFER"]["MIN_DAYS_BETWEEN_SALES_AND_TRANSFER"]:
+        errors["transfer_date"] = "Transfer date must be at least 1 day after sales date"
+    
+    return errors
+```
+
+### Komponenty modułowe
+
+#### Frontend - Każdy typ transakcji ma swój komponent
+```typescript
+// src/features/transactions/components/PaymentBrokerTransferForm.tsx
+export function PaymentBrokerTransferForm({ onSuccess }: { onSuccess: () => void }) {
+  const [formData, setFormData] = useState<PaymentBrokerTransferFormData>({
+    paynow_transfer: "",
+    autopay_transfer: "",
+    transfer_date: "",
+    sales_date: "",
+    business_reference: ""
+  });
+
+  const handleSubmit = async () => {
+    const payload = buildPaymentBrokerTransferPayload(formData);
+    await submitPaymentBrokerTransfer(payload);
+    onSuccess();
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Tylko pola dla payment_broker_transfer */}
+    </form>
+  );
+}
+```
+
+#### Backend - Każdy typ transakcji ma swój handler
+```python
+# src/transactions/handlers/payment_broker_transfer_handler.py
+class PaymentBrokerTransferHandler:
+    def handle(self, data: PaymentBrokerTransferContract) -> TransactionResult:
+        # Logika specyficzna dla payment_broker_transfer
+        commission = self.calculate_commission(data)
+        events = self.create_events(data, commission)
+        return TransactionResult(events=events)
+```
+
+### Plan implementacji
+
+#### Etap 1: Przygotowanie struktury (1-2 dni)
+1. Utworzenie struktury folderów `src/features/transactions/`
+2. Przeniesienie istniejących komponentów do nowej struktury
+3. Stworzenie wspólnych typów i kontraktów API
+
+#### Etap 2: Refaktoryzacja frontendu (3-5 dni)
+1. Wydzielenie komponentów dla każdego typu transakcji
+2. Implementacja wspólnych reguł walidacji
+3. Stworzenie reużywalnych komponentów (AccountSelect, CategorySelect, etc.)
+
+#### Etap 3: Synchronizacja backendu (2-3 dni)
+1. Aktualizacja struktury folderów backendu
+2. Implementacja tych samych kontraktów API
+3. Synchronizacja reguł walidacji
+
+#### Etap 4: Testowanie i dokumentacja (1-2 dni)
+1. Testy end-to-end dla każdego typu transakcji
+2. Dokumentacja API i komponentów
+3. Przykłady użycia
+
+### Korzyści
+- **Spójność:** Frontend i backend używają tych samych nazw i reguł
+- **Łatwość rozwoju:** Dodanie nowego typu transakcji to jeden plaster
+- **Reużywalność:** Komponenty i logika mogą być używane w różnych miejscach
+- **Testowalność:** Możliwość testowania całego plasteru end-to-end
+- **Maintenance:** Zmiany w jednym typie transakcji nie wpływają na inne
+
+### Acceptance criteria
+- Każdy typ transakcji ma swój dedykowany komponent i handler
+- Frontend i backend używają identycznych kontraktów API
+- Reguły walidacji są identyczne w obu warstwach
+- Struktura folderów odzwierciedla domeny biznesowe
+- Dodanie nowego typu transakcji wymaga zmian tylko w jednym plasterze
+
+### Ocena konwencji TODO
+
+**Dobre strony zastosowane:**
+- Struktura problem/goal/solution jest logiczna i czytelna
+- Konkretne przykłady kodu ułatwiają implementację
+- Szczegółowy plan implementacji z etapami
+- Jasne acceptance criteria
+
+**Ulepszenia wprowadzone:**
+- Dodanie sekcji "Ocena konwencji" na końcu
+- Spójny poziom szczegółowości z punktem 3
+- Konkretne szacunki czasowe dla każdego etapu
+- Przykłady struktury folderów z komentarzami
+- Większy nacisk na praktyczne korzyści
+
+**Słabe strony konwencji:**
+- Brak priorytetów między zadaniami
+- Niespójność w długości punktów
+- Brak oceny trudności implementacji
+- Brak zależności między zadaniami
+
+**Rekomendacje dla przyszłych punktów:**
+- Dodanie priorytetów (P1, P2, P3)
+- Szacunki trudności (łatwe/średnie/trudne)
+- Wskazanie zależności między zadaniami
+- Krótsze, bardziej skondensowane punkty 
