@@ -67,6 +67,26 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
     };
   }, [formData.sales_date, salesCache]);
 
+  /* --------------------------------------------------
+   * Auto-adjust gap: ensure transfer_date ≥ sales_date + 1d
+   * -------------------------------------------------- */
+  useEffect(() => {
+    const { transfer_date, sales_date } = formData;
+    if (!transfer_date || !sales_date) return;
+
+    const msDay = 86400000;
+    const t = Date.parse(transfer_date);
+    const s = Date.parse(sales_date);
+    if (Number.isNaN(t) || Number.isNaN(s)) return;
+
+    if (t - s < msDay) {
+      const newSales = new Date(t - msDay).toISOString().split('T')[0];
+      if (newSales !== sales_date) {
+        setFormData((prev) => ({ ...prev, sales_date: newSales }));
+      }
+    }
+  }, [formData.transfer_date, formData.sales_date]);
+
   const handleFieldChange = useCallback(<K extends keyof PaymentBrokerTransferFormData>(field: K, value: PaymentBrokerTransferFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     clearError(field as string);
