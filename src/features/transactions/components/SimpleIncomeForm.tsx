@@ -1,9 +1,11 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
 import { SimpleIncomeFormData } from '../types';
 import { useSimpleIncomeForm } from '../hooks/useSimpleIncomeForm';
 import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
 import { CategoryField, VATSection, FormActions } from '.';
+import { TransactionNotification } from './TransactionNotification';
+import { useToast } from '@/shared/components/ToastProvider';
 
 interface Props {
   onSubmit: (data: SimpleIncomeFormData) => Promise<void>;
@@ -11,11 +13,12 @@ interface Props {
 }
 
 export function SimpleIncomeForm({ onSubmit, onCancel }: Props) {
-  const [submitted, setSubmitted] = useState(false);
+  const { showToast } = useToast();
 
   const internalSubmit = async (data: SimpleIncomeFormData) => {
     await onSubmit(data);
-    setSubmitted(true);
+    const notificationData = { ...data, transaction_type: 'simple_income' } as unknown as Parameters<typeof TransactionNotification>[0]['data'];
+    showToast(<TransactionNotification data={notificationData} />, 'success');
   };
 
   const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset } =
@@ -76,12 +79,6 @@ export function SimpleIncomeForm({ onSubmit, onCancel }: Props) {
         onCancel={onCancel}
         isSubmitting={isSubmitting}
       />
-
-      {submitted && (
-        <p className="text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
-          Income saved successfully.
-        </p>
-      )}
     </form>
   );
 } 

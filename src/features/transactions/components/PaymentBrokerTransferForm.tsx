@@ -1,9 +1,11 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
 import { PaymentBrokerTransferFormData } from '../types';
 import { usePaymentBrokerTransferForm } from '../hooks/usePaymentBrokerTransferForm';
 import { FormField, AmountInput, DateInput } from '@/shared/components/form';
 import { FormActions } from '.';
+import { TransactionNotification } from './TransactionNotification';
+import { useToast } from '@/shared/components/ToastProvider';
 
 interface Props {
   onSubmit: (data: PaymentBrokerTransferFormData) => Promise<void>;
@@ -11,11 +13,12 @@ interface Props {
 }
 
 export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
-  const [submitted, setSubmitted] = useState(false);
+  const { showToast } = useToast();
 
   const internalSubmit = async (data: PaymentBrokerTransferFormData) => {
     await onSubmit(data);
-    setSubmitted(true);
+    const notificationData = { ...data, transaction_type: 'payment_broker_transfer' } as unknown as Parameters<typeof TransactionNotification>[0]['data'];
+    showToast(<TransactionNotification data={notificationData} />, 'success');
   };
 
   const {
@@ -116,12 +119,6 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
         isSubmitting={isSubmitting}
         saveDisabled={saveDisabled}
       />
-
-      {submitted && (
-        <p className="text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
-          Broker transfer saved successfully.
-        </p>
-      )}
     </form>
   );
 } 

@@ -3,12 +3,12 @@ import React, { createContext, useCallback, useContext, useState } from 'react';
 
 interface Toast {
   id: number;
-  message: string;
+  content: React.ReactNode;
   type: 'success' | 'error';
 }
 
 interface ToastContextValue {
-  showToast: (message: string, type?: 'success' | 'error') => void;
+  showToast: (content: React.ReactNode, type?: 'success' | 'error') => void;
 }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
@@ -16,9 +16,9 @@ const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+  const showToast = useCallback((content: React.ReactNode, type: 'success' | 'error' = 'success') => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, content, type }]);
     // auto-remove after 4s
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -34,7 +34,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             key={t.id}
             className={`px-4 py-3 rounded-lg shadow text-white ${t.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
           >
-            {t.message}
+            {t.content}
           </div>
         ))}
       </div>

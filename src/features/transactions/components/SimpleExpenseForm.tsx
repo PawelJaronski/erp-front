@@ -1,9 +1,11 @@
 "use client";
-import React, { useState } from 'react';
+import React from 'react';
 import { SimpleExpenseFormData } from '../types';
 import { useSimpleExpenseForm } from '../hooks/useSimpleExpenseForm';
 import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
 import { CategoryField, VATSection, FormActions } from '.';
+import { TransactionNotification } from './TransactionNotification';
+import { useToast } from '@/shared/components/ToastProvider';
 
 interface SimpleExpenseFormProps {
   onSubmit: (data: SimpleExpenseFormData) => Promise<void>;
@@ -11,11 +13,13 @@ interface SimpleExpenseFormProps {
 }
 
 export function SimpleExpenseForm({ onSubmit, onCancel }: SimpleExpenseFormProps) {
-  const [submitted, setSubmitted] = useState(false);
+  const { showToast } = useToast();
 
   const internalSubmit = async (data: SimpleExpenseFormData) => {
     await onSubmit(data);
-    setSubmitted(true);
+    // show type-aware notification toast
+    const notificationData = { ...data, transaction_type: 'simple_expense' } as unknown as Parameters<typeof TransactionNotification>[0]['data'];
+    showToast(<TransactionNotification data={notificationData} />, 'success');
   };
 
   const {
@@ -80,12 +84,6 @@ export function SimpleExpenseForm({ onSubmit, onCancel }: SimpleExpenseFormProps
 
       {/* Actions */}
       <FormActions onSubmit={handleSubmit} onReset={reset} onCancel={onCancel} isSubmitting={isSubmitting} />
-
-      {submitted && (
-        <p className="text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
-          Expense saved successfully.
-        </p>
-      )}
     </form>
   );
 } 
