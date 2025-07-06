@@ -27,9 +27,13 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
     reset,
     salesTotal,
     salesLoading,
+    salesError,
+    retrySalesFetch,
   } = usePaymentBrokerTransferForm({ onSubmit: internalSubmit }) as ReturnType<typeof usePaymentBrokerTransferForm> & {
     salesTotal?: number;
     salesLoading: boolean;
+    salesError: string | null;
+    retrySalesFetch: () => void;
   };
 
   const transfersSum =
@@ -40,7 +44,7 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
     salesTotal !== undefined ? Number((salesTotal - transfersSum).toFixed(2)) : undefined;
 
   const saveDisabled =
-    isSubmitting || salesLoading || (commissionDiff !== undefined && Math.abs(commissionDiff) > 0.01);
+    isSubmitting || salesLoading || salesError !== null || (commissionDiff !== undefined && Math.abs(commissionDiff) > 0.01);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -89,6 +93,18 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
               {commissionDiff !== undefined && (
                 <p>Commission difference: <span className="font-semibold">{commissionDiff.toFixed(2)} zł</span></p>
               )}
+            </div>
+          )}
+          {salesError && (
+            <div className="mt-2 text-red-700 bg-red-50 border border-red-200 rounded p-3">
+              <p className="text-sm mb-2">{salesError}</p>
+              <button
+                type="button"
+                onClick={retrySalesFetch}
+                className="px-4 py-2 text-sm font-semibold text-red-700 border border-red-600 rounded hover:bg-red-100"
+              >
+                Retry
+              </button>
             </div>
           )}
         </div>

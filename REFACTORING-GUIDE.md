@@ -619,6 +619,17 @@ ERROR HANDLING:
 
 ### Phase 5 (planned)
 
-1. Error handling for sales fetch (display message & retry button, propagate `salesError`)
-2. Add integration test for `PaymentBrokerTransferForm` rendering preview and disabling save
-3. Update README with `PaymentBrokerTransferForm` docs & contribution guidelines for writing validators/hooks
+#### Completed
+
+- [x] Error handling for sales fetch (`salesError`, retry button, disabled Save)
+- [x] Integration test (`PaymentBrokerTransferForm` error handling + retry)
+
+#### Remaining TODO
+
+- [ ] Update README (broker transfer docs, guidelines)
+
+### Phase 6 (planned)
+
+1. README update described above
+2. Integration test for happy-path (valid sales fetch) incl. commission diff logic
+3. Cypress e2e skeleton setup (start page, toggle tabs, fill forms) – groundwork for future phases

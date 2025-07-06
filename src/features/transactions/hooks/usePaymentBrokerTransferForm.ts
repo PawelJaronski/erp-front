@@ -34,6 +34,7 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
   /* ------------------ sales cache & loading ------------------ */
   const [salesCache, setSalesCache] = useState<Record<string, number>>({});
   const [salesLoading, setSalesLoading] = useState(false);
+  const [salesError, setSalesError] = useState<string | null>(null);
 
   const salesTotal = formData.sales_date ? salesCache[formData.sales_date] : undefined;
 
@@ -49,9 +50,12 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
       .then((data) => {
         if (cancelled) return;
         setSalesCache((prev) => ({ ...prev, [date]: data.total }));
+        setSalesError(null);
       })
-      .catch(() => {
-        // ignore error for now
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        const msg = err instanceof Error ? err.message : 'Failed to load sales';
+        setSalesError(msg);
       })
       .finally(() => {
         if (!cancelled) setSalesLoading(false);
@@ -80,9 +84,22 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
     setFormData(defaultState);
   }, []);
 
+  const retrySalesFetch = useCallback(() => {
+    if (!formData.sales_date) return;
+    // remove cached error and force refetch by removing cache entry
+    setSalesCache((prev) => {
+      const clone = { ...prev };
+      delete clone[formData.sales_date!];
+      return clone;
+    });
+    setSalesError(null);
+  }, [formData.sales_date]);
+
   type Extra = {
     salesTotal?: number;
     salesLoading: boolean;
+    salesError: string | null;
+    retrySalesFetch: () => void;
   };
 
   return {
@@ -94,5 +111,7 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
     reset,
     salesTotal,
     salesLoading,
+    salesError,
+    retrySalesFetch,
   } as BaseFormHookReturn<PaymentBrokerTransferFormData> & Extra;
 } 
