@@ -8,18 +8,21 @@ import {
 import React, { useState } from "react";
 import { addTransaction } from '@/features/transactions/api';
 import type { TransactionRequest } from '@/shared/contracts/transactions';
-
-// Accept unknown form data; convert before sending to backend
-const handleSubmit = async (data: unknown) => {
-  try {
-    await addTransaction(data as TransactionRequest);
-  } catch (e) {
-    console.error(e);
-  }
-};
+import { useToast } from '@/shared/components/ToastProvider';
 
 export default function Home() {
   const [activeForm, setActiveForm] = useState<"expense" | "income" | "transfer" | "broker">("expense");
+  const { showToast } = useToast();
+
+  const handleSubmit = async (data: unknown) => {
+    try {
+      await addTransaction(data as TransactionRequest);
+      showToast('Transaction saved', 'success');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Unexpected error';
+      showToast(msg, 'error');
+    }
+  };
 
   return (
     <main className="h-screen overflow-y-auto p-4">
