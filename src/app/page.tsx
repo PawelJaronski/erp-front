@@ -1,3 +1,4 @@
+"use client";
 import SimpleTransactionForm from "@/components/SimpleTransactionForm";
 import {
   SimpleExpenseForm,
