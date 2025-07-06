@@ -18,8 +18,23 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
     setSubmitted(true);
   };
 
-  const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset } =
-    usePaymentBrokerTransferForm({ onSubmit: internalSubmit });
+  const {
+    formData,
+    errors,
+    isSubmitting,
+    handleFieldChange,
+    handleSubmit,
+    reset,
+    salesTotal,
+    salesLoading,
+  } = usePaymentBrokerTransferForm({ onSubmit: internalSubmit }) as ReturnType<typeof usePaymentBrokerTransferForm> & {
+    salesTotal?: number;
+    salesLoading: boolean;
+  };
+
+  const transfersSum =
+    (Number((formData.paynow_transfer || '').replace(',', '.')) || 0) +
+    (Number((formData.autopay_transfer || '').replace(',', '.')) || 0);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -55,7 +70,23 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
         </FormField>
       </div>
 
-      {/* TODO: add sales summary preview in Phase 4 */}
+      {/* Preview Section */}
+      {formData.sales_date && (
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <p className="text-sm font-medium text-gray-700 mb-2">Commission Preview</p>
+          {salesLoading ? (
+            <p className="text-gray-500 text-sm">Loading sales…</p>
+          ) : (
+            <div className="space-y-1 text-sm">
+              <p>Total sales on {formData.sales_date}: <span className="font-semibold">{salesTotal?.toFixed(2) ?? "–"} zł</span></p>
+              <p>Total transfers entered: <span className="font-semibold">{transfersSum.toFixed(2)} zł</span></p>
+              {salesTotal !== undefined && (
+                <p>Commission difference: <span className="font-semibold">{(salesTotal - transfersSum).toFixed(2)} zł</span></p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <FormActions onSubmit={handleSubmit} onReset={reset} onCancel={onCancel} isSubmitting={isSubmitting} />
 

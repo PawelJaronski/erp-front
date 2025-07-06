@@ -609,3 +609,8 @@ ERROR HANDLING:
 - [x] Added unit tests for validators and hooks (`simpleExpenseValidator`, `useSimpleExpenseForm`)
 - [x] ESLint tests exclusion & Vercel build green
 - [x] Added `SimpleTransferForm`, `useSimpleTransferForm`, validator + tests
+
+### Phase 4
+
+- [x] Integrated `fetchSalesForDate` lookup & in-memory cache into `usePaymentBrokerTransferForm`
+- [x] Displayed commission preview with loading state in `PaymentBrokerTransferForm`
