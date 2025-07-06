@@ -9,10 +9,10 @@ import React, { useState } from "react";
 import { addTransaction } from '@/features/transactions/api';
 import type { TransactionRequest } from '@/shared/contracts/transactions';
 
-// Accept any form data and let backend util validate shape
-const handleSubmit = async (data: any) => {
+// Accept unknown form data; convert before sending to backend
+const handleSubmit = async (data: unknown) => {
   try {
-    await addTransaction(data as unknown as TransactionRequest);
+    await addTransaction(data as TransactionRequest);
   } catch (e) {
     console.error(e);
   }
