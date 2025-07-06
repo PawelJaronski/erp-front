@@ -6,7 +6,7 @@ import {
 import { useValidation } from '@/shared/hooks/useValidation';
 import { useApiSubmission } from '@/shared/hooks/useApiSubmission';
 import { paymentBrokerTransferValidator } from '../validators/paymentBrokerTransferValidator';
-import { fetchSalesForDate } from '@/forms/simple-transaction-form/utils/sales';
+import { fetchSalesForDate } from '@/features/transactions/utils/sales';
 
 const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 const today = new Date().toISOString().split('T')[0];

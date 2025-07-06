@@ -4,10 +4,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import { PaymentBrokerTransferForm } from '../PaymentBrokerTransferForm';
 
-jest.mock('@/forms/simple-transaction-form/utils/sales', () => ({
+jest.mock('@/features/transactions/utils/sales', () => ({
   fetchSalesForDate: jest.fn(),
 }));
-const { fetchSalesForDate } = jest.requireMock('@/forms/simple-transaction-form/utils/sales') as {
+const { fetchSalesForDate } = jest.requireMock('@/features/transactions/utils/sales') as {
   fetchSalesForDate: jest.Mock;
 };
 
