@@ -626,7 +626,7 @@ ERROR HANDLING:
 
 #### Remaining TODO
 
-- [ ] Update README (broker transfer docs, guidelines)
+- [x] Update README (broker transfer docs, guidelines)
 
 ### Phase 6 (planned)
 
