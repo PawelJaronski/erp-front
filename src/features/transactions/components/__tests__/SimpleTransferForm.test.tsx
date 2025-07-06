@@ -1,5 +1,5 @@
-/// <reference types="jest" />
 // @ts-nocheck
+/// <reference types="jest" />
 import { describe, it, expect, jest } from '@jest/globals';
 import '@testing-library/jest-dom/extend-expect';
 import { render, screen } from '@testing-library/react';
