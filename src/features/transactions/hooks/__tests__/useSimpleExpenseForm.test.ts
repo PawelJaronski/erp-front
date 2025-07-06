@@ -4,20 +4,9 @@ import { renderHook, act } from '@testing-library/react';
 import { useSimpleExpenseForm } from '../useSimpleExpenseForm';
 import type { SimpleExpenseFormData } from '../../types';
 
-const validData: SimpleExpenseFormData = {
-  account: 'mbank_osobiste',
-  category_group: 'opex',
-  category: 'ads',
-  gross_amount: '10,00',
-  business_timestamp: '2025-01-01',
-  include_tax: false,
-  tax_rate: 23,
-  custom_category_group: '',
-  custom_category: '',
-};
+const submitMock = jest.fn<Promise<void>, [SimpleExpenseFormData]>();
 
-type HandleFn = (field: keyof import('../../types').SimpleExpenseFormData, value: unknown) => void;
-const fillMinimalValidFields = (handle: HandleFn) => {
+const fillRequiredFields = (handle: <K extends keyof SimpleExpenseFormData>(f: K, v: SimpleExpenseFormData[K]) => void) => {
   handle('account', 'mbank_osobiste');
   handle('gross_amount', '10,00');
   handle('business_timestamp', '2025-01-01');
@@ -27,26 +16,26 @@ const fillMinimalValidFields = (handle: HandleFn) => {
 
 describe('useSimpleExpenseForm', () => {
   it('submits valid data without errors', async () => {
-    const onSubmit = jest.fn() as any;
-    const { result } = renderHook(() => useSimpleExpenseForm({ onSubmit } as any));
+    const { result } = renderHook(() => useSimpleExpenseForm({ onSubmit: submitMock }));
 
     act(() => {
-      fillMinimalValidFields(result.current.handleFieldChange as any);
+      fillRequiredFields(result.current.handleFieldChange);
     });
 
     await act(async () => {
       await result.current.handleSubmit({ preventDefault: () => {} } as unknown as React.FormEvent);
     });
 
-    expect(onSubmit).toHaveBeenCalled();
+    expect(submitMock).toHaveBeenCalledTimes(1);
     expect(result.current.errors).toEqual({});
   });
 
   it('sets error when amount missing', async () => {
-    const onSubmit = jest.fn() as any;
-    const { result } = renderHook(() => useSimpleExpenseForm({ onSubmit } as any));
+    submitMock.mockClear();
+    const { result } = renderHook(() => useSimpleExpenseForm({ onSubmit: submitMock }));
 
     act(() => {
+      // Fill only a subset – leave amount empty
       result.current.handleFieldChange('account', 'mbank_osobiste');
     });
 
@@ -54,7 +43,7 @@ describe('useSimpleExpenseForm', () => {
       await result.current.handleSubmit({ preventDefault: () => {} } as unknown as React.FormEvent);
     });
 
-    expect(onSubmit).not.toHaveBeenCalled();
+    expect(submitMock).not.toHaveBeenCalled();
     expect(result.current.errors.gross_amount).toBe('Enter amount');
   });
 }); 
