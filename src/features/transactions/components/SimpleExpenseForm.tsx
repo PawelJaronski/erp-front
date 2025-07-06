@@ -9,10 +9,11 @@ import { useToast } from '@/shared/components/ToastProvider';
 
 interface SimpleExpenseFormProps {
   onSubmit: (data: SimpleExpenseFormData) => Promise<void>;
-  onCancel: () => void;
+  /** kept optional for backward compatibility, ignored */
+  onCancel?: () => void;
 }
 
-export function SimpleExpenseForm({ onSubmit, onCancel }: SimpleExpenseFormProps) {
+export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
   const { showToast } = useToast();
 
   const internalSubmit = async (data: SimpleExpenseFormData) => {
@@ -83,7 +84,7 @@ export function SimpleExpenseForm({ onSubmit, onCancel }: SimpleExpenseFormProps
       />
 
       {/* Actions */}
-      <FormActions onSubmit={handleSubmit} onReset={reset} onCancel={onCancel} isSubmitting={isSubmitting} />
+      <FormActions onSubmit={handleSubmit} onReset={reset} isSubmitting={isSubmitting} />
     </form>
   );
 } 

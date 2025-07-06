@@ -9,10 +9,10 @@ import { useToast } from '@/shared/components/ToastProvider';
 
 interface Props {
   onSubmit: (data: PaymentBrokerTransferFormData) => Promise<void>;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
-export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
+export function PaymentBrokerTransferForm({ onSubmit }: Props) {
   const { showToast } = useToast();
 
   const internalSubmit = async (data: PaymentBrokerTransferFormData) => {
@@ -115,7 +115,6 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
       <FormActions
         onSubmit={handleSubmit}
         onReset={reset}
-        onCancel={onCancel}
         isSubmitting={isSubmitting}
         saveDisabled={saveDisabled}
       />

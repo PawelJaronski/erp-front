@@ -9,10 +9,10 @@ import { useToast } from '@/shared/components/ToastProvider';
 
 interface Props {
   onSubmit: (data: SimpleIncomeFormData) => Promise<void>;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
-export function SimpleIncomeForm({ onSubmit, onCancel }: Props) {
+export function SimpleIncomeForm({ onSubmit }: Props) {
   const { showToast } = useToast();
 
   const internalSubmit = async (data: SimpleIncomeFormData) => {
@@ -76,7 +76,6 @@ export function SimpleIncomeForm({ onSubmit, onCancel }: Props) {
       <FormActions
         onSubmit={handleSubmit}
         onReset={reset}
-        onCancel={onCancel}
         isSubmitting={isSubmitting}
       />
     </form>

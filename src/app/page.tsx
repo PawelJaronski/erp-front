@@ -88,16 +88,16 @@ export default function Home() {
         </div>
 
         {activeForm === "expense" && (
-          <SimpleExpenseForm onSubmit={handleSubmit} onCancel={() => {}} />
+          <SimpleExpenseForm onSubmit={handleSubmit} />
         )}
         {activeForm === "income" && (
-          <SimpleIncomeForm onSubmit={handleSubmit} onCancel={() => {}} />
+          <SimpleIncomeForm onSubmit={handleSubmit} />
         )}
         {activeForm === "transfer" && (
-          <SimpleTransferForm onSubmit={handleSubmit} onCancel={() => {}} />
+          <SimpleTransferForm onSubmit={handleSubmit} />
         )}
         {activeForm === "broker" && (
-          <PaymentBrokerTransferForm onSubmit={handleSubmit} onCancel={() => {}} />
+          <PaymentBrokerTransferForm onSubmit={handleSubmit} />
         )}
       </div>
     </main>
