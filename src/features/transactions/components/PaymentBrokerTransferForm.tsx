@@ -43,8 +43,7 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
   const commissionDiff =
     salesTotal !== undefined ? Number((salesTotal - transfersSum).toFixed(2)) : undefined;
 
-  const saveDisabled =
-    isSubmitting || salesLoading || salesError !== null || (commissionDiff !== undefined && Math.abs(commissionDiff) > 0.01);
+  const saveDisabled = isSubmitting || salesLoading || salesError !== null;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
