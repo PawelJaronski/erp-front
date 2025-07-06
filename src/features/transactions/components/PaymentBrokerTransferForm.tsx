@@ -36,6 +36,12 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
     (Number((formData.paynow_transfer || '').replace(',', '.')) || 0) +
     (Number((formData.autopay_transfer || '').replace(',', '.')) || 0);
 
+  const commissionDiff =
+    salesTotal !== undefined ? Number((salesTotal - transfersSum).toFixed(2)) : undefined;
+
+  const saveDisabled =
+    isSubmitting || salesLoading || (commissionDiff !== undefined && Math.abs(commissionDiff) > 0.01);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -75,20 +81,26 @@ export function PaymentBrokerTransferForm({ onSubmit, onCancel }: Props) {
         <div className="p-4 border rounded-lg bg-gray-50">
           <p className="text-sm font-medium text-gray-700 mb-2">Commission Preview</p>
           {salesLoading ? (
-            <p className="text-gray-500 text-sm">Loading sales…</p>
+            <div className="h-14 animate-pulse bg-gray-200 rounded" />
           ) : (
             <div className="space-y-1 text-sm">
               <p>Total sales on {formData.sales_date}: <span className="font-semibold">{salesTotal?.toFixed(2) ?? "–"} zł</span></p>
               <p>Total transfers entered: <span className="font-semibold">{transfersSum.toFixed(2)} zł</span></p>
-              {salesTotal !== undefined && (
-                <p>Commission difference: <span className="font-semibold">{(salesTotal - transfersSum).toFixed(2)} zł</span></p>
+              {commissionDiff !== undefined && (
+                <p>Commission difference: <span className="font-semibold">{commissionDiff.toFixed(2)} zł</span></p>
               )}
             </div>
           )}
         </div>
       )}
 
-      <FormActions onSubmit={handleSubmit} onReset={reset} onCancel={onCancel} isSubmitting={isSubmitting} />
+      <FormActions
+        onSubmit={handleSubmit}
+        onReset={reset}
+        onCancel={onCancel}
+        isSubmitting={isSubmitting}
+        saveDisabled={saveDisabled}
+      />
 
       {submitted && (
         <p className="text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-4">

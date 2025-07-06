@@ -614,3 +614,11 @@ ERROR HANDLING:
 
 - [x] Integrated `fetchSalesForDate` lookup & in-memory cache into `usePaymentBrokerTransferForm`
 - [x] Displayed commission preview with loading state in `PaymentBrokerTransferForm`
+- [x] Added save-disable logic & skeleton loader, extended `FormActions` (`saveDisabled`)
+- [x] Added unit test for sales cache (salesCache.test.ts)
+
+### Phase 5 (planned)
+
+1. Error handling for sales fetch (display message & retry button, propagate `salesError`)
+2. Add integration test for `PaymentBrokerTransferForm` rendering preview and disabling save
+3. Update README with `PaymentBrokerTransferForm` docs & contribution guidelines for writing validators/hooks

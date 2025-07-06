@@ -5,9 +5,10 @@ interface Props {
   onReset: () => void;
   onCancel: () => void;
   isSubmitting: boolean;
+  saveDisabled?: boolean;
 }
 
-export const FormActions: React.FC<Props> = ({ onSubmit, onReset, onCancel, isSubmitting }) => (
+export const FormActions: React.FC<Props> = ({ onSubmit, onReset, onCancel, isSubmitting, saveDisabled = false }) => (
   <div className="pt-4 flex gap-3">
     <button
       type="button"
@@ -19,7 +20,7 @@ export const FormActions: React.FC<Props> = ({ onSubmit, onReset, onCancel, isSu
     <button
       type="submit"
       onClick={onSubmit}
-      disabled={isSubmitting}
+      disabled={isSubmitting || saveDisabled}
       className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
     >
       {isSubmitting ? 'Saving...' : 'Save'}
