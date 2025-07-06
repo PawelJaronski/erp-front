@@ -4,7 +4,7 @@ import { SimpleExpenseFormData } from '../types';
 import { useSimpleExpenseForm } from '../hooks/useSimpleExpenseForm';
 import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
 import { CategoryField, VATSection, FormActions } from '.';
-import { TransactionNotification } from './TransactionNotification';
+import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 
 interface SimpleExpenseFormProps {

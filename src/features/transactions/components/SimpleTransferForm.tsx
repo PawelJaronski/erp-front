@@ -4,7 +4,7 @@ import { SimpleTransferFormData } from '../types';
 import { useSimpleTransferForm } from '../hooks/useSimpleTransferForm';
 import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
 import { FormActions } from '.';
-import { TransactionNotification } from './TransactionNotification';
+import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 
 interface Props {

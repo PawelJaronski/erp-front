@@ -4,7 +4,7 @@ import { PaymentBrokerTransferFormData } from '../types';
 import { usePaymentBrokerTransferForm } from '../hooks/usePaymentBrokerTransferForm';
 import { FormField, AmountInput, DateInput } from '@/shared/components/form';
 import { FormActions } from '.';
-import { TransactionNotification } from './TransactionNotification';
+import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 
 interface Props {
