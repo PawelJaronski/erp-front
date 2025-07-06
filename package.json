@@ -35,6 +35,8 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.10",
     "ts-jest": "^29",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@testing-library/react": "^14",
+    "@testing-library/user-event": "^14"
   }
 }
