@@ -3,7 +3,7 @@ import React from 'react';
 import { SimpleExpenseFormData } from '../types';
 import { useSimpleExpenseForm } from '../hooks/useSimpleExpenseForm';
 import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
-import { CategoryField, VATSection, FormActions } from '.';
+import { CategoryField, VATSection, FormActions, OptionalDetailsSection } from '.';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 
@@ -81,6 +81,16 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
         taxRate={formData.tax_rate}
         onIncludeTaxChange={(v) => handleFieldChange('include_tax', v)}
         onTaxRateChange={(v) => handleFieldChange('tax_rate', v)}
+      />
+
+      {/* Optional details */}
+      <OptionalDetailsSection
+        businessReference={formData.business_reference || ''}
+        item={formData.item || ''}
+        note={formData.note || ''}
+        onBusinessReferenceChange={(v) => handleFieldChange('business_reference', v)}
+        onItemChange={(v) => handleFieldChange('item', v)}
+        onNoteChange={(v) => handleFieldChange('note', v)}
       />
 
       {/* Actions */}

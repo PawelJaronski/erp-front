@@ -5,4 +5,5 @@ export * from './VATSection';
 export * from './FormActions';
 export * from './SimpleTransferForm';
 export * from './PaymentBrokerTransferForm';
-export * from './SimpleIncomeForm'; 
+export * from './SimpleIncomeForm';
+export * from './OptionalDetailsSection'; 
