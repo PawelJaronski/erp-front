@@ -3,9 +3,9 @@ import SimpleTransactionForm from "@/components/SimpleTransactionForm";
 import {
   SimpleExpenseForm,
   SimpleTransferForm,
+  PaymentBrokerTransferForm,
 } from "@/features/transactions/components";
 import React, { useState } from "react";
-import PaymentBrokerTransferForm from "@/components/PaymentBrokerTransferForm";
 
 const dummySubmit = async () => {
   // TODO: connect backend
