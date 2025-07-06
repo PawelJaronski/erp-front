@@ -1,5 +1,5 @@
 import { SimpleTransactionFormShape } from "./validation";
-import { normalizeAmount, parseAmount } from "./amount";
+import { normalizeAmount, parseAmount } from "@/shared/utils/amount";
 
 interface SimpleTransactionPayload {
   transaction_type: string;

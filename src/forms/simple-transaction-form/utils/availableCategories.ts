@@ -1,6 +1,6 @@
 // Utility to calculate which categories should be presented in the select list
 // depending on current form fields.
-import { categoriesData } from "./staticData";
+import { categoriesData } from "@/features/transactions/utils/staticData";
 import { SimpleTransactionFormShape } from "./validation";
 
 interface CategoryItem {

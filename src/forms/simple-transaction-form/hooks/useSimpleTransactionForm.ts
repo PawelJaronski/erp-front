@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef, Dispatch, SetStateAction } from "react";
-import { categoriesData, accounts, categoryGroups } from "../utils/staticData";
+import { categoriesData, accounts, categoryGroups } from "@/features/transactions/utils/staticData";
 import { computeAvailableCategories } from "../utils/availableCategories";
 import { SimpleTransactionFormShape, validateSimpleTransactionForm } from "../utils/validation";
 import { buildSimpleTransactionPayload } from "../utils/payload";

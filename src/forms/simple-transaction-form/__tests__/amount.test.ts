@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 
-import { normalizeAmount, parseAmount, validateAmount } from "../utils/amount";
+import { normalizeAmount, parseAmount, validateAmount } from "@/shared/utils/amount";
 
 describe("amount utils", () => {
   it("normalizes comma decimal to dot", () => {

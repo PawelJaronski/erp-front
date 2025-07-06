@@ -1,4 +1,4 @@
-import { validateAmount } from "./amount";
+import { validateAmount } from "@/shared/utils/amount";
 
 export interface SimpleTransactionFormShape {
   account: string;
