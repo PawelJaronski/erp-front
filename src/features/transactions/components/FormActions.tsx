@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface Props {
-  onSubmit: (e?: React.FormEvent) => unknown;
+  onSubmit: (e: React.FormEvent) => unknown;
   onReset: () => void;
   onCancel: () => void;
   isSubmitting: boolean;
