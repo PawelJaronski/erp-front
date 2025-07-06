@@ -3,7 +3,7 @@ import React from 'react';
 import { SimpleExpenseFormData } from '../types';
 import { useSimpleExpenseForm } from '../hooks/useSimpleExpenseForm';
 import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
-import { CategoryField, VATSection, FormActions, OptionalDetailsSection } from '.';
+import { CategoryField, VATSection, FormActions } from '.';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 
@@ -60,21 +60,36 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
         />
       </div>
 
-      {/* Item / Note row */}
-      <OptionalDetailsSection
-        item={formData.item || ''}
-        note={formData.note || ''}
-        onItemChange={(v) => handleFieldChange('item', v)}
-        onNoteChange={(v) => handleFieldChange('note', v)}
-      />
-
-      {/* Amount & Business Reference row */}
+      {/* Amount & Item row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField label="Amount (zł)" error={errors.gross_amount} required>
           <AmountInput
             value={formData.gross_amount}
             onChange={(value) => handleFieldChange('gross_amount', value)}
             error={errors.gross_amount}
+          />
+        </FormField>
+
+        <FormField label="Item / Description">
+          <input
+            type="text"
+            value={formData.item || ''}
+            onChange={(e) => handleFieldChange('item', e.target.value)}
+            placeholder="Short item description (optional)"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+          />
+        </FormField>
+      </div>
+
+      {/* Note & Business Reference row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField label="Note">
+          <input
+            type="text"
+            value={formData.note || ''}
+            onChange={(e) => handleFieldChange('note', e.target.value)}
+            placeholder="Internal note (optional)"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
           />
         </FormField>
 
