@@ -628,8 +628,34 @@ ERROR HANDLING:
 
 - [x] Update README (broker transfer docs, guidelines)
 
-### Phase 6 (planned)
+### Phase 6 – Forms parity & first E2E (2025-07-07)
 
-1. README update described above
-2. Integration test for happy-path (valid sales fetch) incl. commission diff logic
-3. Cypress e2e skeleton setup (start page, toggle tabs, fill forms) – groundwork for future phases
+- [x] Implemented `SimpleIncomeForm` (component, hook, validator, tests)
+- [x] Added Income tab in UI switcher
+- [x] Updated `FormActions` label: `Save` → `Add` (+ all tests)
+- [x] Extended Cypress E2E – happy-path broker + income smoke
+- [x] Global ToastProvider for success/error feedback
+- [x] Removed feature flag `NEXT_PUBLIC_NEW_FORMS` – new forms are now default
+- [x] Deleted legacy `SimpleTransactionForm` component (code dead-path)
+
+### Phase 7 – Backend integration & tech-debt cleanup (2025-07-08)
+
+- [x] Shared contract `TransactionRequest` (TS) created in `shared/contracts`
+- [x] `addTransaction` helper + real POST to Railway FastAPI
+- [x] All forms send payload to backend & display toast on success/error
+- [x] Moved `sales.ts` util to `features/transactions/utils` (legacy path purged)
+- [ ] Refactor `buildSimpleTransactionPayload` → `shared/utils/payload.ts` (in progress)
+- [ ] Remove entire legacy folder `src/forms/simple-transaction-form/**` + tsconfig cleanup (in progress)
+
+### Phase 8 – Mobile polish & UX (planned)
+
+1. Responsive grids (`sm:grid-cols-1` etc.)
+2. Toast dismiss on swipe / close btn
+3. Better focus states (accessibility)
+
+### Outstanding TODOs
+
+- [ ] Finish payload refactor and align hooks
+- [ ] Delete legacy folder + update paths
+- [ ] Generate Pydantic models from shared contracts for backend parity
+- [ ] Expand Cypress suite (submit flows & negative paths)

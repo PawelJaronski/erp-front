@@ -7,7 +7,8 @@ import {
 } from "@/features/transactions/components";
 import React, { useState } from "react";
 import { addTransaction } from '@/features/transactions/api';
-import type { TransactionRequest } from '@/shared/contracts/transactions';
+import { buildTransactionPayload } from '@/shared/utils/payload';
+import type { TransactionType } from '@/shared/contracts/transactions';
 import { useToast } from '@/shared/components/ToastProvider';
 
 export default function Home() {
@@ -15,8 +16,21 @@ export default function Home() {
   const { showToast } = useToast();
 
   const handleSubmit = async (data: unknown) => {
+    // Map local activeForm label to TransactionType
+    const transactionMap: Record<typeof activeForm, TransactionType> = {
+      expense: 'simple_expense',
+      income: 'simple_income',
+      transfer: 'simple_transfer',
+      broker: 'payment_broker_transfer',
+    } as const;
+
+    const payload = buildTransactionPayload(
+      data as any, // cast to union – validated at runtime by builder
+      transactionMap[activeForm],
+    );
+
     try {
-      await addTransaction(data as TransactionRequest);
+      await addTransaction(payload);
       showToast('Transaction saved', 'success');
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Unexpected error';
