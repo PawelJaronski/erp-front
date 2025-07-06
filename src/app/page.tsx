@@ -7,7 +7,7 @@ import {
 } from "@/features/transactions/components";
 import React, { useState } from "react";
 import { addTransaction } from '@/features/transactions/api';
-import { buildTransactionPayload } from '@/shared/utils/payload';
+import { buildTransactionPayload, AnyFormData } from '@/shared/utils/payload';
 import type { TransactionType } from '@/shared/contracts/transactions';
 import { useToast } from '@/shared/components/ToastProvider';
 
@@ -25,7 +25,7 @@ export default function Home() {
     } as const;
 
     const payload = buildTransactionPayload(
-      data as any, // cast to union – validated at runtime by builder
+      data as AnyFormData,
       transactionMap[activeForm],
     );
 
