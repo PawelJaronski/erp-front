@@ -4,6 +4,7 @@ import {
   SimpleExpenseForm,
   SimpleTransferForm,
   PaymentBrokerTransferForm,
+  SimpleIncomeForm,
 } from "@/features/transactions/components";
 import React, { useState } from "react";
 
@@ -14,7 +15,7 @@ const dummySubmit = async () => {
 export default function Home() {
   const useNew = process.env.NEXT_PUBLIC_NEW_FORMS === "1";
 
-  const [activeForm, setActiveForm] = useState<"expense" | "transfer" | "broker">("expense");
+  const [activeForm, setActiveForm] = useState<"expense" | "income" | "transfer" | "broker">("expense");
 
   return (
     <main className="h-screen overflow-y-auto p-4">
@@ -31,6 +32,17 @@ export default function Home() {
               }`}
             >
               Expense
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveForm("income")}
+              className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
+                activeForm === "income"
+                  ? "bg-blue-600 text-white border-blue-700"
+                  : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
+              }`}
+            >
+              Income
             </button>
             <button
               type="button"
@@ -58,6 +70,9 @@ export default function Home() {
 
           {activeForm === "expense" && (
             <SimpleExpenseForm onSubmit={dummySubmit} onCancel={() => {}} />
+          )}
+          {activeForm === "income" && (
+            <SimpleIncomeForm onSubmit={dummySubmit} onCancel={() => {}} />
           )}
           {activeForm === "transfer" && (
             <SimpleTransferForm onSubmit={dummySubmit} onCancel={() => {}} />
