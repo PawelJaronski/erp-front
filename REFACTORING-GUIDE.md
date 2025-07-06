@@ -604,4 +604,8 @@ ERROR HANDLING:
 - [x] Phase 1 – step 1.6: hook `useSimpleExpenseForm`
 - [x] Phase 1 – step 1.7: minimal `SimpleExpenseForm` component with CategoryField, VATSection, FormActions
 
-Current position: end of Phase 1 (all steps complete).  Next up – unit tests & polish (Phase 2 in this guide).
+### Phase 2
+
+- [x] Added unit tests for validators and hooks (`simpleExpenseValidator`, `useSimpleExpenseForm`)
+- [x] ESLint tests exclusion & Vercel build green
+- [x] Added `SimpleTransferForm`, `useSimpleTransferForm`, validator + tests

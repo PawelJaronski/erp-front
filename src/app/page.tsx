@@ -1,5 +1,9 @@
 import SimpleTransactionForm from "@/components/SimpleTransactionForm";
-import { SimpleExpenseForm } from "@/features/transactions/components";
+import {
+  SimpleExpenseForm,
+  SimpleTransferForm,
+} from "@/features/transactions/components";
+import React, { useState } from "react";
 
 const dummySubmit = async () => {
   // TODO: connect backend
@@ -8,10 +12,43 @@ const dummySubmit = async () => {
 export default function Home() {
   const useNew = process.env.NEXT_PUBLIC_NEW_FORMS === "1";
 
+  const [activeForm, setActiveForm] = useState<"expense" | "transfer">("expense");
+
   return (
     <main className="h-screen overflow-y-auto p-4">
       {useNew ? (
-        <SimpleExpenseForm onSubmit={dummySubmit} onCancel={() => {}} />
+        <div className="space-y-6">
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={() => setActiveForm("expense")}
+              className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
+                activeForm === "expense"
+                  ? "bg-blue-600 text-white border-blue-700"
+                  : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
+              }`}
+            >
+              Expense
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveForm("transfer")}
+              className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
+                activeForm === "transfer"
+                  ? "bg-blue-600 text-white border-blue-700"
+                  : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
+              }`}
+            >
+              Transfer
+            </button>
+          </div>
+
+          {activeForm === "expense" ? (
+            <SimpleExpenseForm onSubmit={dummySubmit} onCancel={() => {}} />
+          ) : (
+            <SimpleTransferForm onSubmit={dummySubmit} onCancel={() => {}} />
+          )}
+        </div>
       ) : (
         <SimpleTransactionForm />
       )}
