@@ -19,4 +19,12 @@ describe('Transaction forms smoke test', () => {
     cy.get('input[type="date"]').eq(0).clear().type('2025-07-06');
     cy.get('input[type="date"]').eq(1).clear().type('2025-07-05');
   });
+
+  it('fills income form (happy path, no submit)', () => {
+    cy.contains('Income').click();
+
+    cy.get('input[placeholder="123.45 or 123,45"]').type('250,00');
+    cy.get('select').first().select('ads'); // category dropdown (select any) – assuming category field appears
+    cy.get('input[type="date"]').first().clear().type('2025-07-06');
+  });
 }); 

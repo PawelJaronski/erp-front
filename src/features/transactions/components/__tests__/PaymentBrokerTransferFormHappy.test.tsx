@@ -30,7 +30,7 @@ describe('PaymentBrokerTransferForm – happy path', () => {
       expect(fetchSalesForDate).toHaveBeenCalled();
     });
 
-    const saveButton = screen.getByRole('button', { name: /save/i });
+    const saveButton = screen.getByRole('button', { name: /add/i });
     expect(saveButton).toBeDisabled();
 
     // enter transfers adding up to 150

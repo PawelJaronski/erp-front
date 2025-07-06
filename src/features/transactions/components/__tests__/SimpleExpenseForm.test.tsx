@@ -6,6 +6,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SimpleExpenseForm } from '../SimpleExpenseForm';
 
+// @ts-nocheck
+
 function setup() {
   const onSubmit = jest.fn() as any;
   render(<SimpleExpenseForm onSubmit={onSubmit} onCancel={() => {}} />);
@@ -15,7 +17,7 @@ function setup() {
 describe('SimpleExpenseForm component', () => {
   it('shows validation error when required fields are empty', async () => {
     setup();
-    const saveButton = screen.getByRole('button', { name: /save/i });
+    const saveButton = screen.getByRole('button', { name: /add/i });
     await userEvent.click(saveButton);
 
     expect(screen.queryByText(/enter amount/i)).not.toBeNull();

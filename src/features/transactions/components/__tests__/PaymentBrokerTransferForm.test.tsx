@@ -35,7 +35,7 @@ describe('PaymentBrokerTransferForm – error handling', () => {
 
     expect(await screen.findByText('Network error')).toBeInTheDocument();
 
-    const saveButton = screen.getByRole('button', { name: /save/i });
+    const saveButton = screen.getByRole('button', { name: /add/i });
     expect(saveButton).toBeDisabled();
   });
 
