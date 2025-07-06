@@ -4,7 +4,6 @@ interface AmountInputProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
-  label?: string;
   placeholder?: string;
   currency?: string;
 }
@@ -13,7 +12,6 @@ export function AmountInput({
   value,
   onChange,
   error,
-  label = 'Amount',
   placeholder = '123.45 or 123,45',
   currency = 'zł'
 }: AmountInputProps) {

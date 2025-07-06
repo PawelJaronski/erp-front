@@ -50,7 +50,7 @@ export function useSimpleExpenseForm({ onSubmit }: UseSimpleExpenseFormProps): B
     formData,
     errors,
     isSubmitting,
-    handleFieldChange: handleFieldChange as any,
+    handleFieldChange,
     handleSubmit,
     reset,
   };

@@ -6,7 +6,6 @@ interface AccountSelectProps {
   value: string;
   onChange: (value: string) => void;
   error?: string;
-  label?: string;
   placeholder?: string;
 }
 
@@ -14,7 +13,6 @@ export function AccountSelect({
   value,
   onChange,
   error,
-  label = 'Account',
   placeholder = 'Select account...'
 }: AccountSelectProps) {
   const resetField = () => onChange('');
