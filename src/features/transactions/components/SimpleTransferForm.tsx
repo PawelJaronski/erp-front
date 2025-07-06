@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { SimpleTransferFormData } from '../types';
 import { useSimpleTransferForm } from '../hooks/useSimpleTransferForm';
 import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
@@ -11,8 +11,15 @@ interface Props {
 }
 
 export function SimpleTransferForm({ onSubmit, onCancel }: Props) {
+  const [submitted, setSubmitted] = useState(false);
+
+  const internalSubmit = async (data: SimpleTransferFormData) => {
+    await onSubmit(data);
+    setSubmitted(true);
+  };
+
   const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset } =
-    useSimpleTransferForm({ onSubmit });
+    useSimpleTransferForm({ onSubmit: internalSubmit });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -55,6 +62,12 @@ export function SimpleTransferForm({ onSubmit, onCancel }: Props) {
         onCancel={onCancel}
         isSubmitting={isSubmitting}
       />
+
+      {submitted && (
+        <p className="text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
+          Transfer saved successfully.
+        </p>
+      )}
     </form>
   );
 } 

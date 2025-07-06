@@ -10,8 +10,8 @@ It allows accounting staff to record expenses while enforcing domain rules such 
 ## Key Features
 
 * **App Router** – Next 15 with server components where required.
-* **Hook-driven state** – `useSimpleExpenseForm` handles form state, validation, API calls.
-* **Pure utilities** – amount parsing, validation, payload builder; all unit-tested.
+* **Hook-driven state** – `useSimpleExpenseForm` / `useSimpleTransferForm` handle form state, validation, API calls.
+* **Pure utilities** – amount parsing, validation, payload builder; all unit-tested (expense + transfer).
 * **Tailwind CSS** – utility-first styling, no global CSS apart from reset.
 * **Vercel-ready** – production build passes, deployment succeeds.
 
@@ -27,7 +27,8 @@ src/
     layout.tsx             # Layout component
     page.tsx               # Main page component
   components/
-    SimpleExpenseForm.tsx  # Presentational wrapper
+    SimpleExpenseForm.tsx   # Expense wrapper
+    SimpleTransferForm.tsx  # Transfer wrapper
   forms/
     simple-expense/
       hooks/
@@ -63,7 +64,7 @@ pnpm install         # or npm / yarn
 # Start dev server (http://localhost:3000)
 pnpm dev
 
-# Run unit tests (utilities only)
+# Run unit & integration tests
 pnpm test
 ```
 

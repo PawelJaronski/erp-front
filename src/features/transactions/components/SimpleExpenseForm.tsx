@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { SimpleExpenseFormData } from '../types';
 import { useSimpleExpenseForm } from '../hooks/useSimpleExpenseForm';
 import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
@@ -11,6 +11,13 @@ interface SimpleExpenseFormProps {
 }
 
 export function SimpleExpenseForm({ onSubmit, onCancel }: SimpleExpenseFormProps) {
+  const [submitted, setSubmitted] = useState(false);
+
+  const internalSubmit = async (data: SimpleExpenseFormData) => {
+    await onSubmit(data);
+    setSubmitted(true);
+  };
+
   const {
     formData,
     errors,
@@ -18,7 +25,7 @@ export function SimpleExpenseForm({ onSubmit, onCancel }: SimpleExpenseFormProps
     handleFieldChange,
     handleSubmit,
     reset,
-  } = useSimpleExpenseForm({ onSubmit });
+  } = useSimpleExpenseForm({ onSubmit: internalSubmit });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -73,6 +80,12 @@ export function SimpleExpenseForm({ onSubmit, onCancel }: SimpleExpenseFormProps
 
       {/* Actions */}
       <FormActions onSubmit={handleSubmit} onReset={reset} onCancel={onCancel} isSubmitting={isSubmitting} />
+
+      {submitted && (
+        <p className="text-green-700 bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
+          Expense saved successfully.
+        </p>
+      )}
     </form>
   );
 } 
