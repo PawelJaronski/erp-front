@@ -31,7 +31,6 @@ export default function Home() {
 
     try {
       await addTransaction(payload);
-      showToast('Transaction saved', 'success');
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Unexpected error';
       showToast(msg, 'error');
