@@ -16,8 +16,9 @@ export function useValidation<T>(validator: ValidatorFunction<T>) {
 
   const clearError = useCallback((field: string) => {
     setErrors((prev) => {
-      const { [field]: _removed, ...rest } = prev;
-      return rest;
+      const updated = { ...prev };
+      delete updated[field];
+      return updated;
     });
   }, []);
 
