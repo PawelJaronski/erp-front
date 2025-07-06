@@ -2,10 +2,8 @@ import React from 'react';
 import { FormField } from '@/shared/components/form';
 
 interface Props {
-  businessReference: string;
   item: string;
   note: string;
-  onBusinessReferenceChange: (value: string) => void;
   onItemChange: (value: string) => void;
   onNoteChange: (value: string) => void;
 }
@@ -17,24 +15,12 @@ interface Props {
  * – note: internal free-form note
  */
 export const OptionalDetailsSection: React.FC<Props> = ({
-  businessReference,
   item,
   note,
-  onBusinessReferenceChange,
   onItemChange,
   onNoteChange,
 }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <FormField label="Business Reference">
-      <input
-        type="text"
-        value={businessReference}
-        onChange={(e) => onBusinessReferenceChange(e.target.value)}
-        placeholder="Invoice #123 / Transfer title"
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
-      />
-    </FormField>
-
     <FormField label="Item / Description">
       <input
         type="text"
@@ -45,12 +31,13 @@ export const OptionalDetailsSection: React.FC<Props> = ({
       />
     </FormField>
 
-    <FormField label="Note" className="md:col-span-2">
-      <textarea
+    <FormField label="Note">
+      <input
+        type="text"
         value={note}
         onChange={(e) => onNoteChange(e.target.value)}
         placeholder="Internal note (optional)"
-        className="w-full h-24 resize-none px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
       />
     </FormField>
   </div>

@@ -34,15 +34,18 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Account */}
-      <FormField label="Account" error={errors.account} required>
-        <AccountSelect
-          value={formData.account}
-          onChange={(value) => handleFieldChange('account', value)}
-          error={errors.account}
-        />
-      </FormField>
+      {/* Account row – half width */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField label="Account" error={errors.account} required>
+          <AccountSelect
+            value={formData.account}
+            onChange={(value) => handleFieldChange('account', value)}
+            error={errors.account}
+          />
+        </FormField>
+      </div>
 
+      {/* Category row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <CategoryField
           categoryGroup={formData.category_group}
@@ -57,8 +60,16 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
         />
       </div>
 
+      {/* Item / Note row */}
+      <OptionalDetailsSection
+        item={formData.item || ''}
+        note={formData.note || ''}
+        onItemChange={(v) => handleFieldChange('item', v)}
+        onNoteChange={(v) => handleFieldChange('note', v)}
+      />
+
+      {/* Amount & Business Reference row */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Amount */}
         <FormField label="Amount (zł)" error={errors.gross_amount} required>
           <AmountInput
             value={formData.gross_amount}
@@ -67,6 +78,26 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
           />
         </FormField>
 
+        <FormField label="Business Reference">
+          <input
+            type="text"
+            value={formData.business_reference || ''}
+            onChange={(e) => handleFieldChange('business_reference', e.target.value)}
+            placeholder="Invoice #123 / Transfer title"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+          />
+        </FormField>
+      </div>
+
+      {/* VAT toggle & Business Date row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+        <VATSection
+          includeTax={formData.include_tax}
+          taxRate={formData.tax_rate}
+          onIncludeTaxChange={(v) => handleFieldChange('include_tax', v)}
+          onTaxRateChange={(v) => handleFieldChange('tax_rate', v)}
+        />
+
         <FormField label="Business Date" error={errors.business_timestamp} required>
           <DateInput
             value={formData.business_timestamp}
@@ -74,24 +105,6 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
           />
         </FormField>
       </div>
-
-      {/* VAT */}
-      <VATSection
-        includeTax={formData.include_tax}
-        taxRate={formData.tax_rate}
-        onIncludeTaxChange={(v) => handleFieldChange('include_tax', v)}
-        onTaxRateChange={(v) => handleFieldChange('tax_rate', v)}
-      />
-
-      {/* Optional details */}
-      <OptionalDetailsSection
-        businessReference={formData.business_reference || ''}
-        item={formData.item || ''}
-        note={formData.note || ''}
-        onBusinessReferenceChange={(v) => handleFieldChange('business_reference', v)}
-        onItemChange={(v) => handleFieldChange('item', v)}
-        onNoteChange={(v) => handleFieldChange('note', v)}
-      />
 
       {/* Actions */}
       <FormActions onSubmit={handleSubmit} onReset={reset} isSubmitting={isSubmitting} />
