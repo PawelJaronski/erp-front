@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <main className="h-screen overflow-y-auto p-4">
-      <div className="space-y-6">
+      <div className="max-w-3xl mx-autospace-y-6">
         <div className="flex gap-4">
           <button
             type="button"
