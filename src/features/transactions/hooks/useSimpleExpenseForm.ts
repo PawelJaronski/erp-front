@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { SimpleExpenseFormData, BaseFormHookReturn } from '../types';
 import { useValidation } from '@/shared/hooks/useValidation';
 import { useApiSubmission } from '@/shared/hooks/useApiSubmission';
+import { useFormPersistence } from '@/shared/hooks/useFormPersistence';
 import { simpleExpenseValidator } from '../validators/simpleExpenseValidator';
 
 const defaultSimpleExpenseState: SimpleExpenseFormData = {
@@ -24,14 +25,14 @@ interface UseSimpleExpenseFormProps {
 }
 
 export function useSimpleExpenseForm({ onSubmit }: UseSimpleExpenseFormProps): BaseFormHookReturn<SimpleExpenseFormData> {
-  const [formData, setFormData] = useState<SimpleExpenseFormData>(defaultSimpleExpenseState);
+  const { state: formData, updateState, resetState } = useFormPersistence(defaultSimpleExpenseState, 'simple_expense');
   const { errors, validate, clearError } = useValidation(simpleExpenseValidator);
   const { isSubmitting, submit } = useApiSubmission();
 
   const handleFieldChange = useCallback(<K extends keyof SimpleExpenseFormData>(field: K, value: SimpleExpenseFormData[K]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    updateState({ [field]: value });
     clearError(field as string);
-  }, [clearError]);
+  }, [updateState, clearError]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +40,13 @@ export function useSimpleExpenseForm({ onSubmit }: UseSimpleExpenseFormProps): B
 
     if (Object.keys(validationErrors).length === 0) {
       await submit(() => onSubmit(formData));
+      resetState();
     }
-  }, [formData, validate, submit, onSubmit]);
+  }, [formData, validate, submit, onSubmit, resetState]);
 
   const reset = useCallback(() => {
-    setFormData(defaultSimpleExpenseState);
-  }, []);
+    resetState();
+  }, [resetState]);
 
   return {
     formData,
