@@ -12,21 +12,14 @@ import type { TransactionType } from '@/shared/contracts/transactions';
 import { useToast } from '@/shared/components/ToastProvider';
 
 export default function Home() {
-  const [activeForm, setActiveForm] = useState<"expense" | "income" | "transfer" | "broker">("expense");
+  const [activeForm, setActiveForm] = useState<"simple_expense" | "simple_income" | "simple_transfer" | "payment_broker_transfer">("simple_expense");
   const { showToast } = useToast();
 
   const handleSubmit = async (data: unknown) => {
-    // Map local activeForm label to TransactionType
-    const transactionMap: Record<typeof activeForm, TransactionType> = {
-      expense: 'simple_expense',
-      income: 'simple_income',
-      transfer: 'simple_transfer',
-      broker: 'payment_broker_transfer',
-    } as const;
 
     const payload = buildTransactionPayload(
       data as AnyFormData,
-      transactionMap[activeForm],
+      activeForm,
     );
 
     try {
@@ -43,9 +36,9 @@ export default function Home() {
         <div className="flex gap-4">
           <button
             type="button"
-            onClick={() => setActiveForm("expense")}
+            onClick={() => setActiveForm("simple_expense")}
             className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
-              activeForm === "expense"
+              activeForm === "simple_expense"
                 ? "bg-blue-600 text-white border-blue-700"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
             }`}
@@ -54,9 +47,9 @@ export default function Home() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveForm("income")}
+            onClick={() => setActiveForm("simple_income")}
             className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
-              activeForm === "income"
+              activeForm === "simple_income"
                 ? "bg-blue-600 text-white border-blue-700"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
             }`}
@@ -65,9 +58,9 @@ export default function Home() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveForm("transfer")}
+            onClick={() => setActiveForm("simple_transfer")}
             className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
-              activeForm === "transfer"
+              activeForm === "simple_transfer"
                 ? "bg-blue-600 text-white border-blue-700"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
             }`}
@@ -76,9 +69,9 @@ export default function Home() {
           </button>
           <button
             type="button"
-            onClick={() => setActiveForm("broker")}
+            onClick={() => setActiveForm("payment_broker_transfer")}
             className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
-              activeForm === "broker"
+              activeForm === "payment_broker_transfer"
                 ? "bg-blue-600 text-white border-blue-700"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
             }`}
@@ -87,16 +80,16 @@ export default function Home() {
           </button>
         </div>
 
-        {activeForm === "expense" && (
+        {activeForm === "simple_expense" && (
           <SimpleExpenseForm onSubmit={handleSubmit} />
         )}
-        {activeForm === "income" && (
+        {activeForm === "simple_income" && (
           <SimpleIncomeForm onSubmit={handleSubmit} />
         )}
-        {activeForm === "transfer" && (
+        {activeForm === "simple_transfer" && (
           <SimpleTransferForm onSubmit={handleSubmit} />
         )}
-        {activeForm === "broker" && (
+        {activeForm === "payment_broker_transfer" && (
           <PaymentBrokerTransferForm onSubmit={handleSubmit} />
         )}
       </div>
