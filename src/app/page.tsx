@@ -32,11 +32,11 @@ export default function Home() {
   return (
     <main className="h-screen overflow-y-auto p-4">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-2 sm:gap-4">
           <button
             type="button"
             onClick={() => setActiveForm("simple_expense")}
-            className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
+            className={`px-3 py-2 sm:px-4 rounded-lg font-semibold border transition-colors duration-150 text-sm sm:text-base ${
               activeForm === "simple_expense"
                 ? "bg-blue-600 text-white border-blue-700"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
@@ -47,7 +47,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setActiveForm("simple_income")}
-            className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
+            className={`px-3 py-2 sm:px-4 rounded-lg font-semibold border transition-colors duration-150 text-sm sm:text-base ${
               activeForm === "simple_income"
                 ? "bg-blue-600 text-white border-blue-700"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
@@ -58,7 +58,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setActiveForm("simple_transfer")}
-            className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
+            className={`px-3 py-2 sm:px-4 rounded-lg font-semibold border transition-colors duration-150 text-sm sm:text-base ${
               activeForm === "simple_transfer"
                 ? "bg-blue-600 text-white border-blue-700"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
@@ -69,7 +69,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setActiveForm("payment_broker_transfer")}
-            className={`px-4 py-2 rounded-lg font-semibold border transition-colors duration-150 ${
+            className={`px-3 py-2 sm:px-4 rounded-lg font-semibold border transition-colors duration-150 text-sm sm:text-base ${
               activeForm === "payment_broker_transfer"
                 ? "bg-blue-600 text-white border-blue-700"
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
