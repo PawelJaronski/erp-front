@@ -65,7 +65,7 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
       cancelled = true;
       setSalesLoading(false);
     };
-  }, [formData.sales_date, salesCache]);
+  }, [formData.sales_date]);
 
   /* --------------------------------------------------
    * Auto-adjust gap: ensure transfer_date ≥ sales_date + 1d

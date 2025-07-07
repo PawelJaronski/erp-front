@@ -144,7 +144,6 @@ export function buildTransactionPayload(
     const key = k as keyof TransactionRequest;
     const val = payload[key];
     if (val === undefined || val === null || (typeof val === 'string' && val.trim() === '')) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete payload[key];
     }
   });
