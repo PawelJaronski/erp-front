@@ -23,8 +23,16 @@ export interface SalesData {
   total: number;
 }
 
+// Global cache for sales data
+const salesCache = new Map<string, SalesData>();
+
 export async function fetchSalesForDate(date: string): Promise<SalesData> {
   if (!date) throw new Error("Date is required");
+
+  // Check cache first
+  if (salesCache.has(date)) {
+    return salesCache.get(date)!;
+  }
 
   const supabase = getSupabaseClient();
 
@@ -37,8 +45,11 @@ export async function fetchSalesForDate(date: string): Promise<SalesData> {
 
   const value = typeof data === "number" ? data : 0;
 
-  return {
+  const result = {
     paynow: value,
     total: value,
   };
+
+  salesCache.set(date, result);
+  return result;
 } 
