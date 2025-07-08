@@ -1,6 +1,6 @@
 export function useFormPersistence<T>(
-  initialState: T,
-  formKey: string
+  _initialState: T,
+  _formKey: string
 ) {
   // ... existing code ...
 } 
