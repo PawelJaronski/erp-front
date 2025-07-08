@@ -7,3 +7,5 @@ export * from './SimpleTransferForm';
 export * from './PaymentBrokerTransferForm';
 export * from './SimpleIncomeForm';
 export * from './OptionalDetailsSection'; 
+export * from './CategoryGroupSelect';
+export * from './CategorySelect';

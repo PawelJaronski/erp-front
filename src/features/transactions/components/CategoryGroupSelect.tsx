@@ -1,0 +1,68 @@
+import React from 'react';
+import { categoryGroups } from '@/features/transactions/utils/staticData';
+import { ChevronDown, X } from 'lucide-react';
+
+interface Props {
+    value: string;
+    onChange: (value: string) => void;
+    customValue?: string;
+    onCustomValueChange: (value: string) => void;
+    error?: string;
+    placeholder?: string
+}
+
+export const CategoryGroupSelect: React.FC<Props> = ({
+    value,
+    onChange,
+    customValue,
+    onCustomValueChange,
+    error,
+    placeholder = 'Select category group'
+}) => {
+    return (
+        <div className="flex-1">
+            <label className="block text-sm semibold text-gray-700 mb-2">
+                Category Group
+            </label>
+            <div className="relative">
+                <select
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className={`w-full appearance-none pr-20 px-4 py-3 cursor-pointer border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${
+                        error ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                    }`}
+                >
+                    <option value="">{placeholder}</option>
+                    {categoryGroups.map((g) => (
+                        <option key={g.value} value={g.value}>
+                            {g.label}
+                        </option>
+                    ))}
+                    <option value="other">Other</option>
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                {value && (
+                    <button
+                        type="button"
+                        onClick={() => onChange('')}
+                        className="absolute right-8 top-1/2 -translate-y-1/2 p-2 cursor-pointer rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+                        title="Clear category group"
+                    >
+                        <X className="w-4 h-4 text-gray-500" />
+                    </button>
+                )}
+                </div>
+                {value === 'other' && onCustomValueChange && (
+                    <input
+                        type="text"
+                        value={customValue || ''}
+                        onChange={(e) => onCustomValueChange(e.target.value)}
+                        className="mt-2 w-full px-4 py-3 cursor-pointer border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+                        />
+                )}
+                {error && (
+                    <p className="mt-1 text-sm text-red-600">{error}</p>
+                )}
+        </div>
+    );
+};
