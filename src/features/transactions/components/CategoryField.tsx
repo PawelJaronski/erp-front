@@ -41,7 +41,7 @@ export const CategoryField: React.FC<Props> = ({
           <select
             value={categoryGroup}
             onChange={(e) => onCategoryGroupChange(e.target.value)}
-            className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${
+            className={`w-full appearance-none pr-20 px-4 py-3 cursor-pointer border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${
               errors.category_group ? 'border-red-300 bg-red-50' : 'border-gray-300'
             }`}
           >
@@ -58,7 +58,7 @@ export const CategoryField: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => onCategoryGroupChange("")}
-              className="absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+              className="absolute right-8 top-1/2 -translate-y-1/2 p-2 cursor-pointer rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
               title="Clear category group"
             >
               <X className="w-4 h-4 text-gray-500" />
@@ -71,7 +71,7 @@ export const CategoryField: React.FC<Props> = ({
             value={customCategoryGroup}
             onChange={(e) => onCustomCategoryGroupChange(e.target.value)}
             placeholder="Enter custom category group..."
-            className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+            className="mt-2 w-full px-4 py-3 cursor-pointer border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
           />
         )}
         {errors.category_group && (
@@ -88,7 +88,7 @@ export const CategoryField: React.FC<Props> = ({
           <select
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${
+            className={`w-full appearance-none pr-20 px-4 py-3 cursor-pointer border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${
               errors.category ? 'border-red-300 bg-red-50' : 'border-gray-300'
             }`}
           >
@@ -105,7 +105,7 @@ export const CategoryField: React.FC<Props> = ({
             <button
               type="button"
               onClick={() => onCategoryChange("")}
-              className="absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+              className="absolute right-8 top-1/2 -translate-y-1/2 p-2 cursor-pointer rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
               title="Clear category"
             >
               <X className="w-4 h-4 text-gray-500" />
@@ -118,7 +118,7 @@ export const CategoryField: React.FC<Props> = ({
             value={customCategory}
             onChange={(e) => onCustomCategoryChange(e.target.value)}
             placeholder="Enter custom category..."
-            className="mt-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+            className="mt-2 w-full px-4 py-3 cursor-pointer border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
           />
         )}
         {errors.category && (
