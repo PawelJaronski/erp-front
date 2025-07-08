@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import {
   SimpleTransferFormData,
   BaseFormHookReturn,
 } from '../types';
 import { useValidation } from '@/shared/hooks/useValidation';
 import { useApiSubmission } from '@/shared/hooks/useApiSubmission';
+import { useFormPersistence } from '@/shared/hooks/useFormPersistence';
 import { simpleTransferValidator } from '../validators/simpleTransferValidator';
 
 const defaultSimpleTransferState: SimpleTransferFormData = {
@@ -24,9 +25,7 @@ interface UseSimpleTransferFormProps {
 export function useSimpleTransferForm({
   onSubmit,
 }: UseSimpleTransferFormProps): BaseFormHookReturn<SimpleTransferFormData> {
-  const [formData, setFormData] = useState<SimpleTransferFormData>(
-    defaultSimpleTransferState,
-  );
+  const { state: formData, updateState, resetState } = useFormPersistence(defaultSimpleTransferState, 'simple_transfer');
   const { errors, validate, clearError } = useValidation(simpleTransferValidator);
   const { isSubmitting, submit } = useApiSubmission();
 
@@ -35,10 +34,10 @@ export function useSimpleTransferForm({
       field: K,
       value: SimpleTransferFormData[K],
     ) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
+      updateState({ [field]: value });
       clearError(field as string);
     },
-    [clearError],
+    [updateState, clearError],
   );
 
   const handleSubmit = useCallback(
@@ -48,14 +47,15 @@ export function useSimpleTransferForm({
 
       if (Object.keys(validationErrors).length === 0) {
         await submit(() => onSubmit(formData));
+        resetState();
       }
     },
-    [formData, validate, submit, onSubmit],
+    [formData, validate, submit, onSubmit, resetState],
   );
 
   const reset = useCallback(() => {
-    setFormData(defaultSimpleTransferState);
-  }, []);
+    resetState();
+  }, [resetState]);
 
   return {
     formData,
