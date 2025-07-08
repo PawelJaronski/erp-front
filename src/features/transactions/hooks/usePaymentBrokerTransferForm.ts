@@ -5,6 +5,7 @@ import {
 } from '../types';
 import { useValidation } from '@/shared/hooks/useValidation';
 import { useApiSubmission } from '@/shared/hooks/useApiSubmission';
+import { useFormPersistence } from '@/shared/hooks/useFormPersistence';
 import { paymentBrokerTransferValidator } from '../validators/paymentBrokerTransferValidator';
 import { fetchSalesForDate } from '@/features/transactions/utils/sales';
 
@@ -27,7 +28,7 @@ interface Props {
 }
 
 export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookReturn<PaymentBrokerTransferFormData> {
-  const [formData, setFormData] = useState<PaymentBrokerTransferFormData>(defaultState);
+  const { state: formData, updateState, resetState } = useFormPersistence(defaultState, 'payment_broker_transfer');
   const { errors, validate, clearError } = useValidation(paymentBrokerTransferValidator);
   const { isSubmitting, submit } = useApiSubmission();
 
@@ -82,27 +83,34 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
     if (t - s < msDay) {
       const newSales = new Date(t - msDay).toISOString().split('T')[0];
       if (newSales !== sales_date) {
-        setFormData((prev) => ({ ...prev, sales_date: newSales }));
+        updateState({ sales_date: newSales });
       }
     }
-  }, [formData.transfer_date, formData.sales_date, formData]);
+  }, [formData.transfer_date, formData.sales_date, updateState]);
 
   const handleFieldChange = useCallback(<K extends keyof PaymentBrokerTransferFormData>(field: K, value: PaymentBrokerTransferFormData[K]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    updateState({ [field]: value });
     clearError(field as string);
-  }, [clearError]);
+  }, [updateState, clearError]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validate(formData);
     if (Object.keys(validationErrors).length === 0) {
       await submit(() => onSubmit(formData));
+      resetState();
+      // Clear sales cache on successful submit
+      setSalesCache({});
+      setSalesError(null);
     }
-  }, [formData, validate, submit, onSubmit]);
+  }, [formData, validate, submit, onSubmit, resetState]);
 
   const reset = useCallback(() => {
-    setFormData(defaultState);
-  }, []);
+    resetState();
+    // Clear sales cache on reset
+    setSalesCache({});
+    setSalesError(null);
+  }, [resetState]);
 
   const retrySalesFetch = useCallback(() => {
     if (!formData.sales_date) return;
