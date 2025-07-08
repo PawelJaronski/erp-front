@@ -12,7 +12,7 @@ export const FormActions: React.FC<Props> = ({ onSubmit, onReset, isSubmitting, 
     <button
       type="button"
       onClick={onReset}
-      className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+      className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold cursor-pointer rounded-lg hover:bg-gray-50 transition-colors"
     >
       Reset
     </button>
@@ -20,7 +20,7 @@ export const FormActions: React.FC<Props> = ({ onSubmit, onReset, isSubmitting, 
       type="submit"
       onClick={onSubmit}
       disabled={isSubmitting || saveDisabled}
-      className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+      className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white cursor-pointer font-semibold py-3 px-6 rounded-lg transition-colors"
     >
       {isSubmitting ? 'Adding...' : 'Add'}
     </button>
