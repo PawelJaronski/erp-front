@@ -22,7 +22,7 @@ export function AccountSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full appearance-none pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${
+        className={`w-full appearance-none pr-20 px-4 py-3 cursor-pointer border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors ${
           error ? 'border-red-300 bg-red-50' : 'border-gray-300'
         }`}
       >
@@ -38,7 +38,7 @@ export function AccountSelect({
         <button
           type="button"
           onClick={resetField}
-          className="absolute right-8 top-1/2 -translate-y-1/2 p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+          className="absolute right-8 top-1/2 -translate-y-1/2 p-2 cursor-pointer rounded-md border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
           title="Clear account"
         >
           <X className="w-4 h-4 text-gray-500" />
