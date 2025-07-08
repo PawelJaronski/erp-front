@@ -85,7 +85,7 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
         setFormData((prev) => ({ ...prev, sales_date: newSales }));
       }
     }
-  }, [formData.transfer_date, formData.sales_date]);
+  }, [formData.transfer_date, formData.sales_date, formData]);
 
   const handleFieldChange = useCallback(<K extends keyof PaymentBrokerTransferFormData>(field: K, value: PaymentBrokerTransferFormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
