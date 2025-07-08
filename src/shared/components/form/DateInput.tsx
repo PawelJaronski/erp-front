@@ -27,7 +27,7 @@ export function DateInput({ value, onChange, placeholder = '', clearable = true 
         onChange={(e) => onChange(e.target.value)}
         onDoubleClick={openPicker}
         placeholder={placeholder}
-        className="w-full pr-20 px-4 py-3 border rounded-lg cursor-pointer focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+        className="w-full pr-20 px-4 py-3 border rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
       />
       {clearable && value && (
         <button
