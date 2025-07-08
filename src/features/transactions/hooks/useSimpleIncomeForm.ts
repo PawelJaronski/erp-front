@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { SimpleIncomeFormData, BaseFormHookReturn } from '../types';
 import { useValidation } from '@/shared/hooks/useValidation';
 import { useApiSubmission } from '@/shared/hooks/useApiSubmission';
+import { useFormPersistence } from '@/shared/hooks/useFormPersistence';
 import { simpleIncomeValidator } from '../validators/simpleIncomeValidator';
 
 const defaultSimpleIncomeState: SimpleIncomeFormData = {
@@ -24,14 +25,14 @@ interface UseSimpleIncomeFormProps {
 }
 
 export function useSimpleIncomeForm({ onSubmit }: UseSimpleIncomeFormProps): BaseFormHookReturn<SimpleIncomeFormData> {
-  const [formData, setFormData] = useState<SimpleIncomeFormData>(defaultSimpleIncomeState);
+  const { state: formData, updateState, resetState } = useFormPersistence(defaultSimpleIncomeState, 'simple_income');
   const { errors, validate, clearError } = useValidation(simpleIncomeValidator);
   const { isSubmitting, submit } = useApiSubmission();
 
   const handleFieldChange = useCallback(<K extends keyof SimpleIncomeFormData>(field: K, value: SimpleIncomeFormData[K]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    updateState({ [field]: value });
     clearError(field as string);
-  }, [clearError]);
+  }, [updateState, clearError]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +40,13 @@ export function useSimpleIncomeForm({ onSubmit }: UseSimpleIncomeFormProps): Bas
 
     if (Object.keys(validationErrors).length === 0) {
       await submit(() => onSubmit(formData));
+      resetState();
     }
-  }, [formData, validate, submit, onSubmit]);
+  }, [formData, validate, submit, onSubmit, resetState]);
 
   const reset = useCallback(() => {
-    setFormData(defaultSimpleIncomeState);
-  }, []);
+    resetState();
+  }, [resetState]);
 
   return {
     formData,
