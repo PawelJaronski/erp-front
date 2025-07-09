@@ -30,9 +30,9 @@ export default function Home() {
   };
 
   return (
-    <main className="h-screen overflow-y-auto p-4">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex flex-wrap gap-2 sm:gap-4">
+    <main className="min-h-screen bg-gray-100 flex items-center justify-center py-12">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl">
+        <div className="flex flex-wrap gap-2 sm:gap-4 mb-6">
           <button
             type="button"
             onClick={() => setActiveForm("simple_expense")}
