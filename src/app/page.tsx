@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center py-12">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl">
+      <div className="bg-white rounded-lg p-8 w-full max-w-2xl">
         <div className="flex flex-wrap gap-2 sm:gap-4 mb-6">
           <button
             type="button"
