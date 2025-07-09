@@ -85,15 +85,14 @@ export function PaymentBrokerTransferForm({ onSubmit }: Props) {
       {/* Preview Section */}
       {formData.sales_date && (
         <div className="p-4 border rounded-lg bg-gray-50">
-          <p className="text-sm font-medium text-gray-700 mb-2">Commission Preview</p>
           {salesLoading ? (
             <div className="h-14 animate-pulse bg-gray-200 rounded" />
           ) : (
             <div className="space-y-1 text-sm">
-              <p>Total sales on {formData.sales_date}: <span className="font-semibold">{salesTotal?.toFixed(2) ?? "–"} zł</span></p>
-              <p>Total transfers entered: <span className="font-semibold">{transfersSum.toFixed(2)} zł</span></p>
+              <p>Suma sprzedaży: <span className="font-semibold">{salesTotal?.toFixed(2) ?? "–"} zł</span></p>
+              <p>Suma przelewów: <span className="font-semibold">{transfersSum.toFixed(2)} zł</span></p>
               {commissionDiff !== undefined && (
-                <p>Commission difference: <span className="font-semibold">{commissionDiff.toFixed(2)} zł</span></p>
+                <p>Prowizja: <span className="font-semibold">{commissionDiff.toFixed(2)} zł</span></p>
               )}
             </div>
           )}
