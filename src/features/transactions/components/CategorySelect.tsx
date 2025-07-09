@@ -29,7 +29,7 @@ export const CategorySelect: React.FC<Props> = ({
 
   const options = [
     ...availableCategories.map(c => ({ value: c.value, label: c.value })),
-    { value: 'other', label: 'Other' }
+    { value: 'other', label: 'other' }
   ];
 
   return (

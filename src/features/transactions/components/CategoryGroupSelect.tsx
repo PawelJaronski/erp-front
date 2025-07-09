@@ -19,11 +19,6 @@ export const CategoryGroupSelect: React.FC<Props> = ({
     error,
     placeholder = 'Select category group'
 }) => {
-    const options = [
-        ...categoryGroups,
-        { value: 'other', label: 'Other' }
-    ];
-
     return (
         <div className="flex-1">
             <label className="block text-sm semibold text-gray-700 mb-2">
@@ -32,7 +27,7 @@ export const CategoryGroupSelect: React.FC<Props> = ({
             <ComboBox
                 value={value}
                 onChange={onChange}
-                options={options}
+                options={categoryGroups}
                 error={error}
                 placeholder={placeholder}
             />
