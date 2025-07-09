@@ -21,7 +21,7 @@ export const CategoryGroupSelect: React.FC<Props> = ({
 }) => {
     return (
         <div className="flex-1">
-            <label className="block text-sm semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Category Group
             </label>
             <ComboBox
