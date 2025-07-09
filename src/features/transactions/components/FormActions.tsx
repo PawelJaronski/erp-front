@@ -22,7 +22,7 @@ export const FormActions: React.FC<Props> = ({ onSubmit, onReset, isSubmitting, 
       disabled={isSubmitting || saveDisabled}
       className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white cursor-pointer font-semibold py-3 px-6 rounded-lg transition-colors"
     >
-      {isSubmitting ? 'Adding...' : 'Add'}
+      {isSubmitting ? 'Adding...' : 'Submit'}
     </button>
   </div>
 ); 
