@@ -30,8 +30,8 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 flex justify-center py-12">
-      <div className="bg-white rounded-lg p-8 w-full max-w-2xl">
+    <main className="min-h-screen bg-gray-100 py-12">
+      <div className="bg-white rounded-lg p-8 w-full max-w-2xl mx-auto">
         <div className="flex flex-wrap gap-2 sm:gap-4 mb-6">
           <button
             type="button"
