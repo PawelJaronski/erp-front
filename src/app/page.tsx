@@ -75,7 +75,7 @@ export default function Home() {
                 : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
             }`}
           >
-            Broker
+            Paynow
           </button>
         </div>
 
