@@ -83,16 +83,19 @@ export function PaymentBrokerTransferForm({ onSubmit }: Props) {
       </div>
 
       {/* Preview Section */}
-      {formData.sales_date && (
+      
         <div className="p-4 border rounded-lg bg-gray-50">
-          {salesLoading ? (
-            <div className="h-14 animate-pulse bg-gray-200 rounded" />
-          ) : (
+          
             <div className="space-y-1 text-sm">
-              <p>Suma sprzedaży: <span className="font-semibold">{salesTotal?.toFixed(2) ?? "–"} zł</span></p>
-              <p>Suma przelewów: <span className="font-semibold">{transfersSum.toFixed(2)} zł</span></p>
+              <p>Suma sprzedaży: <span className="font-semibold">
+                {salesTotal !== undefined ? `${salesTotal.toFixed(2)} zł` : "-"}
+                </span></p>
+              <p>Suma przelewów: <span className="font-semibold">
+                {transfersSum > 0 ? `${transfersSum.toFixed(2)} zł` : "-"}</span></p>
               {commissionDiff !== undefined && (
-                <p>Prowizja: <span className="font-semibold">{commissionDiff.toFixed(2)} zł</span></p>
+                <p>Prowizja: <span className="font-semibold">
+                  {commissionDiff > 0 ? `${commissionDiff.toFixed(2)} zł` : "-"}
+                  </span></p>
               )}
 
               {}
@@ -104,7 +107,7 @@ export function PaymentBrokerTransferForm({ onSubmit }: Props) {
                 </div>
               )}
             </div>
-          )}
+          
           {salesError && (
             <div className="mt-2 text-red-700 bg-red-50 border border-red-200 rounded p-3">
               <p className="text-sm mb-2">{salesError}</p>
@@ -118,7 +121,7 @@ export function PaymentBrokerTransferForm({ onSubmit }: Props) {
             </div>
           )}
         </div>
-      )}
+      
 
       <FormActions
         onSubmit={handleSubmit}
