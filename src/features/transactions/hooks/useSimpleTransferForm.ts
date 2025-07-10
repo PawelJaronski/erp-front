@@ -34,10 +34,25 @@ export function useSimpleTransferForm({
       field: K,
       value: SimpleTransferFormData[K],
     ) => {
-      updateState({ [field]: value });
+      const swapAccounts = () => {
+        updateState({
+          account: formData.to_account,
+          to_account: formData.account,
+        });
+      };
+
+      const isSwappingAccounts =
+        (field === 'account' && value === formData.to_account) ||
+        (field === 'to_account' && value === formData.account);
+
+      if (isSwappingAccounts) {
+        swapAccounts();
+      } else {
+        updateState({ [field]: value });
+      }
       clearError(field as string);
     },
-    [updateState, clearError],
+    [updateState, clearError, formData.to_account, formData.account],
   );
 
   const handleSubmit = useCallback(
