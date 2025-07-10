@@ -94,6 +94,15 @@ export function PaymentBrokerTransferForm({ onSubmit }: Props) {
               {commissionDiff !== undefined && (
                 <p>Prowizja: <span className="font-semibold">{commissionDiff.toFixed(2)} zł</span></p>
               )}
+
+              {}
+              {salesTotal !== undefined && transfersSum > salesTotal && (
+                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+                  <p className="text-red-700 text-sm font-medium">
+                    Suma przelewów przekracza sumę sprzedaży
+                  </p>
+                </div>
+              )}
             </div>
           )}
           {salesError && (

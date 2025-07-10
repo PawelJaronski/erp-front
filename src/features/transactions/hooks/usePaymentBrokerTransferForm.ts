@@ -95,7 +95,7 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    const validationErrors = validate(formData);
+    const validationErrors = validate(formData, { salesTotal });
     if (Object.keys(validationErrors).length === 0) {
       await submit(() => onSubmit(formData));
       resetState();
@@ -103,7 +103,7 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
       setSalesCache({});
       setSalesError(null);
     }
-  }, [formData, validate, submit, onSubmit, resetState]);
+  }, [formData, validate, submit, onSubmit, resetState, salesTotal]);
 
   const reset = useCallback(() => {
     resetState();

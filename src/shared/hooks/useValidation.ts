@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
 
-type ValidatorFunction<T> = (data: T) => Record<string, string>;
+type ValidatorFunction<T, P = void> = (data: T, params?: P) => Record<string, string>;
 
-export function useValidation<T>(validator: ValidatorFunction<T>) {
+export function useValidation<T, P = void>(validator: ValidatorFunction<T, P>) {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = useCallback(
-    (data: T): Record<string, string> => {
-      const validationErrors = validator(data);
+    (data: T, params?: P): Record<string, string> => {
+      const validationErrors = validator(data, params);
       setErrors(validationErrors);
       return validationErrors;
     },

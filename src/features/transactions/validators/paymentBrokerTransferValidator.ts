@@ -1,11 +1,13 @@
 import { PaymentBrokerTransferFormData } from '../types';
 import { validateAmount } from '@/shared/utils/amount';
 
-/**
- * Validation rules for Payment Broker Transfer form.
- */
+interface PaymentBrokerTransferValidatorParams {
+  salesTotal?: number;
+}
+
 export function paymentBrokerTransferValidator(
   data: PaymentBrokerTransferFormData,
+  params?: PaymentBrokerTransferValidatorParams,
 ): Record<string, string> {
   const errors: Record<string, string> = {};
 
@@ -35,6 +37,16 @@ export function paymentBrokerTransferValidator(
 
   if (!(data.paynow_transfer?.trim() || '') && !(data.autopay_transfer?.trim() || '')) {
     errors.paynow_transfer = 'Enter at least one amount';
+  }
+
+  if (params?.salesTotal !== undefined) {
+    const transferSum = 
+      (Number((data.paynow_transfer || '').replace(',', '.')) || 0) +
+      (Number((data.autopay_transfer || '').replace(',', '.')) || 0);
+    if (transferSum > params.salesTotal) {
+      errors.paynow_transfer = 'Suma przelewów przekracza sumę sprzedaży';
+      errors.autopay_transfer = 'Suma przelewów przekracza sumę sprzedaży';
+    }
   }
 
   return errors;
