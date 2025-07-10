@@ -92,11 +92,11 @@ export function PaymentBrokerTransferForm({ onSubmit }: Props) {
                 </span></p>
               <p>Suma przelewów: <span className="font-semibold">
                 {transfersSum > 0 ? `${transfersSum.toFixed(2)} zł` : "-"}</span></p>
-              {commissionDiff !== undefined && (
+              
                 <p>Prowizja: <span className="font-semibold">
-                  {commissionDiff > 0 ? `${commissionDiff.toFixed(2)} zł` : "-"}
+                  {commissionDiff !== undefined ? `${commissionDiff.toFixed(2)} zł` : "–"}
                   </span></p>
-              )}
+              
 
               {}
               {salesTotal !== undefined && transfersSum > salesTotal && (
