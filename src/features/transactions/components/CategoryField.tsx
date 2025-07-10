@@ -1,4 +1,3 @@
-// frontend/src/features/transactions/components/CategoryField.tsx
 import React from 'react';
 import { CategoryGroupSelect } from './CategoryGroupSelect';
 import { CategorySelect } from './CategorySelect';

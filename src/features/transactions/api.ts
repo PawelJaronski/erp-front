@@ -1,4 +1,4 @@
-import type { TransactionRequest } from '@/shared/contracts/transactions';
+import type { TransactionRequest } from '@/features/transactions/types';
 
 // In browser we hit our own Next.js proxy to avoid CORS; on server we can call backend directly
 const API_BASE = typeof window === 'undefined'

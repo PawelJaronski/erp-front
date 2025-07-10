@@ -1,4 +1,3 @@
-// frontend/src/features/transactions/components/CategorySelect.tsx
 import React from 'react';
 import { categoriesData } from '@/features/transactions/utils/staticData';
 import { ComboBox } from '@/shared/components/form/ComboBox';
