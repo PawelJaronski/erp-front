@@ -108,7 +108,7 @@ export function usePaymentBrokerTransferForm({ onSubmit }: Props): BaseFormHookR
   const reset = useCallback(() => {
     resetState();
     // Clear sales cache on reset
-    setSalesCache({});
+    // setSalesCache({}); <- don't
     setSalesError(null);
   }, [resetState]);
 
