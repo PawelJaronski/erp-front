@@ -51,14 +51,14 @@ export function PaymentBrokerTransferForm({ onSubmit }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Paynow Transfer (zł)" error={errors.paynow_transfer}>
+        <FormField label="Paynow Transfer" error={errors.paynow_transfer}>
           <AmountInput
             value={formData.paynow_transfer || ''}
             onChange={(v) => handleFieldChange('paynow_transfer', v)}
             error={errors.paynow_transfer}
           />
         </FormField>
-        <FormField label="Autopay Transfer (zł)" error={errors.autopay_transfer}>
+        <FormField label="Autopay Transfer" error={errors.autopay_transfer}>
           <AmountInput
             value={formData.autopay_transfer || ''}
             onChange={(v) => handleFieldChange('autopay_transfer', v)}

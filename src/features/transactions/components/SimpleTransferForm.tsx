@@ -44,7 +44,7 @@ export function SimpleTransferForm({ onSubmit }: Props) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Amount (zł)" error={errors.gross_amount} required>
+        <FormField label="Amount" error={errors.gross_amount} required>
           <AmountInput
             value={formData.gross_amount}
             onChange={(v) => handleFieldChange('gross_amount', v)}
