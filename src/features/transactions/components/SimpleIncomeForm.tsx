@@ -2,8 +2,8 @@
 import React from 'react';
 import { SimpleIncomeFormData } from '../types';
 import { useSimpleIncomeForm } from '../hooks/useSimpleIncomeForm';
-import { FormField, AccountSelect, AmountInput, DateInput } from '@/shared/components/form';
-import { CategoryField, VATSection, FormActions } from '.';
+import { FormField, DateInput } from '@/shared/components/form';
+import { CategoryField, VATSection, FormActions, AccountSelect, AmountInput } from '.';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 
