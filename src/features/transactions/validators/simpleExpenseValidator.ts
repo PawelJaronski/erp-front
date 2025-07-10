@@ -1,5 +1,5 @@
-import { SimpleExpenseFormData } from '../types';
-import { validateAmount } from '@/shared/utils/amount';
+import { SimpleExpenseFormData } from '@/features/transactions/types';
+import { validateAmount } from '@/features/transactions/utils';
 
 export function simpleExpenseValidator(data: SimpleExpenseFormData): Record<string, string> {
   const errors: Record<string, string> = {};

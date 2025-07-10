@@ -7,7 +7,7 @@ import {
 } from "@/features/transactions/components";
 import React, { useState } from "react";
 import { addTransaction } from '@/features/transactions/api';
-import { buildTransactionPayload, AnyFormData } from '@/shared/utils/payload';
+import { buildTransactionPayload, AnyFormData } from '@/features/transactions/utils';
 import { useToast } from '@/shared/components/ToastProvider';
 
 export default function Home() {

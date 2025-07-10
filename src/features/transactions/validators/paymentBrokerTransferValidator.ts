@@ -1,5 +1,5 @@
-import { PaymentBrokerTransferFormData } from '../types';
-import { validateAmount } from '@/shared/utils/amount';
+import { PaymentBrokerTransferFormData } from '@/features/transactions/types';
+import { validateAmount } from '@/features/transactions/utils';
 
 interface PaymentBrokerTransferValidatorParams {
   salesTotal?: number;
