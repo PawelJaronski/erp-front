@@ -41,7 +41,7 @@ export const CategoryField: React.FC<Props> = ({
       <CategorySelect
         value={category}
         onChange={onCategoryChange}
-        categoryGroup={categoryGroup}
+        //categoryGroup={categoryGroup} // usunięte 14 lipca 2025
         customValue={customCategory}
         onCustomValueChange={onCustomCategoryChange}
         error={errors.category}
