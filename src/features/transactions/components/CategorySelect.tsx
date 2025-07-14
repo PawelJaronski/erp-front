@@ -1,5 +1,5 @@
 import React from 'react';
-import { categoriesData } from '@/features/transactions/utils/staticData';
+import { categoriesData, CategoryData } from '@/features/transactions/utils/staticData';
 import { ComboBox } from '@/shared/components/form/ComboBox';
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
   onCustomValueChange?: (value: string) => void;
   error?: string;
   placeholder?: string;
-  availableCategories: typeof categoriesData;
+  availableCategories: readonly CategoryData[];
 }
 
 export const CategorySelect: React.FC<Props> = ({
