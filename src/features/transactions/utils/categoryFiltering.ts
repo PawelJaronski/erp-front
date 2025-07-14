@@ -21,7 +21,7 @@ export function filterCategories({
         filtered = filtered.filter(c => allowedCategories.includes(c.value));
     }
 
-    if (categoryGroup && categoryGroup !== 'other') {
+    if (!category && categoryGroup && categoryGroup !== 'other') {
         filtered = filtered.filter(c => c.group === categoryGroup);
     }
 
