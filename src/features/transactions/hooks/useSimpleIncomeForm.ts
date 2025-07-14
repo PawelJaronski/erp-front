@@ -1,9 +1,10 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { SimpleIncomeFormData, BaseFormHookReturn } from '../types';
 import { useValidation } from '@/shared/hooks/useValidation';
 import { useApiSubmission } from '@/shared/hooks/useApiSubmission';
 import { useFormPersistence } from '@/shared/hooks/useFormPersistence';
 import { simpleIncomeValidator } from '../validators/simpleIncomeValidator';
+import { filterCategories } from '../utils/categoryFiltering';
 
 const defaultSimpleIncomeState: SimpleIncomeFormData = {
   gross_amount: '',
@@ -28,6 +29,13 @@ export function useSimpleIncomeForm({ onSubmit }: UseSimpleIncomeFormProps): Bas
   const { state: formData, updateState, resetState } = useFormPersistence(defaultSimpleIncomeState, 'simple_income');
   const { errors, validate, clearError } = useValidation(simpleIncomeValidator);
   const { isSubmitting, submit } = useApiSubmission();
+
+  const filteredCategories = useMemo(() => {
+    return filterCategories({
+      categoryGroup: formData.category_group,
+      category: formData.category,
+    });
+  }, [formData.category_group, formData.category]);
 
   const handleFieldChange = useCallback(<K extends keyof SimpleIncomeFormData>(field: K, value: SimpleIncomeFormData[K]) => {
     updateState({ [field]: value });
@@ -55,5 +63,6 @@ export function useSimpleIncomeForm({ onSubmit }: UseSimpleIncomeFormProps): Bas
     handleFieldChange,
     handleSubmit,
     reset,
+    availableCategories: filteredCategories,
   };
 } 

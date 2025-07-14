@@ -38,6 +38,7 @@ export const categoriesData = [
 
 export type CategoryGroupValue = typeof categoriesData[number]["group"];
 export type CategoryValue = typeof categoriesData[number]["value"];
+export type CategoryData = typeof categoriesData[number];
 
 // List of available bank / cash accounts
 export const accounts = [

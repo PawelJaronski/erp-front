@@ -10,6 +10,7 @@ interface Props {
   onCustomValueChange?: (value: string) => void;
   error?: string;
   placeholder?: string;
+  availableCategories: typeof categoriesData;
 }
 
 export const CategorySelect: React.FC<Props> = ({
@@ -19,15 +20,12 @@ export const CategorySelect: React.FC<Props> = ({
   customValue,
   onCustomValueChange,
   error,
-  placeholder = 'Select category...'
+  placeholder = 'Select category...',
+  availableCategories,
 }) => {
-  const availableCategories = React.useMemo(() => {
-    if (!categoryGroup || categoryGroup === 'other') return categoriesData;
-    return categoriesData.filter((c) => c.group === categoryGroup);
-  }, [categoryGroup]);
 
   const options = [
-    ...availableCategories.map(c => ({ value: c.value, label: c.value })),
+    ...(availableCategories || categoriesData).map(c => ({ value: c.value, label: c.value })),
     { value: 'other', label: 'other' }
   ];
 

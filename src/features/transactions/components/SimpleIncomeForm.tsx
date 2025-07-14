@@ -21,7 +21,7 @@ export function SimpleIncomeForm({ onSubmit }: Props) {
     showToast(<TransactionNotification data={notificationData} />, 'success');
   };
 
-  const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset } =
+  const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset, availableCategories } =
     useSimpleIncomeForm({ onSubmit: internalSubmit });
 
   return (
@@ -49,6 +49,7 @@ export function SimpleIncomeForm({ onSubmit }: Props) {
           onCustomCategoryGroupChange={(v) => handleFieldChange('custom_category_group', v)}
           onCustomCategoryChange={(v) => handleFieldChange('custom_category', v)}
           errors={errors}
+          availableCategories={availableCategories || []}
         />
       </div>
 

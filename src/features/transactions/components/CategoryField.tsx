@@ -1,6 +1,7 @@
 import React from 'react';
 import { CategoryGroupSelect } from './CategoryGroupSelect';
 import { CategorySelect } from './CategorySelect';
+import { CategoryData } from '../utils/staticData';
 
 interface Props {
   categoryGroup: string;
@@ -12,6 +13,7 @@ interface Props {
   onCustomCategoryGroupChange: (value: string) => void;
   onCustomCategoryChange: (value: string) => void;
   errors: Record<string, string>;
+  availableCategories: readonly CategoryData[];
 }
 
 export const CategoryField: React.FC<Props> = ({
@@ -24,6 +26,7 @@ export const CategoryField: React.FC<Props> = ({
   onCustomCategoryGroupChange,
   onCustomCategoryChange,
   errors,
+  availableCategories,
 }) => {
   return (
     <>
@@ -42,6 +45,7 @@ export const CategoryField: React.FC<Props> = ({
         customValue={customCategory}
         onCustomValueChange={onCustomCategoryChange}
         error={errors.category}
+        availableCategories={availableCategories}
       />
     </>
   );

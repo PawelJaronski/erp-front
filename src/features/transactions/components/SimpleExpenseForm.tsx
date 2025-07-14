@@ -30,6 +30,7 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
     handleFieldChange,
     handleSubmit,
     reset,
+    availableCategories,
   } = useSimpleExpenseForm({ onSubmit: internalSubmit });
 
   return (
@@ -57,6 +58,7 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
           onCustomCategoryGroupChange={(value) => handleFieldChange('custom_category_group', value)}
           onCustomCategoryChange={(value) => handleFieldChange('custom_category', value)}
           errors={errors}
+          availableCategories={availableCategories || []}
         />
       </div>
 

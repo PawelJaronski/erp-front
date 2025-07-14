@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { SimpleExpenseFormData, BaseFormHookReturn } from '../types';
 import { useValidation } from '@/shared/hooks/useValidation';
 import { useApiSubmission } from '@/shared/hooks/useApiSubmission';
 import { useFormPersistence } from '@/shared/hooks/useFormPersistence';
 import { simpleExpenseValidator } from '../validators/simpleExpenseValidator';
+import { filterCategories } from '../utils/categoryFiltering';
 
 const defaultSimpleExpenseState: SimpleExpenseFormData = {
   gross_amount: '',
@@ -28,6 +29,13 @@ export function useSimpleExpenseForm({ onSubmit }: UseSimpleExpenseFormProps): B
   const { state: formData, updateState, resetState } = useFormPersistence(defaultSimpleExpenseState, 'simple_expense');
   const { errors, validate, clearError } = useValidation(simpleExpenseValidator);
   const { isSubmitting, submit } = useApiSubmission();
+
+  const filteredCategories = useMemo(() => {
+    return filterCategories({
+      categoryGroup: formData.category_group,
+      category: formData.category,
+    });
+  }, [formData.category_group, formData.category]);
 
   const handleFieldChange = useCallback(<K extends keyof SimpleExpenseFormData>(field: K, value: SimpleExpenseFormData[K]) => {
     updateState({ [field]: value });
@@ -55,5 +63,6 @@ export function useSimpleExpenseForm({ onSubmit }: UseSimpleExpenseFormProps): B
     handleFieldChange,
     handleSubmit,
     reset,
+    availableCategories: filteredCategories,
   };
 } 
