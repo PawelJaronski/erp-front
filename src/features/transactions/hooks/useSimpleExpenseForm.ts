@@ -5,6 +5,7 @@ import { useApiSubmission } from '@/shared/hooks/useApiSubmission';
 import { useFormPersistence } from '@/shared/hooks/useFormPersistence';
 import { simpleExpenseValidator } from '../validators/simpleExpenseValidator';
 import { filterCategories } from '../utils/categoryFiltering';
+import { categoriesData } from '../utils/staticData';
 
 const defaultSimpleExpenseState: SimpleExpenseFormData = {
   gross_amount: '',
@@ -38,9 +39,18 @@ export function useSimpleExpenseForm({ onSubmit }: UseSimpleExpenseFormProps): B
   }, [formData.category_group, formData.category]);
 
   const handleFieldChange = useCallback(<K extends keyof SimpleExpenseFormData>(field: K, value: SimpleExpenseFormData[K]) => {
+    if (field === 'category') {
+      const selectedCategory = categoriesData.find(c => c.value === value);
+      if (selectedCategory && !formData.category_group && typeof value === 'string') {
+        updateState({ category: value, category_group: selectedCategory.group});
+        clearError('category');
+        clearError('category_group');
+        return;
+      }
+    }
     updateState({ [field]: value });
     clearError(field as string);
-  }, [updateState, clearError]);
+  }, [updateState, clearError, formData.category_group]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();

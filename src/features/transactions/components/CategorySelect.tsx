@@ -4,9 +4,7 @@ import { ComboBox } from '@/shared/components/form/ComboBox';
 
 interface Props {
   value: string;
-  onChange: (value: string) => void;
-  //categoryGroup?: string; // dla filtrowania // usunięte 14 lipca 2025
-  customValue?: string;
+  onChange: (value: string) => void;  customValue?: string;
   onCustomValueChange?: (value: string) => void;
   error?: string;
   placeholder?: string;
@@ -16,7 +14,6 @@ interface Props {
 export const CategorySelect: React.FC<Props> = ({
   value,
   onChange,
-  //categoryGroup, // usunięte 14 lipca 2025
   customValue,
   onCustomValueChange,
   error,
