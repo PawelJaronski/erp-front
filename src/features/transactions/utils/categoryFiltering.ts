@@ -22,12 +22,7 @@ export function filterCategories({
     }
 
     if (categoryGroup && categoryGroup !== 'other') {
-        filtered = filtered.filter(c => c.group === categoryGroup || c.value === category);
-    }
-
-    if (category && !filtered.some(c => c.value === category)) {
-        const found = categoriesData.find(c => c.value === category);
-        if (found) filtered = [...filtered, found];
+        filtered = filtered.filter(c => c.group === categoryGroup);
     }
 
     return filtered;
