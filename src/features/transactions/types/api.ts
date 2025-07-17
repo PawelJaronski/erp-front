@@ -9,7 +9,7 @@ export interface TransactionItem {
     vat_amount: number | null;
     business_timestamp: string;
     business_reference: string | null;
-    payload: Record<string, any>;
+    payload: Record<string, unknown>;
 }
 
 export interface TransactionFilters {
