@@ -1,97 +1,26 @@
-"use client";
-import {
-  SimpleExpenseForm,
-  SimpleTransferForm,
-  PaymentBrokerTransferForm,
-  SimpleIncomeForm,
-} from "@/features/transactions/components";
-import React, { useState } from "react";
-import { addTransaction } from '@/features/transactions/api';
-import { buildTransactionPayload, AnyFormData } from '@/features/transactions/utils';
-import { useToast } from '@/shared/components/ToastProvider';
+import Link from 'next/link'
 
-export default function Home() {
-  const [activeForm, setActiveForm] = useState<"simple_expense" | "simple_income" | "simple_transfer" | "payment_broker_transfer">("simple_expense");
-  const { showToast } = useToast();
-
-  const handleSubmit = async (data: unknown) => {
-
-    const payload = buildTransactionPayload(
-      data as AnyFormData,
-      activeForm,
-    );
-
-    try {
-      await addTransaction(payload);
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'Unexpected error';
-      showToast(msg, 'error');
-    }
-  };
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen py-12">
-      <div className="bg-white rounded-lg p-8 w-full max-w-2xl mx-auto">
-        <div className="flex flex-wrap gap-2 sm:gap-4 mb-6">
-          <button
-            type="button"
-            onClick={() => setActiveForm("simple_expense")}
-            className={`px-3 py-2 sm:px-4 rounded-lg font-semibold border transition-colors cursor-pointer duration-150 text-sm sm:text-base ${
-              activeForm === "simple_expense"
-                ? "bg-blue-600 text-white border-blue-700"
-                : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
-            }`}
-          >
-            Expense
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveForm("simple_income")}
-            className={`px-3 py-2 sm:px-4 rounded-lg font-semibold border transition-colors cursor-pointer duration-150 text-sm sm:text-base ${
-              activeForm === "simple_income"
-                ? "bg-blue-600 text-white border-blue-700"
-                : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
-            }`}
-          >
-            Income
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveForm("simple_transfer")}
-            className={`px-3 py-2 sm:px-4 rounded-lg font-semibold border transition-colors cursor-pointer duration-150 text-sm sm:text-base ${
-              activeForm === "simple_transfer"
-                ? "bg-blue-600 text-white border-blue-700"
-                : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
-            }`}
-          >
-            Transfer
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveForm("payment_broker_transfer")}
-            className={`px-3 py-2 sm:px-4 rounded-lg font-semibold border transition-colors cursor-pointer duration-150 text-sm sm:text-base ${
-              activeForm === "payment_broker_transfer"
-                ? "bg-blue-600 text-white border-blue-700"
-                : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-100"
-            }`}
-          >
-            Paynow
-          </button>
-        </div>
-
-        {activeForm === "simple_expense" && (
-          <SimpleExpenseForm onSubmit={handleSubmit} />
-        )}
-        {activeForm === "simple_income" && (
-          <SimpleIncomeForm onSubmit={handleSubmit} />
-        )}
-        {activeForm === "simple_transfer" && (
-          <SimpleTransferForm onSubmit={handleSubmit} />
-        )}
-        {activeForm === "payment_broker_transfer" && (
-          <PaymentBrokerTransferForm onSubmit={handleSubmit} />
-        )}
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">ERP Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Link 
+          href="/finance/add-transaction"
+          className="block p-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          <h2 className="text-xl font-semibold mb-2">Add Transaction</h2>
+          <p>Record new financial transactions</p>
+        </Link>
+        
+        <Link 
+          href="/finance/transactions"
+          className="block p-6 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+        >
+          <h2 className="text-xl font-semibold mb-2">View Transactions</h2>
+          <p>Browse and filter transaction history</p>
+        </Link>
       </div>
-    </main>
-  );
+    </div>
+  )
 }
