@@ -21,7 +21,7 @@ export function SimpleTransferForm({ onSubmit }: Props) {
     showToast(<TransactionNotification data={notificationData} />, 'success');
   };
 
-  const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset } =
+  const { formData, isSubmitting, handleFieldChange, handleSubmit, reset } =
     useSimpleTransferForm({ onSubmit: internalSubmit });
 
   return (
