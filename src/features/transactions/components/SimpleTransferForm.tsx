@@ -21,34 +21,37 @@ export function SimpleTransferForm({ onSubmit }: Props) {
     showToast(<TransactionNotification data={notificationData} />, 'success');
   };
 
-  const { formData, isSubmitting, handleFieldChange, handleSubmit, reset } =
+  const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset } =
     useSimpleTransferForm({ onSubmit: internalSubmit });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="From Account" required>
+        <FormField label="From Account" error={errors.account} required>
           <AccountSelect
             value={formData.account}
             onChange={(v) => handleFieldChange('account', v)}
+            error={errors.account}
           />
         </FormField>
-        <FormField label="To Account" required>
+        <FormField label="To Account" error={errors.to_account} required>
           <AccountSelect
             value={formData.to_account}
             onChange={(v) => handleFieldChange('to_account', v)}
+            error={errors.to_account}
           />
         </FormField>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Amount" required>
+        <FormField label="Amount" error={errors.gross_amount} required>
           <AmountInput
             value={formData.gross_amount}
             onChange={(v) => handleFieldChange('gross_amount', v)}
+            error={errors.gross_amount}
           />
         </FormField>
-        <FormField label="Business Date" required>
+        <FormField label="Business Date" error={errors.business_timestamp} required>
           <DateInput
             value={formData.business_timestamp}
             onChange={(v) => handleFieldChange('business_timestamp', v)}
