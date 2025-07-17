@@ -1,6 +1,7 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
+import { Suspense } from 'react'
 import { useTransactionsFilters } from '@/features/transactions/hooks/useTransactionFilters'
 import { useTransactionsQuery } from '@/features/transactions/hooks/useTransactionsQuery'
 import { AccountSelector } from '@/features/transactions/components/filters/AccountSelector'
@@ -17,6 +18,7 @@ export default function TransactionsPage() {
     const mockFormAccount = 'mbank_firmowe'
 
     return (
+      <Suspense fallback={<div>Loading...</div>}>
         <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Transactions</h1>
@@ -80,5 +82,6 @@ export default function TransactionsPage() {
         />
       )}
     </div>
+    </Suspense>
   )
 }
