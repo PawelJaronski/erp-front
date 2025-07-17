@@ -32,7 +32,6 @@ export function SimpleIncomeForm({ onSubmit }: Props) {
           <AccountSelect
             value={formData.account}
             onChange={(v) => handleFieldChange('account', v)}
-            error={errors.account}
           />
         </FormField>
       </div>

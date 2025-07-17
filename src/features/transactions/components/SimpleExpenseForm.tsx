@@ -41,7 +41,7 @@ export function SimpleExpenseForm({ onSubmit }: SimpleExpenseFormProps) {
           <AccountSelect
             value={formData.account}
             onChange={(value) => handleFieldChange('account', value)}
-            error={errors.account}
+            
           />
         </FormField>
       </div>

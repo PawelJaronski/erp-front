@@ -2,7 +2,7 @@
 
 import { useTransactionsFilters } from '@/features/transactions/hooks/useTransactionFilters'
 import { useTransactionsQuery } from '@/features/transactions/hooks/useTransactionsQuery'
-import { AccountSelector } from '@/features/transactions/components/filters/AccountSelector'
+import { AccountFilterSelector } from '@/features/transactions/components/filters/AccountFilterSelector'
 import { DatePresetSelector } from '@/features/transactions/components/filters/DatePresetSelector'
 import { AmountTypeSelector } from '@/features/transactions/components/filters/AmountTypeSelector'
 import { SearchInput } from '@/features/transactions/components/filters/SearchInput'
@@ -30,7 +30,7 @@ export default function TransactionsClient() {
         {/* Filters */}
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <AccountSelector
+            <AccountFilterSelector
               value={filters.account}
               onChange={(account) => updateFilters({ account })}
               onSyncWithForm={() => syncWithForm(mockFormAccount)}

@@ -7,21 +7,23 @@ interface AccountSelectProps {
   onChange: (value: string) => void;
   error?: string;
   placeholder?: string;
+  isClearable?: boolean;
 }
 
 export function AccountSelect({
   value,
   onChange,
   error,
-  placeholder = 'Select account...'
+  placeholder = 'Select account...',
+  isClearable = true
 }: AccountSelectProps) {
   return (
     <ComboBox
       value={value}
       onChange={onChange}
       options={accounts}
-      error={error}
       placeholder={placeholder}
+      isClearable={isClearable}
     />
   );
 } 

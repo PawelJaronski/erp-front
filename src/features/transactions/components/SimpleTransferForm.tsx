@@ -38,7 +38,6 @@ export function SimpleTransferForm({ onSubmit }: Props) {
           <AccountSelect
             value={formData.to_account}
             onChange={(v) => handleFieldChange('to_account', v)}
-            error={errors.to_account}
           />
         </FormField>
       </div>
