@@ -1,4 +1,5 @@
 'use client'
+export const dynamic = 'force-dynamic'
 
 import { useTransactionsFilters } from '@/features/transactions/hooks/useTransactionFilters'
 import { useTransactionsQuery } from '@/features/transactions/hooks/useTransactionsQuery'
