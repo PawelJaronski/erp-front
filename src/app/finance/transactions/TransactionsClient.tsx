@@ -53,8 +53,8 @@ export default function TransactionsClient() {
             />
             
             <SearchInput
-              value={filters.search}
-              onChange={(search) => updateFilters({ search })}
+              value={searchValue}
+              onChange={(search) => setSearchValue(search || '')}
             />
             
             <AmountTypeSelector
