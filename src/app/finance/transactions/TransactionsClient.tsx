@@ -8,9 +8,20 @@ import { AmountTypeSelector } from '@/features/transactions/components/filters/A
 import { SearchInput } from '@/features/transactions/components/filters/SearchInput'
 import { TransactionList } from '@/features/transactions/components/TransactionList'
 import { Pagination } from '@/features/transactions/components/Pagination'
+import { useDebounce } from '@/shared/hooks/useDebounce'
+import React from 'react'
 
 export default function TransactionsClient() {
     const { filters, updateFilters, resetFilters, syncWithForm } = useTransactionsFilters()
+    const [searchValue, setSearchValue] = React.useState(filters.search || '')
+    const debouncedSearch = useDebounce(searchValue, 300)
+
+    React.useEffect(() => {
+        if (debouncedSearch !== filters.search) {
+            updateFilters({ search: debouncedSearch })
+        }
+    }, [debouncedSearch]);
+
     const { data, isLoading, error } = useTransactionsQuery(filters)
 
     const mockFormAccount = 'mbank_firmowe'
