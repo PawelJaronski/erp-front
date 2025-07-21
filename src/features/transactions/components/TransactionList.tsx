@@ -39,43 +39,38 @@ export function TransactionList({ transactions, isLoading, error }: TransactionL
     }
 
     return (
-        <div className="space-y-2">
-      {transactions.map((transaction) => (
-        <div key={transaction.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium">{transaction.account}</span>
-                <span className="text-sm text-gray-500">{transaction.category_group}</span>
-                <span className="text-sm text-gray-400">•</span>
-                <span className="text-sm text-gray-500">{transaction.category}</span>
-              </div>
-              
-              {transaction.business_reference && (
-                <p className="text-sm text-gray-600 mb-1">{transaction.business_reference}</p>
-              )}
-              
-              <p className="text-xs text-gray-400">
-                {new Date(transaction.business_timestamp).toLocaleDateString()} • {transaction.event_type}
-              </p>
-            </div>
-            
-            <div className="text-right">
-              <div className={`font-medium ${
-                (transaction.gross_amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {transaction.gross_amount?.toFixed(2)} zł
-              </div>
-              
-              {transaction.net_amount && transaction.vat_amount && (
-                <div className="text-xs text-gray-500">
-                  Net: {transaction.net_amount.toFixed(2)} • VAT: {transaction.vat_amount.toFixed(2)}
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                    <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Date</th>
+                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 tracking-wider">Gross</th>
+                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 tracking-wider">Net</th>
+                        <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 tracking-wider">VAT</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Category Group</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Category</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Account</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Business Reference</th>
+                    </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                    {transactions.map((transaction) => (
+                        <tr key={transaction.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(transaction.business_timestamp).toLocaleDateString()}</td>
+                            <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${(transaction.gross_amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {transaction.gross_amount?.toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">{transaction.net_amount?.toFixed(2)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">{transaction.vat_amount?.toFixed(2)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.category_group}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.category}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{transaction.account}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.business_reference}</td>
+                            
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
-      ))}
-    </div>
     )
 }

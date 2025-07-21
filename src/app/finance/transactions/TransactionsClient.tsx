@@ -24,7 +24,7 @@ export default function TransactionsClient() {
 
     const { data, isLoading, error } = useTransactionsQuery(filters)
 
-    const mockFormAccount = 'mbank_firmowe'
+    const mockFormAccount = 'mbank_firmowe' // TODO: remove this when sync is implemented
 
     React.useEffect(() => {
       if (!filters.date_preset) {
