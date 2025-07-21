@@ -15,7 +15,7 @@ export function useTransactionsFilters() {
         search: searchParams.get('search') || undefined,
         date_from: searchParams.get('date_from') || undefined,
         date_to: searchParams.get('date_to') || undefined,
-        date_preset: searchParams.get('date_preset') || undefined,
+        date_preset: searchParams.get('date_preset') || 'month_to_date',
         amount_type: searchParams.get('amount_type') || undefined,
         sort_by: searchParams.get('sort_by') || undefined,
         sort_order: searchParams.get('sort_order') || undefined,
