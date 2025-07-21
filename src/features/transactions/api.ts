@@ -34,6 +34,8 @@ export async function fetchTransactions(filters: TransactionFilters): Promise<Tr
   })
 
   const url = `${API_BASE}/transactions?${params.toString()}`
+  console.log('FETCH TRANSACTIONS URL:', url)
+  console.log('FILTERS:', filters)
 
   const response = await fetch(url, {
     method: 'GET',
