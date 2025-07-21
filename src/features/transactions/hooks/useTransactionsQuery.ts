@@ -2,10 +2,11 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { fetchTransactions } from '@/features/transactions/api'
-import { TransactionFilters } from '@/features/transactions/types'
+import { TransactionFilters, TransactionListResponse } from '@/features/transactions/types'
+import { keepPreviousData } from '@tanstack/react-query'
 
 export function useTransactionsQuery(filters: TransactionFilters) {
-    return useQuery({
+    return useQuery<TransactionListResponse>({
         queryKey: [
             'transactions',
             filters.account,
@@ -22,6 +23,6 @@ export function useTransactionsQuery(filters: TransactionFilters) {
             filters.limit,
         ],
         queryFn: () => fetchTransactions(filters),
-        enabled: true,
+        placeholderData: keepPreviousData,
     })
 }

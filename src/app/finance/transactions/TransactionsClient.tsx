@@ -10,6 +10,7 @@ import { TransactionList } from '@/features/transactions/components/TransactionL
 import { Pagination } from '@/features/transactions/components/Pagination'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 import React from 'react'
+import { TransactionFilters } from '@/features/transactions/types'
 
 export default function TransactionsClient() {
     const { filters, updateFilters, resetFilters, syncWithForm } = useTransactionsFilters()
@@ -17,12 +18,12 @@ export default function TransactionsClient() {
     const debouncedSearch = useDebounce(searchValue, 300)
 
     React.useEffect(() => {
-        if (debouncedSearch !== filters.search) {
+        if (debouncedSearch !== (filters.search || '')) {
             updateFilters({ search: debouncedSearch })
         }
-    }, [debouncedSearch]);
+    }, [debouncedSearch, filters.search, updateFilters]);
 
-    const { data, isLoading, error } = useTransactionsQuery(filters)
+    const { data, isLoading, error, isFetching } = useTransactionsQuery(filters)
 
     const mockFormAccount = 'mbank_firmowe' // TODO: remove this when sync is implemented
 
@@ -37,7 +38,7 @@ export default function TransactionsClient() {
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Transactions</h1>
           <button
-            onClick={resetFilters}
+            onClick={() => resetFilters()}
             className="px-4 py-2 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
           >
             Reset Filters
@@ -70,7 +71,12 @@ export default function TransactionsClient() {
           </div>
         </div>
 
-        
+        {/* Results Summary */}
+        {data && (
+          <div className="text-sm text-gray-600">
+            Found {data.total_count} transactions
+          </div>
+        )}
 
         {/* Pagination */}
         {data && data.total_count > 0 && (
@@ -89,6 +95,7 @@ export default function TransactionsClient() {
         <TransactionList
           transactions={data?.transactions || []}
           isLoading={isLoading}
+          isFetching={isFetching}
           error={error}
         />
 

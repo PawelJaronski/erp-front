@@ -34,6 +34,7 @@ export function useTransactionsFilters() {
             }
         })
 
+        // If the update is for anything other than pagination, reset to page 1.
         if (!('page' in newFilters)) {
             params.set('page', '1')
         }
