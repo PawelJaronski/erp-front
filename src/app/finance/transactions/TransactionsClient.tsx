@@ -22,7 +22,7 @@ export default function TransactionsClient() {
         }
     }, [debouncedSearch, filters.search, updateFilters]);
 
-    const { data, isLoading, error, isFetching } = useTransactionsQuery(filters)
+    const { data, error, isFetching } = useTransactionsQuery(filters)
 
     const mockFormAccount = 'mbank_firmowe' // TODO: remove this when sync is implemented
 
@@ -70,44 +70,38 @@ export default function TransactionsClient() {
           </div>
         </div>
 
-        
-
-        {/* Results Summary */}
-        {data && (
-          <div className="text-sm text-gray-600">
-            Found {data.total_count} transactions
-          </div>
-        )}
-
         {/* Pagination */}
-        <Pagination
-          currentPage={filters.page || 1}
-          totalCount={data?.total_count || 0}
-          limit={filters.limit || 50}
-          hasNext={data?.has_next || false}
-          hasPrevious={data?.has_previous || false}
-          onPageChange={(page) => updateFilters({ page })}
-          showSummary={!!data}
-        />
+        {data && data.total_count > 0 && (
+          <Pagination
+            currentPage={filters.page || 1}
+            totalCount={data.total_count}
+            limit={filters.limit || 50}
+            hasNext={data.has_next}
+            hasPrevious={data.has_previous}
+            onPageChange={(page) => updateFilters({ page })}
+            showSummary={true}
+          />
+        )}
 
         {/* Transaction List */}
         <TransactionList
           transactions={data?.transactions || []}
-          isLoading={isLoading}
           isFetching={isFetching}
           error={error}
         />
 
         {/* Pagination */}
-        <Pagination
-          currentPage={filters.page || 1}
-          totalCount={data?.total_count || 0}
-          limit={filters.limit || 50}
-          hasNext={data?.has_next || false}
-          hasPrevious={data?.has_previous || false}
-          onPageChange={(page) => updateFilters({ page })}
-          showSummary={false}
-        />
+        {data && data.total_count > 0 && (
+          <Pagination
+            currentPage={filters.page || 1}
+            totalCount={data.total_count}
+            limit={filters.limit || 50}
+            hasNext={data.has_next}
+            hasPrevious={data.has_previous}
+            onPageChange={(page) => updateFilters({ page })}
+            showSummary={false}
+          />
+        )}
       </div>
     )
 }

@@ -4,12 +4,11 @@ import { TransactionItem } from '@/features/transactions/types'
 
 interface TransactionListProps {
     transactions: TransactionItem[]
-    isLoading: boolean
     isFetching: boolean
     error: Error | null
 }
 
-export function TransactionList({ transactions, isLoading, isFetching, error }: TransactionListProps) {
+export function TransactionList({ transactions, isFetching, error }: TransactionListProps) {
     
 
     if (error) {
