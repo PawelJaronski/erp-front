@@ -12,7 +12,7 @@ export function useTransactionsFilters() {
         account: searchParams.get('account') || undefined,
         category_group: searchParams.get('category_group') || undefined,
         category: searchParams.get('category') || undefined,
-        search: searchParams.get('search') || undefined,
+        search: searchParams.get('search') || undefined,    
         date_from: searchParams.get('date_from') || undefined,
         date_to: searchParams.get('date_to') || undefined,
         date_preset: searchParams.get('date_preset') || 'month_to_date',
