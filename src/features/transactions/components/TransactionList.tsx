@@ -43,7 +43,7 @@ export function TransactionList({ transactions, isLoading, isFetching, error }: 
     return (
         <div className="relative overflow-x-auto">
           {isFetching && (
-            <div className="absolute inset-0 bg-white bg-opacity-50 z-10 flex items-center justify-center">
+            <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-500"></div>
             </div>
           )}

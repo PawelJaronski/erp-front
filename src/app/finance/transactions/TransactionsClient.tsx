@@ -10,7 +10,6 @@ import { TransactionList } from '@/features/transactions/components/TransactionL
 import { Pagination } from '@/features/transactions/components/Pagination'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 import React from 'react'
-import { TransactionFilters } from '@/features/transactions/types'
 
 export default function TransactionsClient() {
     const { filters, updateFilters, resetFilters, syncWithForm } = useTransactionsFilters()
