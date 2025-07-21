@@ -72,18 +72,23 @@ export default function TransactionsClient() {
 
         
 
-        {/* Pagination */}
-        {data && data.total_count > 0 && (
-          <Pagination
-            currentPage={filters.page || 1}
-            totalCount={data.total_count}
-            limit={filters.limit || 50}
-            hasNext={data.has_next}
-            hasPrevious={data.has_previous}
-            onPageChange={(page) => updateFilters({ page })}
-            showSummary={true}
-          />
+        {/* Results Summary */}
+        {data && (
+          <div className="text-sm text-gray-600">
+            Found {data.total_count} transactions
+          </div>
         )}
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={filters.page || 1}
+          totalCount={data?.total_count || 0}
+          limit={filters.limit || 50}
+          hasNext={data?.has_next || false}
+          hasPrevious={data?.has_previous || false}
+          onPageChange={(page) => updateFilters({ page })}
+          showSummary={!!data}
+        />
 
         {/* Transaction List */}
         <TransactionList
@@ -94,17 +99,15 @@ export default function TransactionsClient() {
         />
 
         {/* Pagination */}
-        {data && data.total_count > 0 && (
-          <Pagination
-            currentPage={filters.page || 1}
-            totalCount={data.total_count}
-            limit={filters.limit || 50}
-            hasNext={data.has_next}
-            hasPrevious={data.has_previous}
-            onPageChange={(page) => updateFilters({ page })}
-            showSummary={false}
-          />
-        )}
+        <Pagination
+          currentPage={filters.page || 1}
+          totalCount={data?.total_count || 0}
+          limit={filters.limit || 50}
+          hasNext={data?.has_next || false}
+          hasPrevious={data?.has_previous || false}
+          onPageChange={(page) => updateFilters({ page })}
+          showSummary={false}
+        />
       </div>
     )
 }
