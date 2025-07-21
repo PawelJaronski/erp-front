@@ -6,6 +6,7 @@ interface PaginationProps {
     limit: number
     hasNext: boolean
     hasPrevious: boolean
+    showSummary: boolean
     onPageChange: (page: number) => void
 }
 
@@ -15,6 +16,7 @@ export function Pagination({
     limit, 
     hasNext, 
     hasPrevious, 
+    showSummary,
     onPageChange 
 }: PaginationProps) {
     const totalPages = Math.ceil(totalCount / limit)
@@ -40,7 +42,8 @@ export function Pagination({
         </button>
       </div>
       
-      <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+      <div className="hidden sm:flex sm:flex-1 sm:items-center">
+        {showSummary && (
         <div>
           <p className="text-sm text-gray-700">
             Showing <span className="font-medium">{startItem}</span> to{' '}
@@ -48,8 +51,9 @@ export function Pagination({
             <span className="font-medium">{totalCount}</span> results
           </p>
         </div>
+        )}
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto">
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={!hasPrevious}

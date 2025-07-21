@@ -70,11 +70,19 @@ export default function TransactionsClient() {
           </div>
         </div>
 
-        {/* Results Summary */}
-        {data && (
-          <div className="text-sm text-gray-600">
-            Found {data.total_count} transactions
-          </div>
+        
+
+        {/* Pagination */}
+        {data && data.total_count > 0 && (
+          <Pagination
+            currentPage={filters.page || 1}
+            totalCount={data.total_count}
+            limit={filters.limit || 50}
+            hasNext={data.has_next}
+            hasPrevious={data.has_previous}
+            onPageChange={(page) => updateFilters({ page })}
+            showSummary={true}
+          />
         )}
 
         {/* Transaction List */}
@@ -93,6 +101,7 @@ export default function TransactionsClient() {
             hasNext={data.has_next}
             hasPrevious={data.has_previous}
             onPageChange={(page) => updateFilters({ page })}
+            showSummary={false}
           />
         )}
       </div>
