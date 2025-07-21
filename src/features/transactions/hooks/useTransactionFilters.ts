@@ -20,7 +20,7 @@ export function useTransactionsFilters() {
         sort_by: searchParams.get('sort_by') || undefined,
         sort_order: searchParams.get('sort_order') || undefined,
         page: parseInt(searchParams.get('page') || '1'),
-        limit: parseInt(searchParams.get('limit') || '10'),
+        limit: parseInt(searchParams.get('limit') || '100'),
     }
 
     const updateFilters = useCallback((newFilters: Partial<TransactionFilters>) => {
