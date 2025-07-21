@@ -70,12 +70,7 @@ export default function TransactionsClient() {
           </div>
         </div>
 
-        {/* Results Summary */}
-        {data && (
-          <div className="text-sm text-gray-600">
-            Found {data.total_count} transactions
-          </div>
-        )}
+        
 
         {/* Pagination */}
         {data && data.total_count > 0 && (
