@@ -16,11 +16,13 @@ export interface LayoutCell {
 export type LayoutRow = LayoutCell[];
 export type Layout = LayoutRow[];
 
+export type Primitive = string | number | boolean | undefined | null;
+
 export interface SimpleExpenseFormPropsFromHook {
-  formData: Record<string, unknown>;
+  formData: Record<string, Primitive>;
   errors: Record<string, string>;
   isSubmitting: boolean;
-  handleFieldChange: (field: string, value: unknown) => void;
+  handleFieldChange: (field: string, value: Primitive) => void;
   handleSubmit: (e: React.FormEvent) => void;
   reset: () => void;
   availableCategories?: readonly CategoryData[];
