@@ -6,10 +6,9 @@ import { AccountSelect } from '@/features/transactions/components/AccountSelect'
 interface AccountFilterSelectorProps {
     value: string | undefined;
     onChange: (value: string | undefined) => void;
-    onSyncWithForm: () => void;
 }
 
-export function AccountFilterSelector({ value, onChange, onSyncWithForm }: AccountFilterSelectorProps) {
+export function AccountFilterSelector({ value, onChange }: AccountFilterSelectorProps) {
     const handleChange = (selectedValue: string) => {
         onChange(selectedValue === '' ? undefined : selectedValue);
     }

@@ -51,7 +51,6 @@ export default function TransactionsClient() {
             <AccountFilterSelector
               value={filters.account}
               onChange={(account) => updateFilters({ account })}
-              onSyncWithForm={() => syncWithForm(mockFormAccount)}
             />
             
             <DatePresetSelector
