@@ -13,7 +13,7 @@ import { CategoryGroupFilterSelector } from '@/features/transactions/components/
 import React from 'react'
 
 export default function TransactionsClient() {
-    const { filters, updateFilters, resetFilters, syncWithForm } = useTransactionsFilters()
+    const { filters, updateFilters, resetFilters } = useTransactionsFilters()
     const [searchValue, setSearchValue] = React.useState(filters.search || '')
     const debouncedSearch = useDebounce(searchValue, 300)
 
@@ -24,8 +24,6 @@ export default function TransactionsClient() {
     }, [debouncedSearch, filters.search, updateFilters]);
 
     const { data, error, isFetching } = useTransactionsQuery(filters)
-
-    const mockFormAccount = 'mbank_firmowe' // TODO: remove this when sync is implemented
 
     React.useEffect(() => {
       if (!filters.date_preset) {

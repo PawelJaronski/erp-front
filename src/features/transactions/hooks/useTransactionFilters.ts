@@ -46,14 +46,9 @@ export function useTransactionsFilters() {
         router.push('?date_preset=month_to_date')
     }, [router])
 
-    const syncWithForm = useCallback((formAccount: string) => {
-        updateFilters({ account: formAccount })
-    }, [updateFilters])
-
     return { 
         filters, 
         updateFilters, 
         resetFilters, 
-        syncWithForm 
     }
 }
