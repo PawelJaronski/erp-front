@@ -20,7 +20,7 @@ export function DateInput({ value, onChange, placeholder = '', clearable = true,
   };
 
   return (
-    <div className={className}>
+    <div className={`relative ${className ?? ""}`}>
       <input
         ref={inputRef}
         type="date"
