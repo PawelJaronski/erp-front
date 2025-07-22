@@ -44,8 +44,8 @@ export default function TransactionsClient() {
 
         {/* Filters */}
         <div className="bg-white border border-gray-200 rounded-lg p-4">
+        
         <div className="flex justify-between items-center">
-          
           <button
             onClick={() => resetFilters()}
             className="px-4 py-2 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 ml-auto"
