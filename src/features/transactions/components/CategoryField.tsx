@@ -14,6 +14,7 @@ interface Props {
   onCustomCategoryChange: (value: string) => void;
   errors: Record<string, string>;
   availableCategories: readonly CategoryData[];
+  className?: string;
 }
 
 export const CategoryField: React.FC<Props> = ({
@@ -27,6 +28,7 @@ export const CategoryField: React.FC<Props> = ({
   onCustomCategoryChange,
   errors,
   availableCategories,
+  className,
 }) => {
   return (
     <>
@@ -36,6 +38,7 @@ export const CategoryField: React.FC<Props> = ({
         customValue={customCategoryGroup}
         onCustomValueChange={onCustomCategoryGroupChange}
         error={errors.category_group}
+        className={className}
       />
       
       <CategorySelect
@@ -45,6 +48,7 @@ export const CategoryField: React.FC<Props> = ({
         onCustomValueChange={onCustomCategoryChange}
         error={errors.category}
         availableCategories={availableCategories}
+        className={className}
       />
     </>
   );

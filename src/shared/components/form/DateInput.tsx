@@ -7,9 +7,10 @@ interface DateInputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   clearable?: boolean;
+  className?: string;
 }
 
-export function DateInput({ value, onChange, placeholder = '', clearable = true }: DateInputProps) {
+export function DateInput({ value, onChange, placeholder = '', clearable = true, className }: DateInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Native date picker opening (Chromium-only at the moment)
@@ -19,7 +20,7 @@ export function DateInput({ value, onChange, placeholder = '', clearable = true 
   };
 
   return (
-    <div className="relative w-full">
+    <div className={className}>
       <input
         ref={inputRef}
         type="date"

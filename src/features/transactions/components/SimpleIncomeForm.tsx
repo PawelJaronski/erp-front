@@ -1,113 +1,67 @@
 "use client";
 import React from 'react';
-import { SimpleIncomeFormData } from '../types';
 import { useSimpleIncomeForm } from '../hooks/useSimpleIncomeForm';
-import { FormField, DateInput } from '@/shared/components/form';
-import { CategoryField, VATSection, FormActions, AccountSelect, AmountInput, TransactionItem, TransactionNote } from '.';
+import { FormActions } from '.';
+import { FormLayout } from './FormLayout';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
+import { SimpleIncomeFormData } from '../types';
 
-interface Props {
+const simpleIncomeFields = [
+  { name: "account", type: "account", label: "Account", required: true },
+  { name: "categoryGroup", type: "categoryGroup", label: "Category Group" },
+  { name: "category", type: "category", label: "Category" },
+  { name: "gross_amount", type: "amount", label: "Amount", required: true },
+  { name: "item", type: "item", label: "Item" },
+  { name: "note", type: "note", label: "Note" },
+  { name: "business_reference", type: "text", label: "Business Reference" },
+  { name: "include_tax", type: "vat", label: "Include VAT" },
+  { name: "business_timestamp", type: "date", label: "Business Date", required: true },
+];
+
+const simpleIncomeLayout2Col = [
+  [{ name: "account", colSpan: 1, colStart: 1 }],
+  [{ name: "categoryGroup", colSpan: 1, colStart: 1 }, { name: "category" }],
+  [{ name: "gross_amount" }, { name: "item" }],
+  [{ name: "note" }, { name: "business_reference" }],
+  [{ name: "include_tax" }, { name: "business_timestamp" }],
+];
+
+interface SimpleIncomeFormProps {
   onSubmit: (data: SimpleIncomeFormData) => Promise<void>;
-  onCancel?: () => void;
+  columns?: number;
+  layout?: any;
 }
 
-export function SimpleIncomeForm({ onSubmit }: Props) {
+export function SimpleIncomeForm({ onSubmit, columns = 2, layout }: SimpleIncomeFormProps) {
   const { showToast } = useToast();
 
   const internalSubmit = async (data: SimpleIncomeFormData) => {
     await onSubmit(data);
-    const notificationData = { ...data, transaction_type: 'simple_income' } as unknown as Parameters<typeof TransactionNotification>[0]['data'];
-    showToast(<TransactionNotification data={notificationData} />, 'success');
+    showToast(
+      <TransactionNotification data={{ ...data, transaction_type: "simple_income" } as SimpleIncomeFormData & { transaction_type: "simple_income" }} />,
+      'success'
+    );
   };
 
-  const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset, availableCategories } =
-    useSimpleIncomeForm({ onSubmit: internalSubmit });
+  const formProps = useSimpleIncomeForm({ onSubmit: internalSubmit });
+
+  const layoutFormProps = {
+    ...formProps,
+    handleFieldChange: (field: string, value: any) => {
+      formProps.handleFieldChange(field as keyof SimpleIncomeFormData, value as SimpleIncomeFormData[keyof SimpleIncomeFormData]);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Account row – half width */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Account" error={errors.account} required>
-          <AccountSelect
-            value={formData.account}
-            onChange={(v) => handleFieldChange('account', v)}
-          />
-        </FormField>
-      </div>
-
-      {/* Category row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <CategoryField
-          categoryGroup={formData.category_group}
-          category={formData.category}
-          customCategoryGroup={formData.custom_category_group}
-          customCategory={formData.custom_category}
-          onCategoryGroupChange={(v) => handleFieldChange('category_group', v)}
-          onCategoryChange={(v) => handleFieldChange('category', v)}
-          onCustomCategoryGroupChange={(v) => handleFieldChange('custom_category_group', v)}
-          onCustomCategoryChange={(v) => handleFieldChange('custom_category', v)}
-          errors={errors}
-          availableCategories={availableCategories || []}
-        />
-      </div>
-
-      {/* Amount & Item row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Amount" error={errors.gross_amount} required>
-          <AmountInput
-            value={formData.gross_amount}
-            onChange={(v) => handleFieldChange('gross_amount', v)}
-            error={errors.gross_amount}
-          />
-        </FormField>
-
-        <TransactionItem
-          value={formData.item || ''}
-          onChange={(value) => handleFieldChange('item', value)}
-        />
-      </div>
-
-      {/* Note & Business Reference row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TransactionNote
-          value={formData.note || ''}
-          onChange={(value) => handleFieldChange('note', value)}
-        />
-
-        <FormField label="Business Reference">
-          <input
-            type="text"
-            value={formData.business_reference || ''}
-            onChange={(e) => handleFieldChange('business_reference', e.target.value)}
-            placeholder="Invoice #123 / Transfer title"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
-          />
-        </FormField>
-      </div>
-
-      {/* VAT toggle & Business Date row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-        <VATSection
-          includeTax={formData.include_tax}
-          taxRate={formData.tax_rate}
-          onIncludeTaxChange={(v) => handleFieldChange('include_tax', v)}
-          onTaxRateChange={(v) => handleFieldChange('tax_rate', v)}
-        />
-
-        <FormField label="Business Date" error={errors.business_timestamp} required>
-          <DateInput
-            value={formData.business_timestamp}
-            onChange={(v) => handleFieldChange('business_timestamp', v)}
-          />
-        </FormField>
-      </div>
-
-      <FormActions
-        onSubmit={handleSubmit}
-        onReset={reset}
-        isSubmitting={isSubmitting}
+    <form onSubmit={formProps.handleSubmit} className="space-y-6">
+      <FormLayout
+        layout={layout || simpleIncomeLayout2Col}
+        fieldsConfig={simpleIncomeFields}
+        formProps={layoutFormProps}
+        columns={columns}
       />
+      <FormActions onSubmit={formProps.handleSubmit} onReset={formProps.reset} isSubmitting={formProps.isSubmitting} />
     </form>
   );
 } 

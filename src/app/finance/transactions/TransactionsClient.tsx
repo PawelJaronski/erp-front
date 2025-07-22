@@ -10,6 +10,7 @@ import { TransactionList } from '@/features/transactions/components/TransactionL
 import { Pagination } from '@/features/transactions/components/Pagination'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 import { CategoryGroupFilterSelector } from '@/features/transactions/components/filters/CategoryGroupFilterSelector'
+import { TransactionFormContainer } from '@/features/transactions/components/TransactionFormContainer'
 import React from 'react'
 
 export default function TransactionsClient() {
@@ -23,7 +24,7 @@ export default function TransactionsClient() {
         }
     }, [debouncedSearch, filters.search, updateFilters]);
 
-    const { data, error, isFetching } = useTransactionsQuery(filters)
+    const { data, error, isFetching, refetch } = useTransactionsQuery(filters)
 
     React.useEffect(() => {
       if (!filters.date_preset) {
@@ -33,6 +34,12 @@ export default function TransactionsClient() {
 
     return (
       <div className="max-w-6xl mx-auto p-6 space-y-6">
+        <TransactionFormContainer 
+        onSuccess={refetch} 
+        collapsible={true} 
+        className="bg-white rounded-lg p-8 mb-8 mx-auto"
+        columns={3}
+         />
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">Transactions</h1>
           <button

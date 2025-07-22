@@ -1,69 +1,59 @@
 "use client";
 import React from 'react';
-import { SimpleTransferFormData } from '../types';
 import { useSimpleTransferForm } from '../hooks/useSimpleTransferForm';
-import { FormField, DateInput } from '@/shared/components/form';
-import { FormActions, AccountSelect, AmountInput } from '.';
+import { FormActions } from '.';
+import { FormLayout } from './FormLayout';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
+import { SimpleTransferFormData } from '../types';
 
-interface Props {
+const simpleTransferFields = [
+  { name: "account", type: "account", label: "From Account", required: true },
+  { name: "to_account", type: "account", label: "To Account", required: true },
+  { name: "gross_amount", type: "amount", label: "Amount", required: true },
+  { name: "business_timestamp", type: "date", label: "Business Date", required: true },
+];
+
+const simpleTransferLayout2Col = [
+  [{ name: "account", colSpan: 1, colStart: 1 }, { name: "to_account" }],
+  [{ name: "gross_amount" }, { name: "business_timestamp" }],
+];
+
+interface SimpleTransferFormProps {
   onSubmit: (data: SimpleTransferFormData) => Promise<void>;
-  onCancel?: () => void;
+  columns?: number;
+  layout?: any;
 }
 
-export function SimpleTransferForm({ onSubmit }: Props) {
+export function SimpleTransferForm({ onSubmit, columns = 2, layout }: SimpleTransferFormProps) {
   const { showToast } = useToast();
 
   const internalSubmit = async (data: SimpleTransferFormData) => {
     await onSubmit(data);
-    const notificationData = { ...data, transaction_type: 'simple_transfer' } as unknown as Parameters<typeof TransactionNotification>[0]['data'];
-    showToast(<TransactionNotification data={notificationData} />, 'success');
+    showToast(
+      <TransactionNotification data={{ ...data, transaction_type: "simple_transfer" } as SimpleTransferFormData & { transaction_type: "simple_transfer" }} />,
+      'success'
+    );
   };
 
-  const { formData, errors, isSubmitting, handleFieldChange, handleSubmit, reset } =
-    useSimpleTransferForm({ onSubmit: internalSubmit });
+  const formProps = useSimpleTransferForm({ onSubmit: internalSubmit });
+
+  const layoutFormProps = {
+    ...formProps,
+    handleFieldChange: (field: string, value: any) => {
+      formProps.handleFieldChange(field as keyof SimpleTransferFormData, value as SimpleTransferFormData[keyof SimpleTransferFormData]);
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="From Account" error={errors.account} required>
-          <AccountSelect
-            value={formData.account}
-            onChange={(v) => handleFieldChange('account', v)}
-            error={errors.account}
-          />
-        </FormField>
-        <FormField label="To Account" error={errors.to_account} required>
-          <AccountSelect
-            value={formData.to_account}
-            onChange={(v) => handleFieldChange('to_account', v)}
-            error={errors.to_account}
-          />
-        </FormField>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormField label="Amount" error={errors.gross_amount} required>
-          <AmountInput
-            value={formData.gross_amount}
-            onChange={(v) => handleFieldChange('gross_amount', v)}
-            error={errors.gross_amount}
-          />
-        </FormField>
-        <FormField label="Business Date" error={errors.business_timestamp} required>
-          <DateInput
-            value={formData.business_timestamp}
-            onChange={(v) => handleFieldChange('business_timestamp', v)}
-          />
-        </FormField>
-      </div>
-
-      <FormActions
-        onSubmit={handleSubmit}
-        onReset={reset}
-        isSubmitting={isSubmitting}
+    <form onSubmit={formProps.handleSubmit} className="space-y-6">
+      <FormLayout
+        layout={layout || simpleTransferLayout2Col}
+        fieldsConfig={simpleTransferFields}
+        formProps={layoutFormProps}
+        columns={columns}
       />
+      <FormActions onSubmit={formProps.handleSubmit} onReset={formProps.reset} isSubmitting={formProps.isSubmitting} />
     </form>
   );
 } 

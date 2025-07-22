@@ -5,11 +5,12 @@ interface Props {
   taxRate: number;
   onIncludeTaxChange: (value: boolean) => void;
   onTaxRateChange: (value: number) => void;
+  className?: string;
 }
 
-export const VATSection: React.FC<Props> = ({ includeTax, taxRate, onIncludeTaxChange, onTaxRateChange }) => {
+export const VATSection: React.FC<Props> = ({ includeTax, taxRate, onIncludeTaxChange, onTaxRateChange, className }) => {
   return (
-    <div className="space-y-2">
+    <div className={className}>
       <label className="block text-sm font-semibold text-gray-700 mb-1">Include VAT</label>
       <div className="flex flex-col md:flex-row items-start gap-2 md:gap-2">
         <button

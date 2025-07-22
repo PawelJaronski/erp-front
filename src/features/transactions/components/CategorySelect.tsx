@@ -9,6 +9,7 @@ interface Props {
   error?: string;
   placeholder?: string;
   availableCategories: readonly CategoryData[];
+  className?: string;
 }
 
 export const CategorySelect: React.FC<Props> = ({
@@ -19,6 +20,7 @@ export const CategorySelect: React.FC<Props> = ({
   error,
   placeholder = 'Select category...',
   availableCategories,
+  className,
 }) => {
 
   const options = [
@@ -27,7 +29,7 @@ export const CategorySelect: React.FC<Props> = ({
   ];
 
   return (
-    <div className="flex-1">
+    <div className={className}>
       <label className="block text-sm font-semibold text-gray-700 mb-2">
         Category
       </label>

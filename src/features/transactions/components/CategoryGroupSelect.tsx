@@ -9,6 +9,7 @@ interface Props {
     onCustomValueChange: (value: string) => void;
     error?: string;
     placeholder?: string
+    className?: string;
 }
 
 export const CategoryGroupSelect: React.FC<Props> = ({
@@ -17,10 +18,11 @@ export const CategoryGroupSelect: React.FC<Props> = ({
     customValue,
     onCustomValueChange,
     error,
-    placeholder = 'Select category group'
+    placeholder = 'Select category group',
+    className,
 }) => {
     return (
-        <div className="flex-1">
+        <div className={className}>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Category Group
             </label>
