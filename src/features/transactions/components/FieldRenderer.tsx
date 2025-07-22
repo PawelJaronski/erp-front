@@ -86,24 +86,71 @@ export function FieldRenderer({ field, formProps }: FieldRendererProps) {
       }
       return null;
     case "item":
-      return <TransactionItem value={formProps.formData.item || ''} onChange={(v) => formProps.handleFieldChange("item", v)} />;
+      return (
+        <TransactionItem
+          value={(formProps.formData.item as string | undefined) ?? ""}
+          onChange={(v) => formProps.handleFieldChange("item", v)}
+        />
+      );
     case "note":
-      return <TransactionNote value={formProps.formData.note || ''} onChange={(v) => formProps.handleFieldChange("note", v)} />;
+      return (
+        <TransactionNote
+          value={(formProps.formData.note as string | undefined) ?? ""}
+          onChange={(v) => formProps.handleFieldChange("note", v)}
+        />
+      );
     case "text":
       if (field.name === "business_reference") {
-        return <FormField label={field.label} error={formProps.errors.business_reference}><input type="text" value={formProps.formData.business_reference || ''} onChange={e => formProps.handleFieldChange("business_reference", e.target.value)} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors" /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.business_reference}>
+            <input
+              type="text"
+              value={(formProps.formData.business_reference as string | undefined) ?? ""}
+              onChange={(e) => formProps.handleFieldChange("business_reference", e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-0 focus:outline-none transition-colors"
+            />
+          </FormField>
+        );
       }
       return null;
     case "vat":
-      return <VATSection includeTax={formProps.formData.include_tax} taxRate={formProps.formData.tax_rate} onIncludeTaxChange={(v) => formProps.handleFieldChange("include_tax", v)} onTaxRateChange={(v) => formProps.handleFieldChange("tax_rate", v)} />;
+      return (
+        <VATSection
+          includeTax={Boolean(formProps.formData.include_tax)}
+          taxRate={(formProps.formData.tax_rate as number | undefined) ?? 0}
+          onIncludeTaxChange={(v) => formProps.handleFieldChange("include_tax", v)}
+          onTaxRateChange={(v) => formProps.handleFieldChange("tax_rate", v)}
+        />
+      );
     case "date":
       // Rozróżniamy różne daty po nazwie pola
       if (field.name === "business_timestamp") {
-        return <FormField label={field.label} error={formProps.errors.business_timestamp} required={field.required}><DateInput value={formProps.formData.business_timestamp} onChange={(v) => formProps.handleFieldChange("business_timestamp", v)} /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.business_timestamp} required={field.required}>
+            <DateInput
+              value={(formProps.formData.business_timestamp as string | undefined) ?? ""}
+              onChange={(v) => formProps.handleFieldChange("business_timestamp", v)}
+            />
+          </FormField>
+        );
       } else if (field.name === "transfer_date") {
-        return <FormField label={field.label} error={formProps.errors.transfer_date} required={field.required}><DateInput value={formProps.formData.transfer_date || ''} onChange={(v) => formProps.handleFieldChange("transfer_date", v)} /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.transfer_date} required={field.required}>
+            <DateInput
+              value={(formProps.formData.transfer_date as string | undefined) ?? ""}
+              onChange={(v) => formProps.handleFieldChange("transfer_date", v)}
+            />
+          </FormField>
+        );
       } else if (field.name === "sales_date") {
-        return <FormField label={field.label} error={formProps.errors.sales_date} required={field.required}><DateInput value={formProps.formData.sales_date || ''} onChange={(v) => formProps.handleFieldChange("sales_date", v)} /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.sales_date} required={field.required}>
+            <DateInput
+              value={(formProps.formData.sales_date as string | undefined) ?? ""}
+              onChange={(v) => formProps.handleFieldChange("sales_date", v)}
+            />
+          </FormField>
+        );
       }
       return null;
     default:
