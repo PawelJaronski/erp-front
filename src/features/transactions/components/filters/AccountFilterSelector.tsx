@@ -15,7 +15,7 @@ export function AccountFilterSelector({ value, onChange, onSyncWithForm }: Accou
     }
 
     return (
-        <div className="flex items-center gap-2">
+        <div>
             <div className="flex-1">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Account:</label>
             </div>
@@ -25,12 +25,12 @@ export function AccountFilterSelector({ value, onChange, onSyncWithForm }: Accou
                 placeholder="All accounts"
                 isClearable={true}
             />
-            <button
+            {/*<button
                 onClick={onSyncWithForm}
-                className="mt-6 px-3 py-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 whitespace-nowrap"
+                className="mt-3 px-3 py-2 text-sm bg-teal-500 text-white rounded cursor-pointer hover:bg-teal-600 whitespace-nowrap"
             >
                 Sync with form
-            </button>
+            </button>*/}
         </div>
     )
 }

@@ -9,6 +9,7 @@ import { SearchInput } from '@/features/transactions/components/filters/SearchIn
 import { TransactionList } from '@/features/transactions/components/TransactionList'
 import { Pagination } from '@/features/transactions/components/Pagination'
 import { useDebounce } from '@/shared/hooks/useDebounce'
+import { CategoryGroupFilterSelector } from '@/features/transactions/components/filters/CategoryGroupFilterSelector'
 import React from 'react'
 
 export default function TransactionsClient() {
@@ -66,6 +67,11 @@ export default function TransactionsClient() {
             <AmountTypeSelector
               value={filters.amount_type}
               onChange={(amount_type) => updateFilters({ amount_type })}
+            />
+
+            <CategoryGroupFilterSelector
+              value={filters.category_group}
+              onChange={(category_group) => updateFilters({ category_group })}
             />
           </div>
         </div>
