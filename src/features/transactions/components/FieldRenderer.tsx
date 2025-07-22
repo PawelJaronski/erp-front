@@ -1,11 +1,11 @@
 import React from "react";
 import { FormField, DateInput } from '@/shared/components/form';
 import { AccountSelect, CategoryGroupSelect, CategorySelect, AmountInput, TransactionItem, TransactionNote, VATSection } from ".";
-import { FieldConfig, SimpleExpenseFormPropsFromHook } from "./types";
+import { FieldConfig, FormHookProps } from "./types";
 
 interface FieldRendererProps {
   field: FieldConfig;
-  formProps: SimpleExpenseFormPropsFromHook;
+  formProps: FormHookProps<Record<string, unknown>>;
 }
 
 export function FieldRenderer({ field, formProps }: FieldRendererProps) {
@@ -13,23 +13,76 @@ export function FieldRenderer({ field, formProps }: FieldRendererProps) {
     case "account":
       // Rozróżniamy From/To Account po nazwie pola
       if (field.name === "account") {
-        return <FormField label={field.label} error={formProps.errors.account} required={field.required}><AccountSelect value={formProps.formData.account} onChange={(v) => formProps.handleFieldChange("account", v)} /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.account} required={field.required}>
+            <AccountSelect
+              value={(formProps.formData.account as string) ?? ""}
+              onChange={(v) => formProps.handleFieldChange("account", v)}
+            />
+          </FormField>
+        );
       } else if (field.name === "to_account") {
-        return <FormField label={field.label} error={formProps.errors.to_account} required={field.required}><AccountSelect value={formProps.formData.to_account} onChange={(v) => formProps.handleFieldChange("to_account", v)} /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.to_account} required={field.required}>
+            <AccountSelect
+              value={(formProps.formData.to_account as string) ?? ""}
+              onChange={(v) => formProps.handleFieldChange("to_account", v)}
+            />
+          </FormField>
+        );
       }
       return null;
     case "categoryGroup":
-      return <CategoryGroupSelect value={formProps.formData.category_group} onChange={(v) => formProps.handleFieldChange("category_group", v)} error={formProps.errors.category_group} onCustomValueChange={() => {}} />;
+      return (
+        <CategoryGroupSelect
+          value={(formProps.formData.category_group as string) ?? ""}
+          onChange={(v) => formProps.handleFieldChange("category_group", v)}
+          error={formProps.errors.category_group}
+          onCustomValueChange={() => {}}
+        />
+      );
     case "category":
-      return <CategorySelect value={formProps.formData.category} onChange={(v) => formProps.handleFieldChange("category", v)} error={formProps.errors.category} availableCategories={formProps.availableCategories || []} onCustomValueChange={() => {}} />;
+      return (
+        <CategorySelect
+          value={(formProps.formData.category as string) ?? ""}
+          onChange={(v) => formProps.handleFieldChange("category", v)}
+          error={formProps.errors.category}
+          availableCategories={formProps.availableCategories || []}
+          onCustomValueChange={() => {}}
+        />
+      );
     case "amount":
       // Rozróżniamy różne amounty po nazwie pola
       if (field.name === "gross_amount") {
-        return <FormField label={field.label} error={formProps.errors.gross_amount} required={field.required}><AmountInput value={formProps.formData.gross_amount} onChange={(v) => formProps.handleFieldChange("gross_amount", v)} error={formProps.errors.gross_amount} /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.gross_amount} required={field.required}>
+            <AmountInput
+              value={(formProps.formData.gross_amount as string) ?? ""}
+              onChange={(v) => formProps.handleFieldChange("gross_amount", v)}
+              error={formProps.errors.gross_amount}
+            />
+          </FormField>
+        );
       } else if (field.name === "paynow_transfer") {
-        return <FormField label={field.label} error={formProps.errors.paynow_transfer}><AmountInput value={formProps.formData.paynow_transfer || ''} onChange={(v) => formProps.handleFieldChange("paynow_transfer", v)} error={formProps.errors.paynow_transfer} /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.paynow_transfer}>
+            <AmountInput
+              value={(formProps.formData.paynow_transfer as string) ?? ""}
+              onChange={(v) => formProps.handleFieldChange("paynow_transfer", v)}
+              error={formProps.errors.paynow_transfer}
+            />
+          </FormField>
+        );
       } else if (field.name === "autopay_transfer") {
-        return <FormField label={field.label} error={formProps.errors.autopay_transfer}><AmountInput value={formProps.formData.autopay_transfer || ''} onChange={(v) => formProps.handleFieldChange("autopay_transfer", v)} error={formProps.errors.autopay_transfer} /></FormField>;
+        return (
+          <FormField label={field.label} error={formProps.errors.autopay_transfer}>
+            <AmountInput
+              value={(formProps.formData.autopay_transfer as string) ?? ""}
+              onChange={(v) => formProps.handleFieldChange("autopay_transfer", v)}
+              error={formProps.errors.autopay_transfer}
+            />
+          </FormField>
+        );
       }
       return null;
     case "item":

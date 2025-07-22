@@ -18,12 +18,20 @@ export type Layout = LayoutRow[];
 
 export type Primitive = string | number | boolean | undefined | null;
 
-export interface SimpleExpenseFormPropsFromHook {
-  formData: Record<string, Primitive>;
+// Generic props returned from our custom form hooks
+export interface FormHookProps<T extends Record<string, unknown>> {
+  formData: T;
   errors: Record<string, string>;
   isSubmitting: boolean;
-  handleFieldChange: (field: string, value: Primitive) => void;
-  handleSubmit: (e: React.FormEvent) => void;
+  handleFieldChange: (field: keyof T, value: Primitive) => void;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
   reset: () => void;
   availableCategories?: readonly CategoryData[];
-} 
+}
+
+// TEMPORARY alias for backwards-compatibility while migrating imports.
+// Should be removed once all files are updated.
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type SimpleExpenseFormPropsFromHook = FormHookProps<Record<string, unknown>>;
+
+// (legacy interface removed – use FormHookProps<T>) 

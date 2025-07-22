@@ -1,11 +1,11 @@
 import React from "react";
 import { FieldRenderer } from "./FieldRenderer";
-import { Layout, LayoutRow, LayoutCell, FieldConfig, SimpleExpenseFormPropsFromHook } from "./types";
+import { Layout, LayoutRow, LayoutCell, FieldConfig, FormHookProps } from "./types";
 
 interface FormLayoutProps {
   layout: Layout;
   fieldsConfig: FieldConfig[];
-  formProps: SimpleExpenseFormPropsFromHook;
+  formProps: FormHookProps<Record<string, unknown>>;
   columns?: number;
 }
 
