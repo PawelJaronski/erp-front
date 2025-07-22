@@ -6,6 +6,7 @@ import { FormLayout } from './FormLayout';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 import { PaymentBrokerTransferFormData } from '../types';
+import type { Layout } from './types';
 
 const paymentBrokerTransferFields = [
   { name: "paynow_transfer", type: "amount", label: "Paynow Transfer" },
@@ -22,7 +23,7 @@ const paymentBrokerTransferLayout2Col = [
 interface PaymentBrokerTransferFormProps {
   onSubmit: (data: PaymentBrokerTransferFormData) => Promise<void>;
   columns?: number;
-  layout?: any;
+  layout?: Layout;
 }
 
 export function PaymentBrokerTransferForm({ onSubmit, columns = 2, layout }: PaymentBrokerTransferFormProps) {
@@ -31,8 +32,8 @@ export function PaymentBrokerTransferForm({ onSubmit, columns = 2, layout }: Pay
   const internalSubmit = async (data: PaymentBrokerTransferFormData) => {
     await onSubmit(data);
     showToast(
-      <TransactionNotification data={{ ...data, transaction_type: "payment_broker_transfer" } as PaymentBrokerTransferFormData & { transaction_type: "payment_broker_transfer" }} />,
-      'success'
+      <TransactionNotification data={{ ...data, transaction_type: 'payment_broker_transfer' } as const} />,
+      'success',
     );
   };
 
@@ -46,9 +47,12 @@ export function PaymentBrokerTransferForm({ onSubmit, columns = 2, layout }: Pay
   // Adapter: zachowuje typowanie i logikę automatycznej korekty dat
   const layoutFormProps = {
     ...formProps,
-    handleFieldChange: (field: string, value: any) => {
-      formProps.handleFieldChange(field as keyof PaymentBrokerTransferFormData, value as PaymentBrokerTransferFormData[keyof PaymentBrokerTransferFormData]);
-    }
+    handleFieldChange: (field: string, value: unknown) => {
+      formProps.handleFieldChange(
+        field as keyof PaymentBrokerTransferFormData,
+        value as PaymentBrokerTransferFormData[keyof PaymentBrokerTransferFormData],
+      );
+    },
   };
 
   const transfersSum =

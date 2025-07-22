@@ -6,6 +6,7 @@ import { FormLayout } from './FormLayout';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 import { SimpleTransferFormData } from '../types';
+import type { Layout } from './types';
 
 const simpleTransferFields = [
   { name: "account", type: "account", label: "From Account", required: true },
@@ -22,7 +23,7 @@ const simpleTransferLayout2Col = [
 interface SimpleTransferFormProps {
   onSubmit: (data: SimpleTransferFormData) => Promise<void>;
   columns?: number;
-  layout?: any;
+  layout?: Layout;
 }
 
 export function SimpleTransferForm({ onSubmit, columns = 2, layout }: SimpleTransferFormProps) {
@@ -31,8 +32,8 @@ export function SimpleTransferForm({ onSubmit, columns = 2, layout }: SimpleTran
   const internalSubmit = async (data: SimpleTransferFormData) => {
     await onSubmit(data);
     showToast(
-      <TransactionNotification data={{ ...data, transaction_type: "simple_transfer" } as SimpleTransferFormData & { transaction_type: "simple_transfer" }} />,
-      'success'
+      <TransactionNotification data={{ ...data, transaction_type: 'simple_transfer' } as const} />,
+      'success',
     );
   };
 
@@ -40,9 +41,12 @@ export function SimpleTransferForm({ onSubmit, columns = 2, layout }: SimpleTran
 
   const layoutFormProps = {
     ...formProps,
-    handleFieldChange: (field: string, value: any) => {
-      formProps.handleFieldChange(field as keyof SimpleTransferFormData, value as SimpleTransferFormData[keyof SimpleTransferFormData]);
-    }
+    handleFieldChange: (field: string, value: unknown) => {
+      formProps.handleFieldChange(
+        field as keyof SimpleTransferFormData,
+        value as SimpleTransferFormData[keyof SimpleTransferFormData],
+      );
+    },
   };
 
   return (
