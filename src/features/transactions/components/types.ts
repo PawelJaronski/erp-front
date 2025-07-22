@@ -1,3 +1,5 @@
+import type { CategoryData } from "../utils/staticData";
+
 export interface FieldConfig {
   name: string;
   type: string;
@@ -15,11 +17,11 @@ export type LayoutRow = LayoutCell[];
 export type Layout = LayoutRow[];
 
 export interface SimpleExpenseFormPropsFromHook {
-  formData: Record<string, any>;
+  formData: Record<string, unknown>;
   errors: Record<string, string>;
   isSubmitting: boolean;
-  handleFieldChange: (field: string, value: any) => void;
+  handleFieldChange: (field: string, value: unknown) => void;
   handleSubmit: (e: React.FormEvent) => void;
   reset: () => void;
-  availableCategories?: any[];
+  availableCategories?: readonly CategoryData[];
 } 

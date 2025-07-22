@@ -69,7 +69,7 @@ export function PaymentBrokerTransferForm({ onSubmit, columns = 2, layout }: Pay
       <FormLayout
         layout={layout || paymentBrokerTransferLayout2Col}
         fieldsConfig={paymentBrokerTransferFields}
-        formProps={layoutFormProps}
+        formProps={layoutFormProps as unknown as import('./types').SimpleExpenseFormPropsFromHook}
         columns={columns}
       />
       {/* Preview Section */}

@@ -62,7 +62,7 @@ export function SimpleIncomeForm({ onSubmit, columns = 2, layout }: SimpleIncome
       <FormLayout
         layout={layout || simpleIncomeLayout2Col}
         fieldsConfig={simpleIncomeFields}
-        formProps={layoutFormProps}
+        formProps={layoutFormProps as unknown as import('./types').SimpleExpenseFormPropsFromHook}
         columns={columns}
       />
       <FormActions onSubmit={formProps.handleSubmit} onReset={formProps.reset} isSubmitting={formProps.isSubmitting} />

@@ -46,7 +46,7 @@ export function SimpleExpenseForm({ onSubmit, columns = 2, layout }: SimpleExpen
       <FormLayout
         layout={layout || simpleExpenseLayout2Col}
         fieldsConfig={simpleExpenseFields}
-        formProps={layoutFormProps}
+        formProps={layoutFormProps as unknown as import('./types').SimpleExpenseFormPropsFromHook}
         columns={columns}
       />
       <FormActions onSubmit={formProps.handleSubmit} onReset={formProps.reset} isSubmitting={formProps.isSubmitting} />

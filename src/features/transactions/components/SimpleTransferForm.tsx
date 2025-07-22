@@ -54,7 +54,7 @@ export function SimpleTransferForm({ onSubmit, columns = 2, layout }: SimpleTran
       <FormLayout
         layout={layout || simpleTransferLayout2Col}
         fieldsConfig={simpleTransferFields}
-        formProps={layoutFormProps}
+        formProps={layoutFormProps as unknown as import('./types').SimpleExpenseFormPropsFromHook}
         columns={columns}
       />
       <FormActions onSubmit={formProps.handleSubmit} onReset={formProps.reset} isSubmitting={formProps.isSubmitting} />
