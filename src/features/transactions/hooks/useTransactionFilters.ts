@@ -39,11 +39,11 @@ export function useTransactionsFilters() {
             params.set('page', '1')
         }
 
-        router.push(`?${params.toString()}`)
+        router.push(`?${params.toString()}`, { scroll: false })
     }, [router, searchParams])
 
     const resetFilters = useCallback(() => {
-        router.push('?date_preset=month_to_date')
+        router.push('?date_preset=month_to_date', { scroll: false })
     }, [router])
 
     return { 

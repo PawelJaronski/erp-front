@@ -40,18 +40,19 @@ export default function TransactionsClient() {
         className="bg-white rounded-lg p-8 mb-8 mx-auto"
         columns={3}
          />
+        
+
+        {/* Filters */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Transactions</h1>
+          
           <button
             onClick={() => resetFilters()}
-            className="px-4 py-2 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+            className="px-4 py-2 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 ml-auto"
           >
             Reset Filters
           </button>
         </div>
-
-        {/* Filters */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <AccountFilterSelector
               value={filters.account}
