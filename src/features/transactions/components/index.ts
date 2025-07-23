@@ -10,5 +10,7 @@ export * from './CategoryGroupSelect';
 export * from './CategorySelect';
 export * from './AccountSelect';
 export * from './AmountInput';
+export * from './TransactionsSum';
+export * from './AccountBalancesPanel';
 export { TransactionItem } from './TransactionItem';
 export { TransactionNote } from './TransactionNote';
