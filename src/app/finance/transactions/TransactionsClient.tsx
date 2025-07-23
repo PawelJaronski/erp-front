@@ -61,6 +61,10 @@ export default function TransactionsClient() {
             date_preset: 'month_to_date',
             date_from: undefined,
             date_to: undefined,
+            account: undefined,
+            amount_type: undefined,
+            category_group: undefined,
+            search: undefined,
         });
         setSearchValue('');
     };
