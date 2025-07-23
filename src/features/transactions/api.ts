@@ -27,15 +27,24 @@ export async function addTransaction(data: TransactionRequest): Promise<void> {
 export async function fetchTransactions(filters: TransactionFilters): Promise<TransactionListResponse> {
   const params = new URLSearchParams()
 
-  Object.entries(filters).forEach(([key, value]) => {
+  // Zapobiegaj wysyłaniu sprzecznych filtrów
+  let effectiveFilters: TransactionFilters = { ...filters };
+  if (filters.date_from && filters.date_to) {
+    effectiveFilters = { ...filters, date_preset: undefined };
+  } else if (filters.date_preset) {
+    effectiveFilters = { ...filters, date_from: undefined, date_to: undefined };
+  }
+
+  Object.entries(effectiveFilters).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       params.append(key, String(value))
     }
   })
 
-  const url = `${API_BASE}/transactions?${params.toString()}`
-  console.log('FETCH TRANSACTIONS URL:', url)
-  console.log('FILTERS:', filters)
+  const url = `${API_BASE}/transactions?${params.toString()}`;
+  console.log('FETCH TRANSACTIONS URL:', url);
+  console.log('FILTERS:', JSON.stringify(effectiveFilters, null, 2));
+  console.log('date_from:', effectiveFilters.date_from, 'date_to:', effectiveFilters.date_to, 'date_preset:', effectiveFilters.date_preset);
 
   const response = await fetch(url, {
     method: 'GET',

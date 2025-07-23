@@ -46,6 +46,9 @@ export const accounts = [
   { value: "mbank_osobiste", label: "mbank_osobiste" },
   { value: "cash", label: "cash" },
   { value: "sumup", label: "sumup" },
+  { value: "paynow", label: "paynow" },
+  { value: "trade_fair", label: "trade_fair" },
+  { value: "mbank_vat_account", label: "mbank_vat_account" },
 ] as const;
 
 // High-level category groups for expenses (plus "other")

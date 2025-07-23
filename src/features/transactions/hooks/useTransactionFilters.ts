@@ -15,7 +15,7 @@ export function useTransactionsFilters() {
         search: searchParams.get('search') || undefined,    
         date_from: searchParams.get('date_from') || undefined,
         date_to: searchParams.get('date_to') || undefined,
-        date_preset: searchParams.get('date_preset') || 'month_to_date',
+        date_preset: (searchParams.get('date_preset') || ( !searchParams.get('date_from') && !searchParams.get('date_to') ? 'month_to_date' : undefined)),
         amount_type: searchParams.get('amount_type') || undefined,
         sort_by: searchParams.get('sort_by') || undefined,
         sort_order: searchParams.get('sort_order') || undefined,
@@ -43,8 +43,8 @@ export function useTransactionsFilters() {
     }, [router, searchParams])
 
     const resetFilters = useCallback(() => {
-        router.push('?date_preset=month_to_date', { scroll: false })
-    }, [router])
+        router.replace(`?date_preset=month_to_date&_reset=${Date.now()}`, { scroll: false });
+    }, [router]);
 
     return { 
         filters, 

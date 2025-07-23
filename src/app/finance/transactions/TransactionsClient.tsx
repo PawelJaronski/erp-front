@@ -11,13 +11,19 @@ import { Pagination } from '@/features/transactions/components/Pagination'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 import { CategoryGroupFilterSelector } from '@/features/transactions/components/filters/CategoryGroupFilterSelector'
 import { TransactionFormContainer } from '@/features/transactions/components/TransactionFormContainer'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { TransactionsSum, AccountBalancesPanel } from '@/features/transactions/components';
+import { addMonths } from 'date-fns';
 
 export default function TransactionsClient() {
     const { filters, updateFilters, resetFilters } = useTransactionsFilters()
     const [searchValue, setSearchValue] = React.useState(filters.search || '')
     const debouncedSearch = useDebounce(searchValue, 300)
+    // Dodaj stan do obsługi "zamrożenia" listy
+    const [pendingDateRange, setPendingDateRange] = useState(false);
+
+    // Czy są aktywne filtry daty?
+    const hasDateFilter = !!(filters.date_preset || (filters.date_from && filters.date_to));
 
     React.useEffect(() => {
         if (debouncedSearch !== (filters.search || '')) {
@@ -25,13 +31,40 @@ export default function TransactionsClient() {
         }
     }, [debouncedSearch, filters.search, updateFilters]);
 
-    const { data, error, isFetching, refetch } = useTransactionsQuery(filters)
+    // Synchronizuj searchValue z filters.search (np. po resecie)
+    useEffect(() => {
+        setSearchValue(filters.search || '');
+    }, [filters.search]);
 
-    React.useEffect(() => {
-      if (!filters.date_preset) {
-        updateFilters({ date_preset: 'month_to_date' })
-      }
-    }, [filters.date_preset, updateFilters])
+    // Pobieraj dane tylko jeśli jest filtr daty
+    const { data, error, isFetching, refetch } = useTransactionsQuery(hasDateFilter ? filters : { ...filters, page: 1, limit: 50 });
+
+    // Obsługa zmiany zakresu dat
+    const handleDateRangeChange = (from: string, to: string) => {
+        // Ustaw tylko zakres, wyczyść preset
+        updateFilters({ date_from: from || undefined, date_to: to || undefined, date_preset: undefined });
+        setPendingDateRange(false);
+    };
+
+    // Obsługa zmiany presetu
+    const handlePresetChange = (preset?: string) => {
+        if (preset === undefined) {
+            setPendingDateRange(true);
+            return;
+        }
+        // Ustaw tylko preset, wyczyść zakres
+        updateFilters({ date_preset: preset, date_from: undefined, date_to: undefined });
+    };
+
+    // Reset filtrów przywraca preset 'month_to_date'
+    const handleResetFilters = () => {
+        updateFilters({
+            date_preset: 'month_to_date',
+            date_from: undefined,
+            date_to: undefined,
+        });
+        setSearchValue('');
+    };
 
     return (
       <div className="max-w-6xl mx-auto p-6 space-y-6">
@@ -55,7 +88,12 @@ export default function TransactionsClient() {
                 />
                 <DatePresetSelector
                   value={filters.date_preset}
-                  onChange={(date_preset) => updateFilters({ date_preset })}
+                  onPresetChange={handlePresetChange}
+                  dateFrom={filters.date_from}
+                  dateTo={filters.date_to}
+                  onDateRangeChange={handleDateRangeChange}
+                  pendingDateRange={pendingDateRange}
+                  setPendingDateRange={setPendingDateRange}
                 />
                 <SearchInput
                   value={searchValue}
@@ -72,7 +110,7 @@ export default function TransactionsClient() {
               </div>
               <div className="flex justify-between items-center mb-2">
             <button
-              onClick={() => resetFilters()}
+              onClick={handleResetFilters}
               className="px-4 py-2 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
             >
               Reset Filters
@@ -86,8 +124,15 @@ export default function TransactionsClient() {
           </div>
         </div>
 
-        {/* Pagination */}
-        {data && data.total_count > 0 && (
+        {/* Komunikat jeśli brak filtra daty */}
+        {!hasDateFilter && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mt-4 rounded">
+            Wybierz zakres dat lub preset, aby zobaczyć transakcje.
+          </div>
+        )}
+
+        {/* Pagination, suma, lista tylko jeśli jest filtr daty */}
+        {hasDateFilter && data && data.total_count > 0 && (
           <Pagination
             currentPage={filters.page || 1}
             totalCount={data.total_count}
@@ -98,19 +143,15 @@ export default function TransactionsClient() {
             showSummary={true}
           />
         )}
-
-        {/* Transactions Sum */}
-        <TransactionsSum filters={filters} />
-
-        {/* Transaction List */}
-        <TransactionList
-          transactions={data?.transactions || []}
-          isFetching={isFetching}
-          error={error}
-        />
-
-        {/* Pagination */}
-        {data && data.total_count > 0 && (
+        {hasDateFilter && <TransactionsSum filters={filters} />}
+        {hasDateFilter && (
+          <TransactionList
+            transactions={data?.transactions || []}
+            isFetching={isFetching}
+            error={error}
+          />
+        )}
+        {hasDateFilter && data && data.total_count > 0 && (
           <Pagination
             currentPage={filters.page || 1}
             totalCount={data.total_count}
