@@ -166,7 +166,7 @@ export function DatePresetSelector({ value, onPresetChange, dateFrom, dateTo, on
     };
 
     return (
-        <div className="flex flex-col gap-1">
+        <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Date:</label>
             <ComboBox
                 value={value || ''}
