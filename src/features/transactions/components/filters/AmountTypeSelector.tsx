@@ -9,7 +9,6 @@ interface AmountTypeSelectorProps {
 }
 
 const AMOUNT_TYPE_OPTIONS = [
-    { value: '', label: 'All types' },
     { value: 'positive', label: 'Income' },
     { value: 'negative', label: 'Expense' },
 ] as const
@@ -27,7 +26,7 @@ export function AmountTypeSelector({ value, onChange }: AmountTypeSelectorProps)
                 onChange={handleChange}
                 options={AMOUNT_TYPE_OPTIONS}
                 placeholder="All types"
-                isClearable={false}
+                isClearable={true}
             />
         </div>
     )
