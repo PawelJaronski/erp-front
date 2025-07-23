@@ -13,10 +13,9 @@ import { CategoryGroupFilterSelector } from '@/features/transactions/components/
 import { TransactionFormContainer } from '@/features/transactions/components/TransactionFormContainer'
 import React, { useState, useEffect } from 'react'
 import { TransactionsSum, AccountBalancesPanel } from '@/features/transactions/components';
-import { addMonths } from 'date-fns';
 
 export default function TransactionsClient() {
-    const { filters, updateFilters, resetFilters } = useTransactionsFilters()
+    const { filters, updateFilters } = useTransactionsFilters()
     const [searchValue, setSearchValue] = React.useState(filters.search || '')
     const debouncedSearch = useDebounce(searchValue, 300)
     // Dodaj stan do obsługi "zamrożenia" listy

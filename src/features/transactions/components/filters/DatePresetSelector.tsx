@@ -5,7 +5,8 @@ import { ComboBox } from '@/shared/components/form/ComboBox';
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
-import { addDays, startOfMonth, endOfMonth, startOfYear, endOfMonth as endOfMonthFn, subMonths } from 'date-fns';
+import { addDays, startOfMonth, startOfYear, endOfMonth as endOfMonthFn, subMonths } from 'date-fns';
+import { RangeKeyDict, Range } from 'react-date-range';
 
 const DATE_PRESET_OPTIONS = [
     { value: 'today', label: 'Today' },
@@ -58,12 +59,12 @@ interface DatePresetSelectorProps {
 
 export function DatePresetSelector({ value, onPresetChange, dateFrom, dateTo, onDateRangeChange, pendingDateRange, setPendingDateRange }: DatePresetSelectorProps) {
     const [showPicker, setShowPicker] = useState(false);
-    const [range, setRange] = useState({
+    const [range, setRange] = useState<Range>({
         startDate: dateFrom ? new Date(dateFrom) : undefined,
         endDate: dateTo ? new Date(dateTo) : undefined,
         key: 'selection',
     });
-    const [tempRange, setTempRange] = useState({
+    const [tempRange, setTempRange] = useState<Range>({
         startDate: dateFrom ? new Date(dateFrom) : undefined,
         endDate: dateTo ? new Date(dateTo) : undefined,
         key: 'selection',
@@ -122,7 +123,7 @@ export function DatePresetSelector({ value, onPresetChange, dateFrom, dateTo, on
         }
     };
 
-    const handleRangeChange = (ranges: any) => {
+    const handleRangeChange = (ranges: RangeKeyDict) => {
         const sel = ranges.selection;
         setTempRange(sel);
     };
