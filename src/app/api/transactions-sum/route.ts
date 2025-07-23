@@ -8,7 +8,7 @@ const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
-  const rpcParams: Record<string, any> = {
+  const rpcParams: Record<string, unknown> = {
     p_account: params.get('account'),
     p_category_group: params.get('category_group'),
     p_category: params.get('category'),
