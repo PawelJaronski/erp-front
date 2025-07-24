@@ -1,9 +1,9 @@
-import { NextRequest } from 'next/server';
+// No specific imports are needed; the global Request type is sufficient for Next.js route handlers
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://jaronski-erp-backend-production.up.railway.app';
 
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
-    const id = context.params.id;
+export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+    const { id } = params;
     if (!id) {
         return new Response(JSON.stringify({ error: 'Missing transaction id' }), { status: 400 });
     }
@@ -26,8 +26,8 @@ export async function DELETE(req: NextRequest, context: { params: { id: string }
     }
 }
 
-export async function GET(req: NextRequest, context: { params: { id: string } }) {
-    const id = context.params.id;
+export async function GET(_req: Request, { params }: { params: { id: string } }) {
+    const { id } = params;
     if (!id) {
         return new Response(JSON.stringify({ error: 'Missing transaction id' }), { status: 400 });
     }
