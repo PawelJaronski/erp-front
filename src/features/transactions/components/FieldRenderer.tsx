@@ -1,6 +1,8 @@
 import React from "react";
-import { FormField, DateInput } from '@/shared/components/form';
-import { AccountSelect, CategoryGroupSelect, CategorySelect, AmountInput, TransactionItem, TransactionNote, VATSection } from ".";
+import { FormField } from '@/shared/components/form/FormField';
+import { DateInput } from '@/shared/components/form/DateInput';
+import { AccountSelect } from "@/features/transactions/components/AccountSelect";
+import { AmountInput } from "@/features/transactions/components/AmountInput";
 import { FieldConfig, FormHookProps } from "./types";
 import { AccountField, AmountField, DateField } from "./shared/fields";
 import { CategoryGroupField } from "./shared/fields/CategoryGroupField";

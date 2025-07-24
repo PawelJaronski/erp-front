@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { DateField, AccountField, AmountField, CategoryField, CategoryGroupField, NoteField, ItemField } from '../shared/fields';
+import { DateField, AccountField, AmountField, CategoryField, CategoryGroupField } from '../shared/fields';
 import type { TransactionItem } from '@/features/transactions/types';
-import { accounts, categoryGroups, categoriesData, CategoryGroupValue } from '@/features/transactions/utils/staticData';
+import { categoriesData, CategoryGroupValue } from '@/features/transactions/utils/staticData';
 
 interface TransactionRowProps {
   transaction: TransactionItem;
-  isSelected: boolean;
   isEditing: boolean;
-  onSelect: (id: string) => void;
   onEdit: (id: string) => void;
   onSave: (id: string, data: Partial<TransactionItem>) => void;
   onCancel: () => void;
@@ -16,9 +14,7 @@ interface TransactionRowProps {
 
 export function TransactionRow({
   transaction,
-  isSelected,
   isEditing,
-  onSelect,
   onEdit,
   onSave,
   onCancel,
