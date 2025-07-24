@@ -25,17 +25,15 @@ export function AccountField({
 }: AccountFieldProps) {
     if (inline) {
         return (
-            <div className={className}>
+            
                 <AccountSelect
                     value={value}
                     onChange={onChange}
                     error={error}
                     placeholder={placeholder}
                 />
-                {error && (
-                    <p className="text-xs text-red-600 mt-1">{error}</p>
-                )}
-            </div>
+                
+                
         );
     }
 
