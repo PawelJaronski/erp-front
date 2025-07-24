@@ -59,3 +59,26 @@ export async function fetchTransactions(filters: TransactionFilters): Promise<Tr
 
   return response.json()
 }
+
+export async function deleteTransaction(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/transactions/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    let msg = 'Failed to delete transaction';
+    try {
+      const errorData = await res.json();
+      msg = errorData.message || msg;
+    } catch {}
+    throw new Error(msg);
+  }
+}
+
+export async function deleteTransactions(ids: string[]): Promise<void> {
+  const deletePromises = ids.map(id => deleteTransaction(id));
+  await Promise.all(deletePromises);
+}
