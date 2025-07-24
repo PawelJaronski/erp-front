@@ -8,7 +8,7 @@ import { FormLayout } from '../FormLayout';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
 import { SimpleExpenseFormData } from '../../types';
-import type { Layout } from '../types';
+import type { FieldConfig, Layout } from '../types';
 
 interface SimpleExpenseFormProps {
   onSubmit: (data: SimpleExpenseFormData) => Promise<void>;
@@ -45,7 +45,7 @@ export function SimpleExpenseForm({ onSubmit, columns = 2, layout }: SimpleExpen
     <form onSubmit={formProps.handleSubmit} className="space-y-6">
       <FormLayout
         layout={layout || simpleExpenseLayout2Col}
-        fieldsConfig={simpleExpenseFields}
+        fieldsConfig={simpleExpenseFields as FieldConfig[]}
         formProps={layoutFormProps as unknown as import('@/features/transactions/components/types').SimpleExpenseFormPropsFromHook}
         columns={columns}
       />
