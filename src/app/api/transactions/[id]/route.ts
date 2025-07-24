@@ -1,8 +1,6 @@
-import { NextRequest } from 'next/server';
-
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://jaronski-erp-backend-production.up.railway.app';
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
     const { id } = params;
     if (!id) {
         return new Response(JSON.stringify({ error: 'Missing transaction id' }), { status: 400 });
@@ -26,7 +24,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: { id: string } }) {
     const { id } = params;
     if (!id) {
         return new Response(JSON.stringify({ error: 'Missing transaction id' }), { status: 400 });
