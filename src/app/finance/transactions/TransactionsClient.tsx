@@ -2,15 +2,15 @@
 
 import { useTransactionsFilters } from '@/features/transactions/hooks/useTransactionFilters'
 import { useTransactionsQuery } from '@/features/transactions/hooks/useTransactionsQuery'
-import { AccountFilterSelector } from '@/features/transactions/components/filters/AccountFilterSelector'
-import { DatePresetSelector } from '@/features/transactions/components/filters/DatePresetSelector'
-import { AmountTypeSelector } from '@/features/transactions/components/filters/AmountTypeSelector'
-import { SearchInput } from '@/features/transactions/components/filters/SearchInput'
-import { TransactionList } from '@/features/transactions/components/TransactionList'
-import { Pagination } from '@/features/transactions/components/Pagination'
+import { AccountFilterSelector } from '@/features/transactions/components/list/filters/AccountFilterSelector'
+import { DatePresetSelector } from '@/features/transactions/components/list/filters/DatePresetSelector'
+import { AmountTypeSelector } from '@/features/transactions/components/list/filters/AmountTypeSelector'
+import { SearchInput } from '@/features/transactions/components/list/filters/SearchInput'
+import { TransactionList } from '@/features/transactions/components/list/TransactionList'
+import { Pagination } from '@/features/transactions/components/list/Pagination'
 import { useDebounce } from '@/shared/hooks/useDebounce'
-import { CategoryGroupFilterSelector } from '@/features/transactions/components/filters/CategoryGroupFilterSelector'
-import { TransactionFormContainer } from '@/features/transactions/components/TransactionFormContainer'
+import { CategoryGroupFilterSelector } from '@/features/transactions/components/list/filters/CategoryGroupFilterSelector'
+import { TransactionFormContainer } from '@/features/transactions/components/forms/TransactionFormContainer'
 import React, { useState, useEffect } from 'react'
 import { TransactionsSum, AccountBalancesPanel } from '@/features/transactions/components';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { TransactionFilters } from '@/features/transactions/types';
-import { useTransactionsSum } from '../hooks/useTransactionsSum';
+import { useTransactionsSum } from '@/features/transactions/hooks/useTransactionsSum';
 
 interface TransactionsSumProps {
   filters: TransactionFilters;

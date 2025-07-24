@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { addTransaction } from '@/features/transactions/api';
 import { buildTransactionPayload, AnyFormData } from '@/features/transactions/utils';
 import { useToast } from '@/shared/components/ToastProvider';
-import { simpleExpenseLayout2Col, simpleExpenseLayout3Col } from "./layouts";
+import { simpleExpenseLayout2Col, simpleExpenseLayout3Col } from "@/features/transactions/components/layouts";
 
 type Props = {
   onSuccess?: () => void;

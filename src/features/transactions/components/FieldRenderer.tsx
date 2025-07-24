@@ -2,6 +2,14 @@ import React from "react";
 import { FormField, DateInput } from '@/shared/components/form';
 import { AccountSelect, CategoryGroupSelect, CategorySelect, AmountInput, TransactionItem, TransactionNote, VATSection } from ".";
 import { FieldConfig, FormHookProps } from "./types";
+import { AccountField, AmountField, DateField } from "./shared/fields";
+import { CategoryGroupField } from "./shared/fields/CategoryGroupField";
+import { CategoryField } from "./shared/fields/CategoryField";
+import { ItemField } from "./shared/fields/ItemField";
+import { NoteField } from "./shared/fields/NoteField";
+import { VatField } from "./shared/fields/VatField";
+import { CategoryGroupValue } from "../utils/staticData";
+
 
 interface FieldRendererProps {
   field: FieldConfig;
@@ -11,15 +19,15 @@ interface FieldRendererProps {
 export function FieldRenderer({ field, formProps }: FieldRendererProps) {
   switch (field.type) {
     case "account":
-      // Rozróżniamy From/To Account po nazwie pola
       if (field.name === "account") {
         return (
-          <FormField label={field.label} error={formProps.errors.account} required={field.required}>
-            <AccountSelect
-              value={(formProps.formData.account as string) ?? ""}
-              onChange={(v) => formProps.handleFieldChange("account", v)}
-            />
-          </FormField>
+          <AccountField
+            label={field.label}
+            value={(formProps.formData.account as string) ?? ""}
+            onChange={(v) => formProps.handleFieldChange("account", v)}
+            error={formProps.errors.account}
+            required={field.required}
+          />
         );
       } else if (field.name === "to_account") {
         return (
@@ -34,34 +42,35 @@ export function FieldRenderer({ field, formProps }: FieldRendererProps) {
       return null;
     case "categoryGroup":
       return (
-        <CategoryGroupSelect
-          value={(formProps.formData.category_group as string) ?? ""}
+        <CategoryGroupField
+          label={field.label}
+          value={(formProps.formData.category_group as CategoryGroupValue) ?? ""}
           onChange={(v) => formProps.handleFieldChange("category_group", v)}
           error={formProps.errors.category_group}
-          onCustomValueChange={() => {}}
+          required={field.required}
         />
       );
     case "category":
       return (
-        <CategorySelect
+        <CategoryField
+          label={field.label}
           value={(formProps.formData.category as string) ?? ""}
           onChange={(v) => formProps.handleFieldChange("category", v)}
           error={formProps.errors.category}
           availableCategories={formProps.availableCategories || []}
-          onCustomValueChange={() => {}}
+          required={field.required}
         />
       );
     case "amount":
-      // Rozróżniamy różne amounty po nazwie pola
       if (field.name === "gross_amount") {
         return (
-          <FormField label={field.label} error={formProps.errors.gross_amount} required={field.required}>
-            <AmountInput
-              value={(formProps.formData.gross_amount as string) ?? ""}
-              onChange={(v) => formProps.handleFieldChange("gross_amount", v)}
-              error={formProps.errors.gross_amount}
-            />
-          </FormField>
+          <AmountField
+            label={field.label}
+            value={(formProps.formData.gross_amount as string) ?? ""}
+            onChange={(v) => formProps.handleFieldChange("gross_amount", v)}
+            error={formProps.errors.gross_amount}
+            required={field.required}
+          />
         );
       } else if (field.name === "paynow_transfer") {
         return (
@@ -87,14 +96,16 @@ export function FieldRenderer({ field, formProps }: FieldRendererProps) {
       return null;
     case "item":
       return (
-        <TransactionItem
+        <ItemField
+          label={field.label}
           value={(formProps.formData.item as string | undefined) ?? ""}
           onChange={(v) => formProps.handleFieldChange("item", v)}
         />
       );
     case "note":
       return (
-        <TransactionNote
+        <NoteField
+          label={field.label}
           value={(formProps.formData.note as string | undefined) ?? ""}
           onChange={(v) => formProps.handleFieldChange("note", v)}
         />
@@ -115,23 +126,26 @@ export function FieldRenderer({ field, formProps }: FieldRendererProps) {
       return null;
     case "vat":
       return (
-        <VATSection
+        <VatField
+          label={field.label}
           includeTax={Boolean(formProps.formData.include_tax)}
           taxRate={(formProps.formData.tax_rate as number | undefined) ?? 0}
           onIncludeTaxChange={(v) => formProps.handleFieldChange("include_tax", v)}
           onTaxRateChange={(v) => formProps.handleFieldChange("tax_rate", v)}
+          error={formProps.errors.vat}
+          required={field.required}
         />
       );
     case "date":
-      // Rozróżniamy różne daty po nazwie pola
       if (field.name === "business_timestamp") {
         return (
-          <FormField label={field.label} error={formProps.errors.business_timestamp} required={field.required}>
-            <DateInput
-              value={(formProps.formData.business_timestamp as string | undefined) ?? ""}
-              onChange={(v) => formProps.handleFieldChange("business_timestamp", v)}
-            />
-          </FormField>
+          <DateField
+            label={field.label}
+            value={(formProps.formData.business_timestamp as string | undefined) ?? ""}
+            onChange={(v) => formProps.handleFieldChange("business_timestamp", v)}
+            error={formProps.errors.business_timestamp}
+            required={field.required}
+          />
         );
       } else if (field.name === "transfer_date") {
         return (

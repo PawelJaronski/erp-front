@@ -1,12 +1,12 @@
 "use client";
 import React from 'react';
-import { usePaymentBrokerTransferForm } from '../hooks/usePaymentBrokerTransferForm';
-import { FormActions } from '.';
-import { FormLayout } from './FormLayout';
+import { usePaymentBrokerTransferForm } from '@/features/transactions/hooks/usePaymentBrokerTransferForm';
+import { FormActions } from '../shared/actions/FormActions';
+import { FormLayout } from '../FormLayout';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
-import { PaymentBrokerTransferFormData } from '../types';
-import type { Layout } from './types';
+import { PaymentBrokerTransferFormData } from '@/features/transactions/types';
+import type { Layout } from '@/features/transactions/components/types';
 
 const paymentBrokerTransferFields = [
   { name: "paynow_transfer", type: "amount", label: "Paynow Transfer" },
@@ -69,7 +69,7 @@ export function PaymentBrokerTransferForm({ onSubmit, columns = 2, layout }: Pay
       <FormLayout
         layout={layout || paymentBrokerTransferLayout2Col}
         fieldsConfig={paymentBrokerTransferFields}
-        formProps={layoutFormProps as unknown as import('./types').SimpleExpenseFormPropsFromHook}
+        formProps={layoutFormProps as unknown as import('@/features/transactions/components/types').SimpleExpenseFormPropsFromHook}
         columns={columns}
       />
       {/* Preview Section */}

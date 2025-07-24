@@ -1,14 +1,15 @@
 "use client";
 import React from 'react';
-import { useSimpleExpenseForm } from '../hooks/useSimpleExpenseForm';
-import { FormActions } from '.';
-import { simpleExpenseFields } from './fieldsConfig';
-import { simpleExpenseLayout2Col } from './layouts';
-import { FormLayout } from './FormLayout';
+import { useSimpleExpenseForm } from '../../hooks/useSimpleExpenseForm';
+import { FormActions } from '..';
+import { simpleExpenseFields } from '../fieldsConfig';
+import { simpleExpenseLayout2Col } from '../layouts';
+import { FormLayout } from '../FormLayout';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
-import { SimpleExpenseFormData } from '../types';
-import type { Layout } from './types';
+import { SimpleExpenseFormData } from '../../types';
+import type { Layout } from '../types';
+import { DateField } from '../shared/fields';
 
 interface SimpleExpenseFormProps {
   onSubmit: (data: SimpleExpenseFormData) => Promise<void>;
@@ -46,7 +47,7 @@ export function SimpleExpenseForm({ onSubmit, columns = 2, layout }: SimpleExpen
       <FormLayout
         layout={layout || simpleExpenseLayout2Col}
         fieldsConfig={simpleExpenseFields}
-        formProps={layoutFormProps as unknown as import('./types').SimpleExpenseFormPropsFromHook}
+        formProps={layoutFormProps as unknown as import('../types').SimpleExpenseFormPropsFromHook}
         columns={columns}
       />
       <FormActions onSubmit={formProps.handleSubmit} onReset={formProps.reset} isSubmitting={formProps.isSubmitting} />

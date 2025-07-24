@@ -1,12 +1,12 @@
 "use client";
 import React from 'react';
-import { useSimpleIncomeForm } from '../hooks/useSimpleIncomeForm';
-import { FormActions } from '.';
-import { FormLayout } from './FormLayout';
+import { useSimpleIncomeForm } from '@/features/transactions/hooks/useSimpleIncomeForm';
+import { FormActions } from '../shared/actions/FormActions';
+import { FormLayout } from '../FormLayout';
 import { TransactionNotification } from '@/features/transactions/components/TransactionNotification';
 import { useToast } from '@/shared/components/ToastProvider';
-import { SimpleIncomeFormData } from '../types';
-import type { Layout } from './types';
+import { SimpleIncomeFormData } from '@/features/transactions/types';
+import type { Layout } from '@/features/transactions/components/types';
 
 const simpleIncomeFields = [
   { name: "account", type: "account", label: "Account", required: true },
@@ -62,7 +62,7 @@ export function SimpleIncomeForm({ onSubmit, columns = 2, layout }: SimpleIncome
       <FormLayout
         layout={layout || simpleIncomeLayout2Col}
         fieldsConfig={simpleIncomeFields}
-        formProps={layoutFormProps as unknown as import('./types').SimpleExpenseFormPropsFromHook}
+        formProps={layoutFormProps as unknown as import('@/features/transactions/components/types').SimpleExpenseFormPropsFromHook}
         columns={columns}
       />
       <FormActions onSubmit={formProps.handleSubmit} onReset={formProps.reset} isSubmitting={formProps.isSubmitting} />
