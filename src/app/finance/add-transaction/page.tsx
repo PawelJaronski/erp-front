@@ -1,5 +1,5 @@
 "use client";
-import { TransactionFormContainer } from "@/features/transactions/components/TransactionFormContainer";
+import { TransactionFormContainer } from "@/features/transactions/components/forms/TransactionFormContainer";
 
 export default function AddTransactionPage() {
     return (
