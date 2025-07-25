@@ -31,3 +31,34 @@ export async function DELETE(req: NextRequest, context: any) {
         return NextResponse.json({ error: msg }, { status: 500 });
     }
 }
+
+export async function PATCH(req: NextRequest, context: any) {
+    const { id } = context.params;
+
+    if (!id) {
+        return NextResponse.json({ error: 'Missing transaction id' }, { status: 400 });
+    }
+
+    try {
+        const body = await req.text();
+        const url = `${API_BASE}/transactions/${id}`;
+
+        const res = await fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body,
+        });
+
+        const text = await res.text();
+        return new Response(text, {
+            status: res.status,
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+    } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : 'Unexpected error';
+        return NextResponse.json({ error: msg }, { status: 500 });
+    }
+}
