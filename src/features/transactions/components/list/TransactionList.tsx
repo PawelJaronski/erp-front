@@ -82,12 +82,12 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
 
   return (
     <div className="relative">
-      {hasSelection && (
+      {/*hasSelection && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center justify-between">
           <span className="text-blue-700 font-medium">{selectedCount} transaction{selectedCount !== 1 ? 's' : ''} selected</span>
           <button onClick={clearSelection} className="text-blue-600 hover:text-blue-800 text-sm">Clear selection</button>
         </div>
-      )}
+      )*/}
 
       <div className={`overflow-x-auto transition-opacity duration-300 ${isFetching ? 'opacity-40' : 'opacity-100'}`}>
         <table className="min-w-full divide-y divide-gray-200">
