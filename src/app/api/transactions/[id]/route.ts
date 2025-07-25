@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://jaronski-erp-backend-production.up.railway.app';
 
-// Na razie tworzymy tylko endpoint DELETE. GET dodamy później, jeśli będzie potrzebny.
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
     const { id } = params;
     if (!id) {
@@ -17,20 +16,20 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
             headers: { 'Content-Type': 'application/json' },
         });
 
-        // Jeśli backend zwrócił błąd, przekaż go dalej
         if (!res.ok) {
             const errorText = await res.text();
-            return new Response(errorText, {
-                status: res.status,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            try {
+                const errorJson = JSON.parse(errorText);
+                return NextResponse.json({ error: errorJson.message || 'Backend error' }, { status: res.status });
+            } catch {
+                return NextResponse.json({ error: errorText }, { status: res.status });
+            }
         }
-
-        // Jeśli sukces, zwróć pustą odpowiedź z kodem 204 (No Content)
+        
         return new Response(null, { status: 204 });
 
     } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : 'Unexpected error';
+        const msg = e instanceof Error ? e.message : 'Unexpected network or server error';
         return NextResponse.json({ error: msg }, { status: 500 });
     }
 }
