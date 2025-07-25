@@ -8,8 +8,8 @@ export function useFormPersistence<T>(
     
     // For testing: change to 15 * 1000 (15 seconds)
     // For production: change to 4 * 60 * 60 * 1000 (4 hours)
-    //const MAX_AGE = 4 * 60 * 60 * 1000; // 4 hours
-    const MAX_AGE = 10 * 1000; // 15 seconds for testing
+    const MAX_AGE = 4 * 60 * 60 * 1000; // 4 hours
+    //const MAX_AGE = 10 * 1000; // 15 seconds for testing
 
     const getInitialState = (): T => {
         try {
