@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TransactionItem } from '@/features/transactions/types';
 import { TransactionRow } from './TransactionRow';
+import { EditableTransactionRow } from './EditableTransactionRow';
 import { ContextMenu } from './ContextMenu';
 import { useTransactionSelection } from '@/features/transactions/hooks/useTransactionSelection';
 import { useContextMenu } from '@/features/transactions/hooks/useContextMenu';
@@ -17,6 +18,8 @@ interface TransactionListProps {
 }
 
 export function TransactionList({ transactions, isFetching, error }: TransactionListProps) {
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  
   const { selectedRows, toggleSelection, clearSelection, selectAll, hasSelection, selectedCount } = useTransactionSelection();
   const { contextMenu, showContextMenu, hideContextMenu } = useContextMenu();
   const { confirmState, showConfirmation, hideConfirmation, startDeleting } = useDeleteConfirmation();
@@ -24,6 +27,10 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
   const { showToast } = useToast();
 
   const handleDelete = (ids: string[]) => {
+    // Cancel editing if deleting the currently edited row
+    if (editingRowId && ids.includes(editingRowId)) {
+      setEditingRowId(null);
+    }
     showConfirmation(ids);
   };
 
@@ -53,9 +60,42 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
     }
   };
   
-  const handleEditAccount = (id: string) => console.log('Edit account for transaction:', id);
-  const handleDoubleClick = (id: string) => console.log('Edit transaction:', id);
+  const handleEditAccount = (id: string) => {
+    // Cancel any current editing
+    setEditingRowId(null);
+    console.log('Edit account for transaction:', id);
+  };
+
+  const handleDoubleClick = (id: string) => {
+    // Cancel any other operations
+    clearSelection();
+    hideContextMenu();
+    
+    // Start editing this row
+    setEditingRowId(id);
+  };
+
   const handleSelectAll = () => hasSelection ? clearSelection() : selectAll(transactions.map(t => t.id));
+
+  const handleCancelEdit = () => {
+    setEditingRowId(null);
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, id: string) => {
+    // Cancel editing when context menu is opened
+    if (editingRowId) {
+      setEditingRowId(null);
+    }
+    showContextMenu(e, id, selectedRows);
+  };
+
+  const handleSelection = (id: string) => {
+    // Cancel editing when selecting rows
+    if (editingRowId) {
+      setEditingRowId(null);
+    }
+    toggleSelection(id);
+  };
 
   if (error) {
     return (
@@ -85,7 +125,7 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
                             checked={hasSelection && selectedCount === transactions.length && transactions.length > 0} 
                             onChange={handleSelectAll} 
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            disabled={transactions.length === 0}
+                            disabled={transactions.length === 0 || editingRowId !== null}
                         />
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '110px'}}>Date</th>
@@ -101,26 +141,39 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
             <tbody className={`bg-white divide-y divide-gray-200 transition-opacity duration-300 ${
                 isFetching ? 'opacity-40' : 'opacity-100'
             }`}>
-                {transactions.map((transaction) => (
-                  <TransactionRow
-                    key={transaction.id}
-                    transaction={transaction}
-                    isSelected={selectedRows.has(transaction.id)}
-                    isActive={contextMenu.isVisible && contextMenu.targetRowIds.includes(transaction.id)}
-                    onSelect={toggleSelection}
-                    onContextMenu={(e, id) => showContextMenu(e, id, selectedRows)}
-                    onDoubleClick={handleDoubleClick}
-                  />
-                ))}
+                {transactions.map((transaction) => {
+                  const isEditing = editingRowId === transaction.id;
+                  
+                  return isEditing ? (
+                    <EditableTransactionRow
+                      key={transaction.id}
+                      transaction={transaction}
+                      isSelected={selectedRows.has(transaction.id)}
+                      isActive={contextMenu.isVisible && contextMenu.targetRowIds.includes(transaction.id)}
+                      onSelect={handleSelection}
+                      onContextMenu={handleContextMenu}
+                      onCancelEdit={handleCancelEdit}
+                    />
+                  ) : (
+                    <TransactionRow
+                      key={transaction.id}
+                      transaction={transaction}
+                      isSelected={selectedRows.has(transaction.id)}
+                      isActive={contextMenu.isVisible && contextMenu.targetRowIds.includes(transaction.id)}
+                      isEditing={isEditing}
+                      onSelect={handleSelection}
+                      onContextMenu={handleContextMenu}
+                      onDoubleClick={handleDoubleClick}
+                    />
+                  );
+                })}
             </tbody>
         </table>
       </div>
 
       {isFetching && (
         <div className="absolute top-4 right-4">
-
           <div className="h-6 w-6 rounded-full border-2 border-gray-200 border-t-gray-600 animate-spin shadow-inner"></div>
-
         </div>
       )}
 
