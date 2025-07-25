@@ -1,7 +1,8 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://jaronski-erp-backend-production.up.railway.app';
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
+// Funkcja DELETE z poprawną sygnaturą
+export async function DELETE(_req: Request, context: { params: { id: string } }) {
+    const { id } = context.params; // Destrukturyzacja wewnątrz funkcji
     if (!id) {
         return new Response(JSON.stringify({ error: 'Missing transaction id' }), { status: 400 });
     }
@@ -24,8 +25,9 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     }
 }
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
+// Funkcja GET z poprawną sygnaturą
+export async function GET(_req: Request, context: { params: { id: string } }) {
+    const { id } = context.params; // Destrukturyzacja wewnątrz funkcji
     if (!id) {
         return new Response(JSON.stringify({ error: 'Missing transaction id' }), { status: 400 });
     }
@@ -46,4 +48,4 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
         const msg = e instanceof Error ? e.message : 'Unexpected error';
         return new Response(JSON.stringify({ error: msg }), { status: 500 });
     }
-} 
+}
