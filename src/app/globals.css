@@ -135,3 +135,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .react-select-container .react-select__single-value {
   color: #1f2937;
 }
+
+table th, table td {
+  box-sizing: border-box;
+}

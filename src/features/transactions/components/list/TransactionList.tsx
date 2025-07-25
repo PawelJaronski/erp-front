@@ -23,40 +23,33 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 
-  // 1. Użytkownik klika "Delete" w menu kontekstowym
   const handleDelete = (ids: string[]) => {
-    showConfirmation(ids); // Otwieramy modal z potwierdzeniem
+    showConfirmation(ids);
   };
 
-  // 2. Użytkownik klika "Delete" w modalu
   const handleConfirmedDelete = async () => {
     if (confirmState.transactionIds.length === 0) return;
     
-    startDeleting(); // Uruchamiamy animację "kręciołka" na przycisku
+    startDeleting();
 
     try {
-      // Wywołujemy naszą funkcję API
       await deleteTransactions(confirmState.transactionIds);
       
-      // Pokazujemy pozytywny komunikat
       showToast(
         `Successfully deleted ${confirmState.transactionCount} transaction${confirmState.transactionCount !== 1 ? 's' : ''}`,
         'success'
       );
       
-      // Kluczowe: Mówimy React Query, aby odświeżył wszystkie dane związane z transakcjami.
-      // Nie musimy ręcznie usuwać wierszy, dane odświeżą się same!
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['transactions-sum'] });
       queryClient.invalidateQueries({ queryKey: ['account-balances'] });
       
-      // Sprzątanie po operacji
       clearSelection();
       hideConfirmation();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to delete transactions';
       showToast(message, 'error');
-      hideConfirmation(); // Ukryj modal nawet jeśli jest błąd
+      hideConfirmation();
     }
   };
   
@@ -72,7 +65,7 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
     );
   }
 
-  if (!isFetching && !transactions.length) {
+  if (!isFetching && transactions.length === 0) {
     return (
       <div className="border border-gray-200 rounded-lg p-8 text-center">
         <p className="text-gray-500">No transactions found</p>
@@ -82,29 +75,32 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
 
   return (
     <div className="relative">
-      {/*hasSelection && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center justify-between">
-          <span className="text-blue-700 font-medium">{selectedCount} transaction{selectedCount !== 1 ? 's' : ''} selected</span>
-          <button onClick={clearSelection} className="text-blue-600 hover:text-blue-800 text-sm">Clear selection</button>
-        </div>
-      )*/}
-
-      <div className={`overflow-x-auto transition-opacity duration-300 ${isFetching ? 'opacity-40' : 'opacity-100'}`}>
-        <table className="min-w-full divide-y divide-gray-200">
+      <div className="overflow-x-auto">
+        <table className="w-full divide-y divide-gray-200 table-fixed" style={{tableLayout: 'fixed'}}>
             <thead className="bg-gray-50">
                 <tr>
-                    <th scope="col" className="px-3 py-3"><input type="checkbox" checked={hasSelection && selectedCount === transactions.length} onChange={handleSelectAll} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"/></th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Date</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 tracking-wider">Gross</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 tracking-wider">Net</th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 tracking-wider">VAT</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Category Group</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Category</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Account</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider">Business Reference</th>
+                    <th scope="col" className="p-0" style={{width: '40px'}}>
+                        <input 
+                            type="checkbox" 
+                            checked={hasSelection && selectedCount === transactions.length && transactions.length > 0} 
+                            onChange={handleSelectAll} 
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            disabled={transactions.length === 0}
+                        />
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '110px'}}>Date</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '90px'}}>Gross</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '90px'}}>Net</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '90px'}}>VAT</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '160px'}}>Category Group</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '130px'}}>Category</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '130px'}}>Account</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider" style={{width: '130px'}}>Business Reference</th>
                 </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className={`bg-white divide-y divide-gray-200 transition-opacity duration-300 ${
+                isFetching ? 'opacity-40' : 'opacity-100'
+            }`}>
                 {transactions.map((transaction) => (
                   <TransactionRow
                     key={transaction.id}
@@ -120,11 +116,23 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
         </table>
       </div>
 
-      {isFetching && (<div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div></div>)}
-
-      <ContextMenu isVisible={contextMenu.isVisible} x={contextMenu.x} y={contextMenu.y} targetRowIds={contextMenu.targetRowIds} onClose={hideContextMenu} onDelete={handleDelete} onEditAccount={handleEditAccount}/>
+      <ContextMenu 
+        isVisible={contextMenu.isVisible} 
+        x={contextMenu.x} 
+        y={contextMenu.y} 
+        targetRowIds={contextMenu.targetRowIds} 
+        onClose={hideContextMenu} 
+        onDelete={handleDelete} 
+        onEditAccount={handleEditAccount}
+      />
       
-      <DeleteConfirmationModal isOpen={confirmState.isOpen} transactionCount={confirmState.transactionCount} onConfirm={handleConfirmedDelete} onCancel={hideConfirmation} isDeleting={confirmState.isDeleting}/>
+      <DeleteConfirmationModal 
+        isOpen={confirmState.isOpen} 
+        transactionCount={confirmState.transactionCount} 
+        onConfirm={handleConfirmedDelete} 
+        onCancel={hideConfirmation} 
+        isDeleting={confirmState.isDeleting}
+      />
     </div>
   );
 }

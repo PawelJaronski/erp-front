@@ -4,7 +4,7 @@ import { TransactionItem } from '@/features/transactions/types';
 interface TransactionRowProps {
   transaction: TransactionItem;
   isSelected: boolean;
-  isActive?: boolean; // Dodaj ten prop
+  isActive?: boolean;
   onSelect: (id: string) => void;
   onContextMenu: (e: React.MouseEvent, id: string) => void;
   onDoubleClick: (id: string) => void;
@@ -13,14 +13,13 @@ interface TransactionRowProps {
 export function TransactionRow({
   transaction,
   isSelected,
-  isActive = false, // domyślnie false
+  isActive = false,
   onSelect,
   onContextMenu,
   onDoubleClick
 }: TransactionRowProps) {
   const handleRowClick = (e: React.MouseEvent) => {
-    // Usuwamy zaznaczanie po kliknięciu w wiersz
-    // (zostawiamy tylko obsługę w checkboxie)
+    // Empty - only checkbox handles selection
   };
 
   const handleDoubleClick = () => {
@@ -38,60 +37,52 @@ export function TransactionRow({
           ? 'bg-blue-50 hover:bg-blue-100'
           : 'hover:bg-gray-50'
       }`}
-      onClick={handleRowClick} // <- można usunąć ten props, bo funkcja jest pusta
+      onClick={handleRowClick}
       onContextMenu={(e) => onContextMenu(e, transaction.id)}
       onDoubleClick={handleDoubleClick}
     >
       {/* Checkbox column */}
-      <td className="px-3 py-4 whitespace-nowrap">
+      <td className="p-0 text-center" style={{width: '40px', padding: 0}}>
         <input
           type="checkbox"
           checked={isSelected}
           onChange={handleCheckboxChange}
           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          onClick={(e) => e.stopPropagation()} // Prevent row click
+          onClick={(e) => e.stopPropagation()}
         />
       </td>
-      
       {/* Date */}
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         {new Date(transaction.business_timestamp).toLocaleDateString()}
       </td>
-      
       {/* Gross Amount */}
-      <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${
+      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
         (transaction.gross_amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'
       }`}>
         {transaction.gross_amount?.toFixed(2)}
       </td>
-      
       {/* Net Amount */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         {transaction.net_amount?.toFixed(2)}
       </td>
-      
       {/* VAT Amount */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         {transaction.vat_amount?.toFixed(2)}
       </td>
-      
       {/* Category Group */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 break-all">
         {transaction.category_group}
       </td>
-      
       {/* Category */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 break-all">
         {transaction.category}
       </td>
-      
       {/* Account */}
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         {transaction.account}
       </td>
-      
       {/* Business Reference */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 break-all max-w-[130px]">
         {transaction.business_reference}
       </td>
     </tr>
