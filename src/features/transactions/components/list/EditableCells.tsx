@@ -1,6 +1,8 @@
 import React from 'react';
 import { AccountSelect, CategoryGroupSelect, CategorySelect } from '@/features/transactions/components';
 import { DateInput } from '@/shared/components/form/DateInput';
+import { StylesConfig, GroupBase } from 'react-select';
+import { CategoryData } from '@/features/transactions/utils/staticData';
 
 interface EditableTextCellProps {
   value: string;
@@ -33,12 +35,17 @@ export function EditableTextCell({
   );
 }
 
+interface Option {
+  value: string;
+  label: string;
+}
+
 interface EditableSelectCellProps {
   value: string;
   onChange: (value: string) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
   type: 'account' | 'category_group' | 'category';
-  availableCategories?: any[];
+  availableCategories?: readonly CategoryData[];
   error?: boolean;
 }
 
@@ -57,20 +64,25 @@ export function EditableSelectCell({
     }
   };
 
+  // Define proper styles for react-select
+  const selectStyles: StylesConfig<Option, false, GroupBase<Option>> = {
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    control: (base) => ({
+      ...base,
+      minHeight: '32px',
+      height: '32px',
+      fontSize: '14px',
+      borderColor: error ? '#ef4444' : base.borderColor,
+      backgroundColor: error ? '#fef2f2' : base.backgroundColor,
+    })
+  };
+
   const selectProps = {
     value,
     onChange,
     className: error ? 'border-red-500' : '',
     menuPortalTarget: typeof document !== 'undefined' ? document.body : null,
-    styles: {
-      menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-      control: (base: any) => ({
-        ...base,
-        minHeight: '32px',
-        height: '32px',
-        fontSize: '14px'
-      })
-    }
+    styles: selectStyles
   };
 
   return (
