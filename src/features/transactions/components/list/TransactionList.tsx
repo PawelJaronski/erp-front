@@ -4,9 +4,6 @@ import { TransactionRow } from './TransactionRow';
 import { ContextMenu } from './ContextMenu';
 import { useTransactionSelection } from '@/features/transactions/hooks/useTransactionSelection';
 import { useContextMenu } from '@/features/transactions/hooks/useContextMenu';
-import { deleteTransactions } from '@/features/transactions/api';
-import { useDeleteConfirmation } from '@/features/transactions/hooks/useDeleteConfirmation';
-import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/shared/components/ToastProvider';
 
@@ -32,38 +29,6 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
     hideContextMenu
   } = useContextMenu();
 
-  const { confirmState, showConfirmation, hideConfirmation } = useDeleteConfirmation();
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-
-  // Handle delete action
-  const handleDelete = async (ids: string[]) => {
-    showConfirmation(ids);
-  };
-
-  const handleConfirmedDelete = async () => {
-    if (confirmState.transactionIds.length === 0) return;
-    try {
-      await deleteTransactions(confirmState.transactionIds);
-      
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['account-balances'] });
-      queryClient.invalidateQueries({ queryKey: ['transactions-summary'] });
-
-      showToast(
-        `Successfully deleted ${confirmState.transactionCount} transaction${confirmState.transactionCount !== 1 ? 's' : ''}`,
-        'success'
-      );
-      
-      clearSelection();
-      hideConfirmation();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to delete transactions';
-      showToast(message, 'error');
-    } finally {
-      hideConfirmation();
-    }
-  };
   // Handle edit account action  
   const handleEditAccount = (id: string) => {
     // TODO: Implement bulk account edit
@@ -189,16 +154,7 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
         y={contextMenu.y}
         targetRowIds={contextMenu.targetRowIds}
         onClose={hideContextMenu}
-        onDelete={handleDelete}
         onEditAccount={handleEditAccount}
-      />
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        isOpen={confirmState.isOpen}
-        transactionCount={confirmState.transactionCount}
-        onConfirm={handleConfirmedDelete}
-        onCancel={hideConfirmation}
-        isDeleting={confirmState.isDeleting}
       />
     </div>
   );
