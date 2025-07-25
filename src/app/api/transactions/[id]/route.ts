@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://jaronski-erp-backend-production.up.railway.app';
 
-// Używamy globalnego typu `Request` i destrukturyzacji drugiego argumentu, co jest
-// standardowym wzorcem dla dynamicznych Route Handlerów w Next.js 13+
+// Standardowy wzorzec dla dynamicznych Route Handlerów w Next.js 14 (App Router)
 export async function GET(req: Request, { params }: { params: { id: string } }) {
     const { id } = params;
     if (!id) {
@@ -15,9 +14,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     try {
         const res = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
         });
         const text = await res.text();
         return new Response(text, {
@@ -41,9 +38,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     try {
         const res = await fetch(url, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
         });
         const text = await res.text();
         return new Response(text, {
