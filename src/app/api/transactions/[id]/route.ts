@@ -1,10 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server';
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://jaronski-erp-backend-production.up.railway.app';
 
-// Funkcja DELETE z poprawną sygnaturą
-export async function DELETE(_req: Request, context: { params: { id: string } }) {
-    const { id } = context.params; // Destrukturyzacja wewnątrz funkcji
+export async function DELETE(_req: NextRequest, context: { params: { id: string } }) {
+    const { id } = context.params;
     if (!id) {
-        return new Response(JSON.stringify({ error: 'Missing transaction id' }), { status: 400 });
+        return NextResponse.json({ error: 'Missing transaction id' }, { status: 400 });
     }
     const url = `${API_BASE}/transactions/${id}`;
     try {
@@ -15,21 +16,21 @@ export async function DELETE(_req: Request, context: { params: { id: string } })
             },
         });
         const text = await res.text();
+        // Zwracamy odpowiedź w formacie, którego oczekuje Next.js
         return new Response(text, {
             status: res.status,
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : 'Unexpected error';
-        return new Response(JSON.stringify({ error: msg }), { status: 500 });
+        return NextResponse.json({ error: msg }, { status: 500 });
     }
 }
 
-// Funkcja GET z poprawną sygnaturą
-export async function GET(_req: Request, context: { params: { id: string } }) {
-    const { id } = context.params; // Destrukturyzacja wewnątrz funkcji
+export async function GET(_req: NextRequest, context: { params: { id: string } }) {
+    const { id } = context.params;
     if (!id) {
-        return new Response(JSON.stringify({ error: 'Missing transaction id' }), { status: 400 });
+        return NextResponse.json({ error: 'Missing transaction id' }, { status: 400 });
     }
     const url = `${API_BASE}/transactions/${id}`;
     try {
@@ -40,12 +41,12 @@ export async function GET(_req: Request, context: { params: { id: string } }) {
             },
         });
         const text = await res.text();
+        // Zwracamy odpowiedź w formacie, którego oczekuje Next.js
         return new Response(text, {
             status: res.status,
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : 'Unexpected error';
-        return new Response(JSON.stringify({ error: msg }), { status: 500 });
+        return NextResponse.json({ error: msg }, { status: 500 });
     }
-}
