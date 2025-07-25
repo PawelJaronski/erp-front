@@ -174,37 +174,15 @@ export function useRowEditor(transaction: TransactionItem) {
         updatePayload.business_reference = editedData.business_reference;
       }
   
-      const response = await updateTransaction(transaction.id, updatePayload);
+      await updateTransaction(transaction.id, updatePayload);
       
-      // Optimistically update the cache with the new data
-      queryClient.setQueryData<any>(['transactions'], (oldData: any) => {
-        if (!oldData) return oldData;
-        
-        return {
-          ...oldData,
-          transactions: oldData.transactions.map((t: TransactionItem) => 
-            t.id === transaction.id 
-              ? {
-                  ...t,
-                  event_type: editedData.event_type,
-                  category_group: editedData.category_group,
-                  category: editedData.category,
-                  account: editedData.account,
-                  gross_amount: parseFloat(editedData.gross_amount) || 0,
-                  net_amount: parseFloat(editedData.net_amount) || null,
-                  vat_amount: parseFloat(editedData.vat_amount) || null,
-                  business_timestamp: `${editedData.business_timestamp}T12:00:00Z`,
-                  business_reference: editedData.business_reference || null,
-                }
-              : t
-          )
-        };
+      // Get all transaction-related queries and invalidate them
+      await queryClient.invalidateQueries({ 
+        queryKey: ['transactions'],
+        exact: false // This will invalidate all queries that start with ['transactions']
       });
-      
-      // Also invalidate to ensure fresh data
-      queryClient.invalidateQueries({ queryKey: ['transactions'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['transactions-sum'] });
-      queryClient.invalidateQueries({ queryKey: ['account-balances'] });
+      await queryClient.invalidateQueries({ queryKey: ['transactions-sum'] });
+      await queryClient.invalidateQueries({ queryKey: ['account-balances'] });
       
       showToast('Transaction updated successfully', 'success');
       setIsEditing(false);
@@ -214,7 +192,10 @@ export function useRowEditor(transaction: TransactionItem) {
       showToast(message, 'error');
       
       // Invalidate on error to refresh data
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ 
+        queryKey: ['transactions'],
+        exact: false
+      });
     } finally {
       setIsSubmitting(false);
     }
