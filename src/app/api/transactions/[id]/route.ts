@@ -50,3 +50,4 @@ export async function GET(_req: NextRequest, context: { params: { id: string } }
         const msg = e instanceof Error ? e.message : 'Unexpected error';
         return NextResponse.json({ error: msg }, { status: 500 });
     }
+}
