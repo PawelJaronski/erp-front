@@ -59,3 +59,29 @@ export async function fetchTransactions(filters: TransactionFilters): Promise<Tr
 
   return response.json()
 }
+
+export async function deleteTransaction(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/transactions/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!res.ok) {
+    let msg = 'Failed to delete transaction';
+    try {
+      // Próbujemy odczytać JSON z błędem, jeśli jest
+      const errorData = await res.json();
+      msg = errorData.error || msg;
+    } catch {
+      // Jeśli odpowiedź błędu nie jest JSON-em, używamy statusu
+      msg = `Error: ${res.status} ${res.statusText}`;
+    }
+    throw new Error(msg);
+  }
+  // Dla statusu 204 (sukces) nie ma body, więc nic nie zwracamy
+}
+
+export async function deleteTransactions(ids: string[]): Promise<void> {
+  // Wykonujemy wszystkie operacje usuwania równolegle
+  const deletePromises = ids.map(id => deleteTransaction(id));
+  await Promise.all(deletePromises);
+}
