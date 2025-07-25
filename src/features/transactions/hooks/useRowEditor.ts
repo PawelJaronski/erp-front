@@ -22,10 +22,13 @@ interface ValidationErrors {
 }
 
 export function useRowEditor(transaction: TransactionItem) {
+    console.log('useRowEditor initialized for transaction:', transaction.id, transaction);
+
+    
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [editedData, setEditedData] = useState<EditedData>({
     event_type: transaction.event_type,
     category_group: transaction.category_group,
@@ -87,11 +90,11 @@ export function useRowEditor(transaction: TransactionItem) {
   }, [validateField]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    e.stopPropagation();
 
     switch (e.key) {
       case 'Tab':
         e.preventDefault();
+        e.stopPropagation();
         if (e.shiftKey) {
           setCurrentFieldIndex(prev => Math.max(0, prev - 1));
         } else {
@@ -101,11 +104,13 @@ export function useRowEditor(transaction: TransactionItem) {
       
       case 'Enter':
         e.preventDefault();
+        e.stopPropagation();
         handleSave();
         break;
       
       case 'Escape':
         e.preventDefault();
+        e.stopPropagation();
         handleCancel();
         break;
     }
@@ -130,12 +135,12 @@ export function useRowEditor(transaction: TransactionItem) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
-
+  
     if (!hasChanges()) {
       setIsEditing(false);
       return;
     }
-
+  
     setIsSubmitting(true);
     try {
       const updatePayload: TransactionUpdateData = {};
@@ -168,11 +173,36 @@ export function useRowEditor(transaction: TransactionItem) {
       if (editedData.business_reference !== (transaction.business_reference || '')) {
         updatePayload.business_reference = editedData.business_reference;
       }
-
-      await updateTransaction(transaction.id, updatePayload);
+  
+      const response = await updateTransaction(transaction.id, updatePayload);
       
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      // Optimistically update the cache with the new data
+      queryClient.setQueryData<any>(['transactions'], (oldData: any) => {
+        if (!oldData) return oldData;
+        
+        return {
+          ...oldData,
+          transactions: oldData.transactions.map((t: TransactionItem) => 
+            t.id === transaction.id 
+              ? {
+                  ...t,
+                  event_type: editedData.event_type,
+                  category_group: editedData.category_group,
+                  category: editedData.category,
+                  account: editedData.account,
+                  gross_amount: parseFloat(editedData.gross_amount) || 0,
+                  net_amount: parseFloat(editedData.net_amount) || null,
+                  vat_amount: parseFloat(editedData.vat_amount) || null,
+                  business_timestamp: `${editedData.business_timestamp}T12:00:00Z`,
+                  business_reference: editedData.business_reference || null,
+                }
+              : t
+          )
+        };
+      });
+      
+      // Also invalidate to ensure fresh data
+      queryClient.invalidateQueries({ queryKey: ['transactions'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['transactions-sum'] });
       queryClient.invalidateQueries({ queryKey: ['account-balances'] });
       
@@ -182,6 +212,9 @@ export function useRowEditor(transaction: TransactionItem) {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to update transaction';
       showToast(message, 'error');
+      
+      // Invalidate on error to refresh data
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
     } finally {
       setIsSubmitting(false);
     }
@@ -205,10 +238,7 @@ export function useRowEditor(transaction: TransactionItem) {
     setIsEditing(false);
   }, [transaction]);
 
-  const startEditing = useCallback(() => {
-    setIsEditing(true);
-    setCurrentFieldIndex(0);
-  }, []);
+
 
   return {
     isEditing,
@@ -221,7 +251,6 @@ export function useRowEditor(transaction: TransactionItem) {
     handleKeyDown,
     handleSave,
     handleCancel,
-    startEditing,
     hasChanges: hasChanges()
   };
 }

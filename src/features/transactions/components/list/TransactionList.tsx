@@ -67,12 +67,17 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
   };
 
   const handleDoubleClick = (id: string) => {
+    console.log('Double click on transaction:', id);
+    console.log('Current editing row:', editingRowId);
+    console.log('Available transactions:', transactions.map(t => t.id));
+    
     // Cancel any other operations
     clearSelection();
     hideContextMenu();
     
     // Start editing this row
     setEditingRowId(id);
+    console.log('Set editing row to:', id);
   };
 
   const handleSelectAll = () => hasSelection ? clearSelection() : selectAll(transactions.map(t => t.id));
@@ -143,30 +148,36 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
             }`}>
                 {transactions.map((transaction) => {
                   const isEditing = editingRowId === transaction.id;
-                  
-                  return isEditing ? (
-                    <EditableTransactionRow
-                      key={transaction.id}
-                      transaction={transaction}
-                      isSelected={selectedRows.has(transaction.id)}
-                      isActive={contextMenu.isVisible && contextMenu.targetRowIds.includes(transaction.id)}
-                      onSelect={handleSelection}
-                      onContextMenu={handleContextMenu}
-                      onCancelEdit={handleCancelEdit}
-                    />
-                  ) : (
-                    <TransactionRow
-                      key={transaction.id}
-                      transaction={transaction}
-                      isSelected={selectedRows.has(transaction.id)}
-                      isActive={contextMenu.isVisible && contextMenu.targetRowIds.includes(transaction.id)}
-                      isEditing={isEditing}
-                      onSelect={handleSelection}
-                      onContextMenu={handleContextMenu}
-                      onDoubleClick={handleDoubleClick}
-                    />
-                  );
-                })}
+                  const isSelected = selectedRows.has(transaction.id);
+                  const isActive = contextMenu.isVisible && contextMenu.targetRowIds.includes(transaction.id);
+  
+  if (isEditing) {
+    return (
+      <EditableTransactionRow
+        key={`edit-${transaction.id}`}  // Different key for editing mode
+        transaction={transaction}
+        isSelected={isSelected}
+        isActive={isActive}
+        onSelect={handleSelection}
+        onContextMenu={handleContextMenu}
+        onCancelEdit={handleCancelEdit}
+      />
+    );
+  }
+  
+  return (
+    <TransactionRow
+      key={`display-${transaction.id}`}  // Different key for display mode
+      transaction={transaction}
+      isSelected={isSelected}
+      isActive={isActive}
+      isEditing={false}
+      onSelect={handleSelection}
+      onContextMenu={handleContextMenu}
+      onDoubleClick={handleDoubleClick}
+    />
+  );
+})}
             </tbody>
         </table>
       </div>

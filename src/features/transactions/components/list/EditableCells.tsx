@@ -14,26 +14,34 @@ interface EditableTextCellProps {
 }
 
 export function EditableTextCell({ 
-  value, 
-  onChange, 
-  onKeyDown, 
-  error, 
-  type = 'text',
-  className = '' 
-}: EditableTextCellProps) {
-  return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      onKeyDown={onKeyDown}
-      className={`w-full px-2 py-1 border rounded ${
-        error ? 'border-red-500 bg-red-50' : 'border-gray-300'
-      } focus:outline-none focus:border-blue-500 ${className}`}
-      autoFocus={type === 'text'}
-    />
-  );
-}
+    value, 
+    onChange, 
+    onKeyDown, 
+    error, 
+    type = 'text',
+    className = '' 
+  }: EditableTextCellProps) {
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === 'Tab' || e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        onKeyDown(e);
+      }
+    };
+  
+    return (
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        className={`w-full px-2 py-1 border rounded ${
+          error ? 'border-red-500 bg-red-50' : 'border-gray-300'
+        } focus:outline-none focus:border-blue-500 ${className}`}
+        autoFocus={type === 'text'}
+      />
+    );
+  }
 
 interface Option {
   value: string;
@@ -57,55 +65,68 @@ export function EditableSelectCell({
   availableCategories,
   error 
 }: EditableSelectCellProps) {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Let react-select handle its own keyboard navigation
-    if (e.key === 'Tab' || e.key === 'Enter' || e.key === 'Escape') {
-      onKeyDown(e);
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        // Handle special keys
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
+          onKeyDown(e); // This will trigger save
+          return;
+        }
+        
+        if (e.key === 'Tab' || e.key === 'Escape') {
+          e.preventDefault();
+          e.stopPropagation();
+          onKeyDown(e);
+          return;
+        }
+        
+        // Let react-select handle other keys normally
+      };
+    
+      // Define proper styles for react-select
+      const selectStyles: StylesConfig<Option, false, GroupBase<Option>> = {
+        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+        control: (base) => ({
+          ...base,
+          minHeight: '32px',
+          height: '32px',
+          fontSize: '14px',
+          borderColor: error ? '#ef4444' : base.borderColor,
+          backgroundColor: error ? '#fef2f2' : base.backgroundColor,
+        })
+      };
+    
+      const selectProps = {
+        value,
+        onChange,
+        className: error ? 'border-red-500' : '',
+        menuPortalTarget: typeof document !== 'undefined' ? document.body : null,
+        styles: selectStyles,
+        onKeyDown: handleKeyDown // Add this to handle keyboard events
+      };
+    
+      return (
+        <div>
+          {type === 'account' && (
+            <AccountSelect {...selectProps} />
+          )}
+          {type === 'category_group' && (
+            <CategoryGroupSelect 
+              {...selectProps} 
+              onCustomValueChange={() => {}} 
+            />
+          )}
+          {type === 'category' && (
+            <CategorySelect 
+              {...selectProps} 
+              availableCategories={availableCategories || []} 
+              onCustomValueChange={() => {}} 
+            />
+          )}
+        </div>
+      );
     }
-  };
-
-  // Define proper styles for react-select
-  const selectStyles: StylesConfig<Option, false, GroupBase<Option>> = {
-    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    control: (base) => ({
-      ...base,
-      minHeight: '32px',
-      height: '32px',
-      fontSize: '14px',
-      borderColor: error ? '#ef4444' : base.borderColor,
-      backgroundColor: error ? '#fef2f2' : base.backgroundColor,
-    })
-  };
-
-  const selectProps = {
-    value,
-    onChange,
-    className: error ? 'border-red-500' : '',
-    menuPortalTarget: typeof document !== 'undefined' ? document.body : null,
-    styles: selectStyles
-  };
-
-  return (
-    <div onKeyDown={handleKeyDown}>
-      {type === 'account' && (
-        <AccountSelect {...selectProps} />
-      )}
-      {type === 'category_group' && (
-        <CategoryGroupSelect 
-          {...selectProps} 
-          onCustomValueChange={() => {}} 
-        />
-      )}
-      {type === 'category' && (
-        <CategorySelect 
-          {...selectProps} 
-          availableCategories={availableCategories || []} 
-          onCustomValueChange={() => {}} 
-        />
-      )}
-    </div>
-  );
-}
 
 interface EditableDateCellProps {
   value: string;

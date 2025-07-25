@@ -20,6 +20,8 @@ export function EditableTransactionRow({
   onContextMenu,
   onCancelEdit
 }: EditableTransactionRowProps) {
+    console.log('EditableTransactionRow rendered for transaction:', transaction.id, transaction);
+
   const {
     isEditing,
     editedData,

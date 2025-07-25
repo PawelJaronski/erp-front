@@ -1,4 +1,4 @@
-import type { TransactionRequest } from '@/features/transactions/types';
+import type { TransactionItem, TransactionRequest } from '@/features/transactions/types';
 import { TransactionFilters, TransactionListResponse } from '@/features/transactions/types';
 
 // In browser we hit our own Next.js proxy to avoid CORS; on server we can call backend directly
@@ -98,7 +98,12 @@ export interface TransactionUpdateData {
   business_reference?: string;
 }
 
-export async function updateTransaction(id: string, data: TransactionUpdateData): Promise<void> {
+export interface TransactionUpdateResponse {
+  message: string;
+  transaction?: TransactionItem;
+}
+
+export async function updateTransaction(id: string, data: TransactionUpdateData): Promise<TransactionUpdateResponse> {
   const res = await fetch(`${API_BASE}/transactions/${id}`, {
     method: 'PATCH',
     headers: {
@@ -117,4 +122,7 @@ export async function updateTransaction(id: string, data: TransactionUpdateData)
     }
     throw new Error(msg);
   }
+
+  return res.json();
 }
+

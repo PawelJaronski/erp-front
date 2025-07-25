@@ -25,7 +25,10 @@ export function TransactionRow({
     // Empty - only checkbox handles selection
   };
 
-  const handleDoubleClick = () => {
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('TransactionRow handleDoubleClick called for:', transaction.id);
     if (!isEditing) {
       onDoubleClick(transaction.id);
     }
