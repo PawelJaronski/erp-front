@@ -6,6 +6,7 @@ interface ContextMenuProps {
     y: number;
     targetRowIds: string[];
     onClose: () => void;
+    onDelete: (ids: string[]) => void;
     onEditAccount: (id: string) => void;
 }
 
@@ -15,12 +16,16 @@ export function ContextMenu({
     y, 
     targetRowIds, 
     onClose, 
+    onDelete, 
     onEditAccount 
 }: ContextMenuProps) {
     if (!isVisible) return null;
-
     const isMultipleSelection = targetRowIds.length > 1;
 
+    const handleDelete = () => {
+        onDelete(targetRowIds);
+        onClose();
+    };
     const handleEditAccount = () => {
         onEditAccount(targetRowIds[0]);
         onClose();
@@ -32,15 +37,13 @@ export function ContextMenu({
             style={{ left: x, top: y }}
             onClick={(e) => e.stopPropagation()}
         >
-            <button
-                onClick={handleEditAccount}
-                className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center"
-            >
+            <button onClick={handleEditAccount} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center">
                 <span>Edit Account{isMultipleSelection ? ` (${targetRowIds.length})` : ''}</span>
-                </button>
-
-               
-
-            </div>
+            </button>
+            <div className="border-t border-gray-100 my-1" />
+            <button onClick={handleDelete} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center">
+                <span>Delete{isMultipleSelection ? ` (${targetRowIds.length})` : ''}</span>
+            </button>
+        </div>
     );
 }
