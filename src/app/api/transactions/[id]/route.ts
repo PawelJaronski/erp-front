@@ -32,6 +32,7 @@ export async function DELETE(req: NextRequest, context: any) {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function PATCH(req: NextRequest, context: any) {
     const { id } = context.params;
 
