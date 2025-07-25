@@ -85,3 +85,36 @@ export async function deleteTransactions(ids: string[]): Promise<void> {
   const deletePromises = ids.map(id => deleteTransaction(id));
   await Promise.all(deletePromises);
 }
+
+export interface TransactionUpdateData {
+  event_type?: string;
+  category_group?: string;
+  category?: string;
+  account?: string;
+  gross_amount?: number;
+  net_amount?: number;
+  vat_amount?: number;
+  business_timestamp?: string;
+  business_reference?: string;
+}
+
+export async function updateTransaction(id: string, data: TransactionUpdateData): Promise<void> {
+  const res = await fetch(`${API_BASE}/transactions/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    let msg = 'Failed to update transaction';
+    try {
+      const errorData = await res.json();
+      msg = errorData.error || errorData.detail || msg;
+    } catch {
+      msg = `Error: ${res.status} ${res.statusText}`;
+    }
+    throw new Error(msg);
+  }
+}
