@@ -19,11 +19,8 @@ export function TransactionRow({
   onDoubleClick
 }: TransactionRowProps) {
   const handleRowClick = (e: React.MouseEvent) => {
-    // Prevent selection when clicking checkbox
-    if ((e.target as HTMLInputElement).type === 'checkbox') {
-      return;
-    }
-    onSelect(transaction.id);
+    // Usuwamy zaznaczanie po kliknięciu w wiersz
+    // (zostawiamy tylko obsługę w checkboxie)
   };
 
   const handleDoubleClick = () => {
@@ -41,7 +38,7 @@ export function TransactionRow({
           ? 'bg-blue-50 hover:bg-blue-100'
           : 'hover:bg-gray-50'
       }`}
-      onClick={handleRowClick}
+      onClick={handleRowClick} // <- można usunąć ten props, bo funkcja jest pusta
       onContextMenu={(e) => onContextMenu(e, transaction.id)}
       onDoubleClick={handleDoubleClick}
     >
