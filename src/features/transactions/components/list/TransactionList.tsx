@@ -116,6 +116,14 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
         </table>
       </div>
 
+      {isFetching && (
+        <div className="absolute top-4 right-4">
+
+          <div className="h-6 w-6 rounded-full border-2 border-gray-200 border-t-gray-600 animate-spin shadow-inner"></div>
+
+        </div>
+      )}
+
       <ContextMenu 
         isVisible={contextMenu.isVisible} 
         x={contextMenu.x} 
