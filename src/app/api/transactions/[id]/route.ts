@@ -5,7 +5,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://jaronski-erp-backe
 // WZORZEC SKLONOWANY Z `add-transaction` I ZASTOSOWANY TUTAJ:
 // 1. Używamy `NextRequest` z importu, a nie globalnego `Request`.
 // 2. Używamy `context` jako drugiego argumentu - to jest jedyna, konieczna różnica.
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, context: { params: { id: string } }) {
     // Pobieramy `id` z `context`, bo to trasa dynamiczna
     const { id } = context.params;
     
