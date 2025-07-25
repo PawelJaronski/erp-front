@@ -69,7 +69,7 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
   return (
     <div className="relative">
       {/* Selection info bar */}
-      {hasSelection && (
+      {/*hasSelection && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 flex items-center justify-between">
           <span className="text-blue-700 font-medium">
             {selectedCount} transaction{selectedCount !== 1 ? 's' : ''} selected
