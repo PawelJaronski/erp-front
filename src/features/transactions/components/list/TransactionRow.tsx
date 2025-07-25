@@ -4,6 +4,7 @@ import { TransactionItem } from '@/features/transactions/types';
 interface TransactionRowProps {
   transaction: TransactionItem;
   isSelected: boolean;
+  isActive?: boolean; // Dodaj ten prop
   onSelect: (id: string) => void;
   onContextMenu: (e: React.MouseEvent, id: string) => void;
   onDoubleClick: (id: string) => void;
@@ -12,6 +13,7 @@ interface TransactionRowProps {
 export function TransactionRow({
   transaction,
   isSelected,
+  isActive = false, // domyślnie false
   onSelect,
   onContextMenu,
   onDoubleClick
@@ -33,8 +35,12 @@ export function TransactionRow({
   };
 
   return (
-    <tr 
-      className={`hover:bg-gray-50 cursor-pointer ${isSelected ? 'bg-blue-50' : ''}`}
+    <tr
+      className={`cursor-pointer ${
+        isActive || isSelected
+          ? 'bg-blue-50 hover:bg-blue-100'
+          : 'hover:bg-gray-50'
+      }`}
       onClick={handleRowClick}
       onContextMenu={(e) => onContextMenu(e, transaction.id)}
       onDoubleClick={handleDoubleClick}

@@ -106,7 +106,15 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
                 {transactions.map((transaction) => (
-                  <TransactionRow key={transaction.id} transaction={transaction} isSelected={selectedRows.has(transaction.id)} onSelect={toggleSelection} onContextMenu={(e, id) => showContextMenu(e, id, selectedRows)} onDoubleClick={handleDoubleClick}/>
+                  <TransactionRow
+                    key={transaction.id}
+                    transaction={transaction}
+                    isSelected={selectedRows.has(transaction.id)}
+                    isActive={contextMenu.isVisible && contextMenu.targetRowIds.includes(transaction.id)}
+                    onSelect={toggleSelection}
+                    onContextMenu={(e, id) => showContextMenu(e, id, selectedRows)}
+                    onDoubleClick={handleDoubleClick}
+                  />
                 ))}
             </tbody>
         </table>
