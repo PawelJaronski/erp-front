@@ -1,4 +1,3 @@
-// Replace the entire file with this updated version
 import React from 'react';
 import { TransactionItem } from '@/features/transactions/types';
 
@@ -6,7 +5,6 @@ interface TransactionRowProps {
   transaction: TransactionItem;
   isSelected: boolean;
   isActive?: boolean;
-  isEditing?: boolean;
   onSelect: (id: string) => void;
   onContextMenu: (e: React.MouseEvent, id: string) => void;
   onDoubleClick: (id: string) => void;
@@ -16,34 +14,25 @@ export function TransactionRow({
   transaction,
   isSelected,
   isActive = false,
-  isEditing = false,
   onSelect,
   onContextMenu,
   onDoubleClick
 }: TransactionRowProps) {
   const handleRowClick = (e: React.MouseEvent) => {
-    // Empty - only checkbox handles selection
+    if ((e.target as HTMLInputElement).type !== 'checkbox') {
+      e.stopPropagation();
+    }
   };
 
   const handleDoubleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('TransactionRow handleDoubleClick called for:', transaction.id);
-    if (!isEditing) {
-      onDoubleClick(transaction.id);
-    }
+    onDoubleClick(transaction.id);
   };
 
   const handleCheckboxChange = () => {
-    if (!isEditing) {
-      onSelect(transaction.id);
-    }
+    onSelect(transaction.id);
   };
-
-  // Don't render display row if in editing mode
-  if (isEditing) {
-    return null;
-  }
 
   return (
     <tr
@@ -53,7 +42,7 @@ export function TransactionRow({
           : 'hover:bg-gray-50'
       }`}
       onClick={handleRowClick}
-      onContextMenu={(e) => !isEditing && onContextMenu(e, transaction.id)}
+      onContextMenu={(e) => onContextMenu(e, transaction.id)}
       onDoubleClick={handleDoubleClick}
     >
       {/* Checkbox column */}
@@ -64,7 +53,6 @@ export function TransactionRow({
           onChange={handleCheckboxChange}
           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           onClick={(e) => e.stopPropagation()}
-          disabled={isEditing}
         />
       </td>
       {/* Date */}

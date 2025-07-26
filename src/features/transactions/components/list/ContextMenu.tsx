@@ -7,7 +7,7 @@ interface ContextMenuProps {
     targetRowIds: string[];
     onClose: () => void;
     onDelete: (ids: string[]) => void;
-    onEditAccount: (id: string) => void;
+    onEdit: (id: string) => void;
 }
 
 export function ContextMenu({ 
@@ -17,18 +17,23 @@ export function ContextMenu({
     targetRowIds, 
     onClose, 
     onDelete, 
-    onEditAccount 
+    onEdit 
 }: ContextMenuProps) {
     if (!isVisible) return null;
+    
     const isMultipleSelection = targetRowIds.length > 1;
+    const isSingleSelection = targetRowIds.length === 1;
 
     const handleDelete = () => {
         onDelete(targetRowIds);
         onClose();
     };
-    const handleEditAccount = () => {
-        onEditAccount(targetRowIds[0]);
-        onClose();
+    
+    const handleEdit = () => {
+        if (isSingleSelection) {
+            onEdit(targetRowIds[0]);
+            onClose();
+        }
     };
 
     return (
@@ -37,11 +42,25 @@ export function ContextMenu({
             style={{ left: x, top: y }}
             onClick={(e) => e.stopPropagation()}
         >
-            <button onClick={handleEditAccount} className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center">
-                <span>Edit Account{isMultipleSelection ? ` (${targetRowIds.length})` : ''}</span>
+            <button 
+                onClick={handleEdit} 
+                disabled={!isSingleSelection}
+                className={`w-full px-4 py-2 text-left text-sm flex items-center ${
+                    isSingleSelection 
+                        ? 'hover:bg-gray-100 text-gray-900 cursor-pointer' 
+                        : 'text-gray-400 cursor-not-allowed'
+                }`}
+            >
+                <span>Edit</span>
+                {isMultipleSelection && (
+                    <span className="ml-2 text-xs text-gray-500">(select single row)</span>
+                )}
             </button>
             <div className="border-t border-gray-100 my-1" />
-            <button onClick={handleDelete} className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center">
+            <button 
+                onClick={handleDelete} 
+                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center cursor-pointer"
+            >
                 <span>Delete{isMultipleSelection ? ` (${targetRowIds.length})` : ''}</span>
             </button>
         </div>

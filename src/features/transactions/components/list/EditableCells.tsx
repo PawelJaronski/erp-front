@@ -1,3 +1,5 @@
+// Do wywalenia
+
 import React from 'react';
 import { AccountSelect, CategoryGroupSelect, CategorySelect } from '@/features/transactions/components';
 import { DateInput } from '@/shared/components/form/DateInput';

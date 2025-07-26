@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TransactionItem } from '@/features/transactions/types';
 import { TransactionRow } from './TransactionRow';
+import { TransactionEditModal } from '../TransactionEditModal';
 import { EditableTransactionRow } from './EditableTransactionRow';
 import { ContextMenu } from './ContextMenu';
 import { useTransactionSelection } from '@/features/transactions/hooks/useTransactionSelection';
@@ -25,12 +26,10 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
   const { confirmState, showConfirmation, hideConfirmation, startDeleting } = useDeleteConfirmation();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+  const [editModalTransaction, setEditModalTransaction] = useState<TransactionItem | null>(null);
+  const [selectionBeforeEdit, setSelectionBeforeEdit] = useState<Set<string>>(new Set());
 
   const handleDelete = (ids: string[]) => {
-    // Cancel editing if deleting the currently edited row
-    if (editingRowId && ids.includes(editingRowId)) {
-      setEditingRowId(null);
-    }
     showConfirmation(ids);
   };
 
@@ -60,46 +59,51 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
     }
   };
   
-  const handleEditAccount = (id: string) => {
-    // Cancel any current editing
-    setEditingRowId(null);
-    console.log('Edit account for transaction:', id);
+  const handleEdit = (id: string) => {
+    const transaction = transactions.find(t => t.id === id);
+    if (transaction) {
+      setSelectionBeforeEdit(new Set(selectedRows));
+      clearSelection();
+      setEditModalTransaction(transaction);
+    }
   };
 
   const handleDoubleClick = (id: string) => {
-    console.log('Double click on transaction:', id);
-    console.log('Current editing row:', editingRowId);
-    console.log('Available transactions:', transactions.map(t => t.id));
-    
-    // Cancel any other operations
-    clearSelection();
-    hideContextMenu();
-    
-    // Start editing this row
-    setEditingRowId(id);
-    console.log('Set editing row to:', id);
+    const transaction = transactions.find(t => t.id === id);
+    if (transaction) {
+      setSelectionBeforeEdit(new Set(selectedRows));
+      clearSelection();
+      setEditModalTransaction(transaction);
+    }
+  };
+
+  const handleModalCancel = () => {
+    setSelectedRows(selectionBeforeEdit);
+    setEditModalTransaction(null);
+    setSelectionBeforeEdit(new Set());
+  };
+
+  const handleModalSave = () => {
+    setEditModalTransaction(null);
+    setSelectionBeforeEdit(new Set());
   };
 
   const handleSelectAll = () => hasSelection ? clearSelection() : selectAll(transactions.map(t => t.id));
 
-  const handleCancelEdit = () => {
-    setEditingRowId(null);
-  };
-
   const handleContextMenu = (e: React.MouseEvent, id: string) => {
-    // Cancel editing when context menu is opened
-    if (editingRowId) {
-      setEditingRowId(null);
-    }
     showContextMenu(e, id, selectedRows);
   };
 
   const handleSelection = (id: string) => {
-    // Cancel editing when selecting rows
-    if (editingRowId) {
-      setEditingRowId(null);
-    }
     toggleSelection(id);
+  };
+
+  const setSelectedRows = (newSelection: Set<string>) => {
+    clearSelection();
+    if (newSelection.size > 0) {
+      const idsArray = Array.from(newSelection);
+      idsArray.forEach(id => toggleSelection(id));
+    }
   };
 
   if (error) {
@@ -151,27 +155,12 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
                   const isSelected = selectedRows.has(transaction.id);
                   const isActive = contextMenu.isVisible && contextMenu.targetRowIds.includes(transaction.id);
   
-  if (isEditing) {
-    return (
-      <EditableTransactionRow
-        key={`edit-${transaction.id}`}  // Different key for editing mode
-        transaction={transaction}
-        isSelected={isSelected}
-        isActive={isActive}
-        onSelect={handleSelection}
-        onContextMenu={handleContextMenu}
-        onCancelEdit={handleCancelEdit}
-      />
-    );
-  }
-  
   return (
     <TransactionRow
       key={`display-${transaction.id}`}  // Different key for display mode
       transaction={transaction}
       isSelected={isSelected}
       isActive={isActive}
-      isEditing={false}
       onSelect={handleSelection}
       onContextMenu={handleContextMenu}
       onDoubleClick={handleDoubleClick}
@@ -195,7 +184,7 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
         targetRowIds={contextMenu.targetRowIds} 
         onClose={hideContextMenu} 
         onDelete={handleDelete} 
-        onEditAccount={handleEditAccount}
+        onEdit={handleEdit}
       />
       
       <DeleteConfirmationModal 
@@ -204,6 +193,14 @@ export function TransactionList({ transactions, isFetching, error }: Transaction
         onConfirm={handleConfirmedDelete} 
         onCancel={hideConfirmation} 
         isDeleting={confirmState.isDeleting}
+      />
+
+      <TransactionEditModal
+        key={editModalTransaction?.id}
+        transaction={editModalTransaction}
+        isOpen={editModalTransaction !== null}
+        onClose={handleModalCancel}
+        onSave={handleModalSave}
       />
     </div>
   );

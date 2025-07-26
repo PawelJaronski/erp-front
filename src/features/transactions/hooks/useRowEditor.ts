@@ -1,3 +1,5 @@
+// Do wywalenia
+
 import { useState, useCallback, useEffect } from 'react';
 import { TransactionItem } from '@/features/transactions/types';
 import { updateTransaction, TransactionUpdateData } from '@/features/transactions/api';

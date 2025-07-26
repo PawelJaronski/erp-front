@@ -1,3 +1,5 @@
+// Do wywalenia
+
 import React, { useEffect, useRef } from 'react';
 import { TransactionItem } from '@/features/transactions/types';
 import { useRowEditor } from '@/features/transactions/hooks/useRowEditor';
