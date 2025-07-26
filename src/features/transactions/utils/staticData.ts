@@ -34,6 +34,11 @@ export const categoriesData = [
   // taxes
   { value: "vat", group: "taxes" },
   { value: "zus", group: "taxes" },
+
+  // other
+  { value: "paynow_payout", group: "payment_broker_transfer" },
+  { value: "autopay_payout", group: "payment_broker_transfer" },
+
 ] as const;
 
 export type CategoryGroupValue = typeof categoriesData[number]["group"];
