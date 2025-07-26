@@ -7,6 +7,7 @@ import { filterCategories } from '@/features/transactions/utils/categoryFilterin
 import { AccountSelect, CategoryGroupSelect, CategorySelect } from '@/features/transactions/components';
 import { DateInput } from '@/shared/components/form/DateInput';
 import { FormField } from '@/shared/components/form/FormField';
+import { ComboBox } from '@/shared/components/form/ComboBox';
 
 interface EditedData {
   event_type: string;
@@ -70,7 +71,23 @@ export function TransactionEditModal({ transaction, isOpen, onClose, onSave }: T
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  // Get available categories based on selected category group
+  // Custom ComboBox for modal with higher z-index
+  const ModalComboBox = ({ value, onChange, options, error, placeholder }: {
+    value: string;
+    onChange: (value: string) => void;
+    options: readonly { value: string; label: string }[];
+    error?: string;
+    placeholder?: string;
+  }) => (
+    <ComboBox
+      value={value}
+      onChange={onChange}
+      options={options}
+      error={error}
+      placeholder={placeholder}
+      className="modal-select"
+    />
+  );
   const availableCategories = filterCategories({
     categoryGroup: editedData.category_group,
     category: editedData.category,
@@ -201,7 +218,49 @@ export function TransactionEditModal({ transaction, isOpen, onClose, onSave }: T
     }
   };
 
-  // Handle escape key
+  // Handle body scroll lock and select z-index when modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Store original styles (actual style properties, not computed)
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyPaddingRight = document.body.style.paddingRight;
+    
+    // Calculate scrollbar width
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    // Lock scroll and add padding to prevent layout shift
+    document.body.style.overflow = 'hidden';
+    
+    // Only add padding if there was actually a scrollbar
+    if (scrollbarWidth > 0) {
+      const currentPadding = parseInt(originalBodyPaddingRight) || 0;
+      document.body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
+    }
+
+    // Add global style for react-select in modals
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      .react-select__menu {
+        z-index: 9999 !important;
+      }
+      .react-select__menu-portal {
+        z-index: 9999 !important;
+      }
+    `;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      // Restore exactly what was there before
+      document.body.style.overflow = originalBodyOverflow;
+      document.body.style.paddingRight = originalBodyPaddingRight;
+      
+      // Remove the style element
+      if (document.head.contains(styleElement)) {
+        document.head.removeChild(styleElement);
+      }
+    };
+  }, [isOpen]);
   useEffect(() => {
     if (!isOpen) return;
 
@@ -259,13 +318,15 @@ export function TransactionEditModal({ transaction, isOpen, onClose, onSave }: T
     <>
       {/* Modal Overlay */}
       <div 
-        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black/50 flex items-center justify-center"
+        style={{ zIndex: 50 }}
         onClick={handleClose}
       >
         <div
           ref={modalRef}
-          className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto relative"
           onClick={(e) => e.stopPropagation()}
+          style={{ zIndex: 60 }}
         >
           <h2 className="text-xl font-semibold mb-6 text-gray-800">
             Edit Transaction
@@ -383,7 +444,7 @@ export function TransactionEditModal({ transaction, isOpen, onClose, onSave }: T
 
       {/* Confirmation Dialog */}
       {showConfirmDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-60">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center" style={{ zIndex: 70 }}>
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-medium mb-4 text-gray-800">
               Unsaved Changes
