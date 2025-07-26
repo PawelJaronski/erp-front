@@ -53,6 +53,10 @@ export function TransactionEditModal({ transaction, isOpen, onClose, onSave }: T
       };
     }
     
+    // Debug log to see what we're getting
+    console.log('Modal initializing with transaction:', transaction);
+    console.log('Category group value:', transaction.category_group);
+    
     return {
       event_type: transaction.event_type,
       category_group: transaction.category_group,

@@ -56,6 +56,8 @@ export const categoryGroups = [
   { value: "cogs_printing", label: "cogs_printing" },
   { value: "cogs", label: "cogs" },
   { value: "opex", label: "opex" },
+  { value: "payment_broker_transfer", label: "payment_broker_transfer" },
+  { value: "shop_sales", label: "shop_sales" },
   { value: "taxes", label: "taxes" },
   { value: "other", label: "other" },
 ] as const; 
